@@ -9,11 +9,11 @@
 
   <!--Simple launch file   -->
   <node name="gazebo" pkg="gazebo_ros" type="gazebo" 
-   args="$(find wr_sim)/worlds/multi_robot_house.world" respawn="false" output="screen" />
+   args="$(find mrs_main)/worlds/multi_robot_house.world" respawn="false" output="screen" />
   <!-- <node name="map_server" pkg="map_server" type="map_server" args="$(find wr_sim)/map/house.yaml"/> -->
   <!-- start gui -->
   <!-- <node name="gazebo_gui" pkg="gazebo_ros" type="gui" respawn="false" output="screen"/> -->
 
   <!-- include our robots -->
-  <include file="$(find wr_sim)/launch/robots.launch"/>
+  <include file="$(find mrs_main)/launch/robots.launch"/>
 </launch>
