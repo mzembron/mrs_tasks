@@ -1,0 +1,19 @@
+<launch>
+  <param name="/use_sim_time" value="true" />
+
+  <!-- start world -->
+
+  <!-- Pal launch file -->
+  <!-- <node name="gazebo" pkg="gazebo_ros" type="gazebo" 
+   args="$(find gazebo_ros)/launch/empty_world.launch" respawn="false" output="screen" /> -->
+
+  <!--Simple launch file   -->
+  <node name="gazebo" pkg="gazebo_ros" type="gazebo" 
+   args="$(find wr_sim)/worlds/multi_robot_house.world" respawn="false" output="screen" />
+  <!-- <node name="map_server" pkg="map_server" type="map_server" args="$(find wr_sim)/map/house.yaml"/> -->
+  <!-- start gui -->
+  <!-- <node name="gazebo_gui" pkg="gazebo_ros" type="gui" respawn="false" output="screen"/> -->
+
+  <!-- include our robots -->
+  <include file="$(find wr_sim)/launch/robots.launch"/>
+</launch>

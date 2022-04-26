@@ -1,0 +1,43 @@
+<launch>
+  <!-- No namespace here as we will share this description. 
+       Access with slash at the beginning -->
+    <arg name="model" default="waffle_pi"/>
+  <param name="robot_description"
+    command="$(find xacro)/xacro --inorder $(find turtlebot3_description)/urdf/turtlebot3_$(arg model).urdf.xacro" />
+
+  <!-- BEGIN ROBOT 1-->
+  <group ns="robot1">
+    <param name="tf_prefix" value="robot1_tf" />
+    <include file="$(find wr_sim)/launch/one_robot.launch" >
+      <arg name="init_pose" value="-x 1 -y 1 -z 0" />
+      <arg name="robot_name"  value="Robot1" />
+    </include>
+  </group>
+
+  <!-- statyczna transformacja dla robota 1 -->
+<node pkg="tf" type="static_transform_publisher" name="robot1_odom_to_map" args="0 0 0 0 0 0  /map robot1_tf/odom 10" />
+  <!-- BEGIN ROBOT 2-->
+  <group ns="robot2">
+    <param name="tf_prefix" value="robot2_tf" />
+    <include file="$(find wr_sim)/launch/one_robot.launch" >
+      <arg name="init_pose" value="-x -1 -y 1 -z 0" />
+      <arg name="robot_name"  value="Robot2" />
+    </include>
+  </group>
+
+  <!-- statyczna transformacja dla robota 2 -->
+  <node pkg="tf" type="static_transform_publisher" name="robot2_odom_to_map" args="0 0 0 0 0 0  /map robot2_tf/odom 10" />
+
+    <!-- BEGIN ROBOT 3 -->
+  <!-- <group ns="robot3">
+    <param name="tf_prefix" value="robot3_tf" />
+    <include file="$(find wr_sim)/launch/one_robot.launch" >
+      <arg name="init_pose" value="-x -3 -y 1 -z 0" />
+      <arg name="robot_name"  value="Robot3" />
+    </include>
+  </group> -->
+
+  <!-- statyczna transformacja dla robota 3 -->
+  <!-- <node pkg="tf" type="static_transform_publisher" name="robot3_odom_to_map" args="0 0 0 0 0 0  /map robot3_tf/odom 10" /> -->
+
+</launch>
