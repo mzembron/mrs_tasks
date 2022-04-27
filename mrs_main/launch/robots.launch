@@ -15,7 +15,7 @@
   </group>
 
   <!-- statyczna transformacja dla robota 1 -->
-<node pkg="tf" type="static_transform_publisher" name="robot1_odom_to_map" args="0 0 0 0 0 0  /map robot1_tf/odom 10" />
+<node pkg="tf" type="static_transform_publisher" name="robot1_odom_to_map" args="-0.7 -0.5 0 0 0 0  /map robot1_tf/odom 10" />
   <!-- BEGIN ROBOT 2-->
   <group ns="robot2">
     <param name="tf_prefix" value="robot2_tf" />
@@ -26,7 +26,7 @@
   </group>
 
   <!-- statyczna transformacja dla robota 2 -->
-  <node pkg="tf" type="static_transform_publisher" name="robot2_odom_to_map" args="0 0 0 0 0 0  /map robot2_tf/odom 10" />
+  <node pkg="tf" type="static_transform_publisher" name="robot2_odom_to_map" args="-0.5 -0.5 0 0 0 0  /map robot2_tf/odom 10" />
 
     <!-- BEGIN ROBOT 3 -->
   <!-- <group ns="robot3">

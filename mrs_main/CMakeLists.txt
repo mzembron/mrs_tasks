@@ -12,6 +12,14 @@ find_package(catkin REQUIRED COMPONENTS
   nav_msgs
   rospy
   std_msgs
+  roscpp
+  genmsg
+  tf2_ros
+  costmap_2d
+  global_planner
+  nav_msgs
+  dwa_local_planner
+  rotate_recovery
 )
 
 ## System dependencies are found with CMake's conventions
@@ -135,6 +143,7 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/mrs_main_node.cpp)
+add_executable(mrs_planer src/mrs_planer.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -145,11 +154,13 @@ include_directories(
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(mrs_planer stero_mobile_init_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
+target_link_libraries(mrs_planer ${catkin_LIBRARIES})
 
 #############
 ## Install ##
@@ -185,6 +196,15 @@ include_directories(
 #   FILES_MATCHING PATTERN "*.h"
 #   PATTERN ".svn" EXCLUDE
 # )
+
+install (DIRECTORY worlds/ DESTINATION share/${CMAKE_PROJECT_NAME}/worlds 
+         FILES_MATCHING PATTERN "*.world")
+install (DIRECTORY launch/ DESTINATION share/${CMAKE_PROJECT_NAME}/launch 
+         FILES_MATCHING PATTERN "*.launch*")
+install (DIRECTORY config/ DESTINATION share/${CMAKE_PROJECT_NAME}/config 
+         FILES_MATCHING PATTERN "*.yaml")
+install (DIRECTORY param/ DESTINATION share/${CMAKE_PROJECT_NAME}/param 
+         FILES_MATCHING PATTERN "*.yaml")
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 # install(FILES
