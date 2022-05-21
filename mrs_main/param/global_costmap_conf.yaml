@@ -7,6 +7,10 @@ plugins:
 publish_frequency: 1.0
 static_map: true
 robot_radius: 0.26
+robot_base_frame: robot1_tf/base_link
+global_frame: robot1_tf/odom
+
+
 always_send_full_costmap: true
 
 #warstwa inflacyjna nakladana na warstwe globalna
