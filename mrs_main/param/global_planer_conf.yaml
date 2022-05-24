@@ -1,3 +1,3 @@
 use_grid_path: true #If true, use the quadratic approximation of the potential. 
 #Otherwise, use a simpler calculation. 
-use_dijkstra: false #If true, use dijkstra's algorithm. Otherwise, A*
+use_dijkstra: true #If true, use dijkstra's algorithm. Otherwise, A*

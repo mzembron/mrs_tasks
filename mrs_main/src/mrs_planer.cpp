@@ -1,3 +1,12 @@
+#include <math.h> 
+#include <sstream>
+#include <iostream>
+#include <tf2_ros/transform_listener.h>
+#include <nav_msgs/Path.h>
+#include <base_local_planner/trajectory_planner_ros.h>
+#include <dwa_local_planner/DWAPlannerConfig.h>
+#include <rotate_recovery/rotate_recovery.h>
+
 #include "ros/ros.h"
 #include "std_msgs/String.h"
 #include "geometry_msgs/PoseStamped.h"
@@ -5,14 +14,8 @@
 #include "nav_msgs/Odometry.h"
 #include "costmap_2d/costmap_2d_ros.h"
 #include "global_planner/planner_core.h"
-#include <math.h> 
-#include <sstream>
-#include <tf2_ros/transform_listener.h>
-#include <nav_msgs/Path.h>
-#include <base_local_planner/trajectory_planner_ros.h>
 #include "dwa_local_planner/dwa_planner_ros.h"
-#include <dwa_local_planner/DWAPlannerConfig.h>
-#include <rotate_recovery/rotate_recovery.h>
+
 
 
 geometry_msgs::PoseStamped goal;
@@ -82,7 +85,7 @@ int main(int argc, char **argv)
       currentOdomPose.header.frame_id = "map";
       steroGlobalPlanner.makePlan(currentOdomPose, goal, globalPlan);
   
-      //steroGlobalPlanner.publishPlan(globalPlan); // nie potrzebny
+      steroGlobalPlanner.publishPlan(globalPlan); // nie potrzebny
       planToBeMade= false;
     }
 
@@ -105,9 +108,9 @@ int main(int argc, char **argv)
         currentOdomTwist.angular.z = 1;
         velocityPublisher.publish(currentOdomTwist);
         // rr.runBehavior();
-                ss << "Goal reached!";
-        msg.data = ss.str();
-        ROS_INFO("%s", msg.data.c_str());
+        // ss << "Goal reached!";
+        // msg.data = ss.str();
+        // ROS_INFO("%s", msg.data.c_str());
 
       }
 

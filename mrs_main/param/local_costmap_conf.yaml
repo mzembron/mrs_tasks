@@ -8,16 +8,21 @@ publish_frequency: 1.0
 
 #warstwa lokalna - sknowanie obszaru robota za pomoca sensorow
 obstacles:
-    observation_sources: /robot1_scan
-    base_scan: {data_type: LaserScan, sensor_frame: robot1_tf/base_scan, clearing: true, marking: true, topic: /scan_raw}
+    # observation_sources: /robot1_scan
+    # observation_sources: /robot1_tf
+    # base_scan: {data_type: LaserScan, sensor_frame: robot1_tf/base_scan, clearing: true, marking: true, topic: /scan_raw}
+    base_scan: {data_type: LaserScan, sensor_frame: robot1_tf/base_scan, clearing: true, marking: true, topic: robot1/scan}
 
 #warstwa inflacyjna nakladana na warstwe lokalna
 inflation_layer:
     inflation_radius: 0.2
     cost_scaling_factor: 5 #wartosc wykorzystywana przy wylicznaiu kosztu 
 
-robot_base_frame: robot1_tf/base_link
-global_frame: robot1_tf/odom
+# zmiana z base_link na base_footprint
+
+robot_base_frame: robot1_tf/base_footprint
+# global_frame: robot1_tf/odom
+global_frame: map
 
 
 
