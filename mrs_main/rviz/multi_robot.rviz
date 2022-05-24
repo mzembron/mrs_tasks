@@ -6,7 +6,9 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
+        - /RobotModel1/Status1
         - /LaserScan1
+        - /Map1
       Splitter Ratio: 0.5
     Tree Height: 555
   - Class: rviz/Selection
@@ -243,6 +245,16 @@ Visualization Manager:
       Use Fixed Frame: true
       Use rainbow: true
       Value: true
+    - Alpha: 0.699999988079071
+      Class: rviz/Map
+      Color Scheme: costmap
+      Draw Behind: false
+      Enabled: true
+      Name: Map
+      Topic: /mrs_planer/global_costmap/costmap
+      Unreliable: false
+      Use Timestamp: false
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -271,25 +283,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 10
+      Distance: 9.574191093444824
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0
-        Y: 0
-        Z: 0
+        X: 0.38488534092903137
+        Y: 1.6060998439788818
+        Z: -0.024843808263540268
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.8353979587554932
+      Pitch: 0.8703977465629578
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 0.690398097038269
+      Yaw: 6.10358190536499
     Saved: ~
 Window Geometry:
   Displays:
@@ -307,5 +319,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1200
-  X: 929
-  Y: 93
+  X: 960
+  Y: 76

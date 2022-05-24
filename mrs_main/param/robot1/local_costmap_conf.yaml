@@ -1,0 +1,33 @@
+
+plugins: 
+    - {name: obstacles,        type: "costmap_2d::VoxelLayer"}
+    - {name: inflation_layer,  type: "costmap_2d::InflationLayer"}
+
+
+publish_frequency: 1.0
+
+#warstwa lokalna - sknowanie obszaru robota za pomoca sensorow
+obstacles:
+    # observation_sources: /robot1_scan
+    # observation_sources: robot1_tf
+    # base_scan: {data_type: LaserScan, sensor_frame: robot1_tf/base_scan, clearing: true, marking: true, topic: /scan_raw}
+    base_scan: {data_type: LaserScan, sensor_frame: robot1_tf/base_scan, clearing: true, marking: true, topic: /robot1/scan}
+
+#warstwa inflacyjna nakladana na warstwe lokalna
+inflation_layer:
+    inflation_radius: 0.2
+    cost_scaling_factor: 5 #wartosc wykorzystywana przy wylicznaiu kosztu 
+
+# zmiana z base_link na base_footprint
+
+robot_base_frame: robot1_tf/base_footprint
+# global_frame: robot1_tf/odom
+global_frame: map
+
+
+
+rolling_window: true
+always_send_full_costmap: true
+
+# footprint: [[-0.325, -0.325], [-0.325, 0.325], [0.325, 0.325], [0.46, 0.0], [0.325, -0.325]]
+robot_radius: 0.26

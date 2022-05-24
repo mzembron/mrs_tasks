@@ -50,7 +50,7 @@ void goalCallback(const geometry_msgs::PoseStamped::ConstPtr& msg)
 
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "mrs_planer");
+  ros::init(argc, argv, "robot1_planer");
   float distance = 0;
 
 
