@@ -6,7 +6,8 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
-        - /RobotModel1/Status1
+        - /RobotModel1
+        - /RobotModel2
         - /LaserScan1
         - /Map1
       Splitter Ratio: 0.5
@@ -118,7 +119,7 @@ Visualization Manager:
           Value: true
       Name: RobotModel
       Robot Description: robot_description
-      TF Prefix: robot1_tf
+      TF Prefix: robot1
       Update Interval: 0
       Value: true
       Visual Enabled: true
@@ -185,7 +186,7 @@ Visualization Manager:
           Value: true
       Name: RobotModel
       Robot Description: robot_description
-      TF Prefix: robot2_tf
+      TF Prefix: robot2
       Update Interval: 0
       Value: true
       Visual Enabled: true
@@ -319,5 +320,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1200
-  X: 960
-  Y: 76
+  X: 928
+  Y: 44

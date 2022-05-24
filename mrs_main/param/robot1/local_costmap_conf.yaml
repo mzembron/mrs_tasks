@@ -1,33 +1,36 @@
+#Independent settings for the local planner's costmap. Detailed descriptions of these parameters can be found at http://www.ros.org/wiki/costmap_2d
 
-plugins: 
-    - {name: obstacles,        type: "costmap_2d::VoxelLayer"}
-    - {name: inflation_layer,  type: "costmap_2d::InflationLayer"}
+local_costmap:
+  #We'll publish the voxel grid used by this costmap
+  publish_voxel_map: true
 
+  #Set the global and robot frames for the costmap
+  global_frame: robot1/odom
+  robot_base_frame: robot1/base_link
 
-publish_frequency: 1.0
+  #Set the update and publish frequency of the costmap
+  update_frequency: 5.0
+  publish_frequency: 2.0
 
-#warstwa lokalna - sknowanie obszaru robota za pomoca sensorow
-obstacles:
-    # observation_sources: /robot1_scan
-    # observation_sources: robot1_tf
-    # base_scan: {data_type: LaserScan, sensor_frame: robot1_tf/base_scan, clearing: true, marking: true, topic: /scan_raw}
-    base_scan: {data_type: LaserScan, sensor_frame: robot1_tf/base_scan, clearing: true, marking: true, topic: /robot1/scan}
+  #We'll configure this costmap to be a rolling window... meaning it is always
+  #centered at the robot
+  static_map: false
+  rolling_window: true
+  width: 6.0
+  height: 6.0
+  resolution: 0.025
+  origin_x: 0.0
+  origin_y: 0.0
 
 #warstwa inflacyjna nakladana na warstwe lokalna
-inflation_layer:
+  inflation_layer:
     inflation_radius: 0.2
     cost_scaling_factor: 5 #wartosc wykorzystywana przy wylicznaiu kosztu 
 
 # zmiana z base_link na base_footprint
 
-robot_base_frame: robot1_tf/base_footprint
-# global_frame: robot1_tf/odom
-global_frame: map
-
-
-
-rolling_window: true
-always_send_full_costmap: true
+  rolling_window: true
+  always_send_full_costmap: true
 
 # footprint: [[-0.325, -0.325], [-0.325, 0.325], [0.325, 0.325], [0.46, 0.0], [0.325, -0.325]]
-robot_radius: 0.26
+  robot_radius: 0.26
