@@ -4,6 +4,7 @@ local_costmap:
   #We'll publish the voxel grid used by this costmap
   publish_voxel_map: true
 
+  transform_tolerance: 0.5
   #Set the global and robot frames for the costmap
   global_frame: robot2/odom
   robot_base_frame: robot2/base_link
@@ -21,16 +22,23 @@ local_costmap:
   resolution: 0.025
   origin_x: 0.0
   origin_y: 0.0
+  footprint: [[-0.205,-0.155],[-0.205,0.155],[0.077,0.155],[0.077,-0.155]]
+  footprint_padding: 0.01
 
 #warstwa inflacyjna nakladana na warstwe lokalna
   inflation_layer:
-    inflation_radius: 0.2
-    cost_scaling_factor: 5 #wartosc wykorzystywana przy wylicznaiu kosztu 
-
+    inflation_radius: 1.0
+    cost_scaling_factor: 3.0 #wartosc wykorzystywana przy wylicznaiu kosztu 
+  obstacle_layer:
+    max_obstacle_height: 2.0
+    origin_z: 0.0
+    z_resolution: 0.2
+    z_voxels: 10
+    unknown_threshold: 9
+    mark_threshold: 0 
 # zmiana z base_link na base_footprint
 
   rolling_window: true
   always_send_full_costmap: true
 
-# footprint: [[-0.325, -0.325], [-0.325, 0.325], [0.325, 0.325], [0.46, 0.0], [0.325, -0.325]]
   robot_radius: 0.26
