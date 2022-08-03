@@ -1,8 +1,9 @@
-holonomic_robot: false
-yaw_goal_tolerance: 0.1 #tolerancja obrotu
-xy_goal_tolerance: 0.2 #tolerancja polozenia
-occdist_scale: 0.02 #jak bardzo ma unikac przeszkod
-meter_scoring: true #[Warn] 
-sim_time: 3.5 #The amount of time to forward-simulate trajectories in seconds
-path_distance_bias: 2 #The weighting for how much the controller should stay 
+TrajectoryPlannerROS:
+  holonomic_robot: false
+  yaw_goal_tolerance: 0.1 #tolerancja obrotu
+  xy_goal_tolerance: 0.2 #tolerancja polozenia
+  occdist_scale: 0.02 #jak bardzo ma unikac przeszkod
+  meter_scoring: true #[Warn] 
+  sim_time: 3.5 #The amount of time to forward-simulate trajectories in seconds
+  path_distance_bias: 2 #The weighting for how much the controller should stay 
 #close to the path it was given, maximal possible value is 5.0 

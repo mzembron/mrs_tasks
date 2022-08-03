@@ -13,20 +13,45 @@
   <node name="gazebo" pkg="gazebo_ros" type="gazebo" 
    args="$(find mrs_main)/worlds/multi_robot_house.world" respawn="false" output="screen" />
    <!-- Navigation planning  -->
-  <node name="map_server" pkg="map_server" type="map_server" args="$(find mrs_main)/map/house.yaml"/>
-  <node name="robot1_conf" pkg="mrs_main" type="robot1_conf" output="screen">
-    <rosparam file="$(find mrs_main)/param/robot1/local_costmap_conf.yaml" command="load" ns="local_costmap" />
-    <rosparam file="$(find mrs_main)/param/robot1/global_costmap_conf.yaml" command="load" ns="global_costmap" />
-    <rosparam file="$(find mrs_main)/param/robot1/local_planer_conf.yaml" command="load" ns="local_planer" />
-    <rosparam file="$(find mrs_main)/param/robot1/global_planer_conf.yaml" command="load" ns="global_planer" />
+  <node name="map_server" pkg="map_server" type="map_server" args="$(find mrs_main)/map/house.yaml">
+      <param name="frame_id" value="/map" />
   </node>
 
-  <node name="robot2_conf" pkg="mrs_main" type="robot2_conf" output="screen">
+ <group ns="robot1">
+    <param name="tf_prefix" value="robot1" />
+
+    <node pkg="move_base" type="move_base" respawn="false" name="move_base_node" output="screen">
+      <remap from="map" to="/map" />
+      <param name="controller_frequency" value="10.0" />
+      <rosparam file="$(find mrs_main)/param/robot1/common_costmap_param.yaml" command="load" ns="global_costmap" />
+      <rosparam file="$(find mrs_main)/param/robot1/common_costmap_param.yaml" command="load" ns="local_costmap" />
+      <rosparam file="$(find mrs_main)/param/robot1/local_costmap_conf.yaml" command="load" />
+      <rosparam file="$(find mrs_main)/param/robot1/global_costmap_conf.yaml" command="load" />
+      <rosparam file="$(find mrs_main)/param/robot1/base_local_planner_params.yaml" command="load" />
+    </node>
+  </group>
+
+ <group ns="robot2">
+    <param name="tf_prefix" value="robot2" />
+
+    <node pkg="move_base" type="move_base" respawn="false" name="move_base_node" output="screen">
+      <remap from="map" to="/map" />
+      <param name="controller_frequency" value="10.0" />
+      <rosparam file="$(find mrs_main)/param/robot2/common_costmap_param.yaml" command="load" ns="global_costmap" />
+      <rosparam file="$(find mrs_main)/param/robot2/common_costmap_param.yaml" command="load" ns="local_costmap" />
+      <rosparam file="$(find mrs_main)/param/robot2/local_costmap_conf.yaml" command="load" />
+      <rosparam file="$(find mrs_main)/param/robot2/global_costmap_conf.yaml" command="load" />
+      <rosparam file="$(find mrs_main)/param/robot2/base_local_planner_params.yaml" command="load" />
+    </node>
+  </group>
+
+ <!-- <node name="robot2_conf" pkg="mrs_main" type="robot2_conf" output="screen">
     <rosparam file="$(find mrs_main)/param/robot2/local_costmap_conf.yaml" command="load" ns="local_costmap" />
     <rosparam file="$(find mrs_main)/param/robot2/global_costmap_conf.yaml" command="load" ns="global_costmap" />
     <rosparam file="$(find mrs_main)/param/robot2/local_planer_conf.yaml" command="load" ns="local_planer" />
     <rosparam file="$(find mrs_main)/param/robot2/global_planer_conf.yaml" command="load" ns="global_planer" />
   </node>
+  -->
   <!-- start gui -->
   <!-- <node name="gazebo_gui" pkg="gazebo_ros" type="gui" respawn="false" output="screen"/> -->
 
