@@ -6,3 +6,5 @@ export TURTLEBOT3_MODEL=waffle_pi
 
 zabicie procesów gazebo - przydatne gdy gazebo dlugo sie uruchamia
 killall -9 gazebo & killall -9 gzserver  & killall -9 gzclient
+
+Dla ros noetic utuchamianie plików pythona za posrednictwem v3: python3

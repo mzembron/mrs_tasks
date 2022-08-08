@@ -1,4 +1,6 @@
-import queue
+
+# import queue
+
 import rospy
 import math
 from move_base_msgs.msg import MoveBaseActionGoal
@@ -30,6 +32,8 @@ def move_base_goal_callback(data):
     msg.goal.target_pose.pose.orientation.z = data.pose.orientation.z
     msg.goal.target_pose.pose.orientation.w = data.pose.orientation.w
 
+    # planing 
+    
     x_goal = data.pose.position.x
     y_goal = data.pose.position.y
 
