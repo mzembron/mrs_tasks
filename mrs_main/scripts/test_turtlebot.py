@@ -14,20 +14,12 @@ def main():
     make_plan = rospy.ServiceProxy('/robot1/move_base_node/NavfnROS/make_plan', GetPlan)
     req = GetPlanRequest()
 
-    # req.start.header.frame_id = 'map'
-    # req.start.pose.position.x = 1.34
-    # req.start.pose.position.y = 0.37
-    # req.start.pose.orientation.w = 1
 
-    # req.goal.header.frame_id = 'map'
-    # req.goal.pose.position.x = -4
-    # req.goal.pose.position.y = 1
-    # req.goal.pose.orientation.w = 1
+    plan_master = PlanMaster()
+    plan_master.subscribe(Turtlebot("/robot1"))
+    plan_master.subscribe(Turtlebot("/robot2"))
 
-    # req.tolerance = 0.1
-    # res = make_plan(req)
-    # print(res)
-    costam = PlanMaster()
+
     rospy.spin()
 
 if __name__ == "__main__":

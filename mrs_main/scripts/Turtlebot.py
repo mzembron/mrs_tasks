@@ -10,11 +10,12 @@ import math
 
 class Turtlebot:
 
-    def __init__(self, odometry_sub_topic_name, goal_pub_topic_name):
+    def __init__(self, robot_name):
         self.rospy = rospy
-        self.rospy.Subscriber(odometry_sub_topic_name, Odometry, self._odom_callback)
-        self.goal_publisher = rospy.Publisher(goal_pub_topic_name, MoveBaseActionGoal, queue_size=10)
-        self.make_plan_srv = rospy.ServiceProxy('/robot1/move_base_node/NavfnROS/make_plan', GetPlan)
+        self.rospy.Subscriber(robot_name + "/odom", Odometry, self._odom_callback)
+        self.goal_publisher = rospy.Publisher(robot_name + "/move_base/goal", MoveBaseActionGoal, queue_size=10)
+        self.make_plan_srv = rospy.ServiceProxy(robot_name + "/move_base_node/NavfnROS/make_plan", GetPlan)
+        self.robot_name = robot_name
     
     def get_operation_cost(self, goal_odom_data):
         plan = self._make_path_plan(goal_odom_data)
@@ -32,6 +33,7 @@ class Turtlebot:
     def go_to_goal(self, goal_odom_data):
         msg = MoveBaseActionGoal()
         HelpfulFunctions.copy_pose_data(msg.goal.target_pose, goal_odom_data)
+        self.goal_publisher.publish(msg)
 
     def _odom_callback(self, data):
         self.current_odom_data = data
