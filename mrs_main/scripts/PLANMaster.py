@@ -1,6 +1,6 @@
 
 # import queue
-
+## Version 0.0 - to be removed
 import rospy
 import math
 from move_base_msgs.msg import MoveBaseActionGoal
