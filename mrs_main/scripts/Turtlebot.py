@@ -3,7 +3,8 @@ import math
 import rospy
 from nav_msgs.msg import  Odometry
 from move_base_msgs.msg import MoveBaseActionGoal
-from actionlib_msgs.msg import GoalStatusArray
+from move_base_msgs.msg import MoveBaseActionResult
+# from actionlib_msgs.msg import GoalStatusArray
 from nav_msgs.srv import GetPlan, GetPlanRequest
 
 from HelpfulFunctions import HelpfulFunctions
@@ -17,24 +18,22 @@ class Turtlebot:
 
     def __init__(self, robot_name):
         rospy.Subscriber(robot_name + "/odom", Odometry, self._odom_callback)
-        rospy.Subscriber(robot_name+"/move_base/status", GoalStatusArray, self._task_status_callback)
+        rospy.Subscriber(robot_name+"/move_base/result", MoveBaseActionResult, self._action_result_callback)
         self.goal_publisher = rospy.Publisher(robot_name + "/move_base/goal", MoveBaseActionGoal, queue_size=10)
         self.make_plan_srv = rospy.ServiceProxy(robot_name + "/move_base_node/NavfnROS/make_plan", GetPlan)
         self.robot_name = robot_name
         self.current_goal = None
-        self.current_goal_status = None
+        # self.current_goal_status = None - 
     
-    def get_operation_cost(self, goal_odom_data):
-        plan = self._make_path_plan(goal_odom_data)
-        #DEBUG!
-        # check:
-        # http://docs.ros.org/en/diamondback/api/nav_msgs/html/classnav__msgs_1_1srv_1_1__GetPlan_1_1GetPlanResponse.html
-        # print(type(plan.plan.poses))
-        # for element in plan.poses:
-        #     print(element.pose.position)
-
-        # print(self._approximate_path_length(plan))
+    def get_operation_cost_from_current_position(self, goal_odom_data):
+        plan = self._make_path_plan(self.current_odom_data.pose, goal_odom_data)
         return self._approximate_path_length(plan)
+
+    def get_operation_cost_fro_specific_position(self, start_odom_data, goal_odom_data):
+        plan = self._make_path_plan(start_odom_data, goal_odom_data)
+        return self._approximate_path_length(plan)
+
+    
        
     
     def go_to_goal(self, goal_odom_data):
@@ -49,19 +48,31 @@ class Turtlebot:
         # DEBUG!
         # print(self.robot_name, "Current_goal: ", self.current_goal)
 
-    def _task_status_callback(self, status):
-        #TODO! 
-        ## problem with synchronizing provided 
-        pass
-        # Not really working
-        # self.current_goal_status = status.status_list[LATEST_STATUS_INDEX].status
-        # if status.status_list[LATEST_STATUS_INDEX].status is not (PENDING or ACTIVE):
-        #     self.current_goal = None
+    # def _task_status_callback(self, status):
+    #     #TODO! 
+    #     ## problem with synchronizing provided 
+    #     # pass
+    #     # Not really working
+    #     print(self.robot_name)
+    #     print(status.status_list)
+    #     # self.current_goal_status = status.status_list[LATEST_STATUS_INDEX].status
+    #     # if status.status_list[LATEST_STATUS_INDEX].status is not (PENDING or ACTIVE):
+    #     #     self.current_goal = None
 
-    def _make_path_plan(self, goal_odom_data):
+    def _action_result_callback(self, result):
+        print(self.current_goal)
+        self.current_goal = None
+        
+        if(result.status.status == 3):
+            print(self.robot_name, " achieved goal! #############")
+        else:
+            print(self.robot_name, " was unable to achive goal! #############")
+
+
+    def _make_path_plan(self, start_odom_data, goal_odom_data):
         req = GetPlanRequest()
 
-        HelpfulFunctions.copy_pose_data(req.start, self.current_odom_data.pose)
+        HelpfulFunctions.copy_pose_data(req.start, start_odom_data)
         HelpfulFunctions.copy_pose_data(req.goal, goal_odom_data)
 
         req.tolerance = 0.1

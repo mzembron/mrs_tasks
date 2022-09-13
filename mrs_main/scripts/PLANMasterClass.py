@@ -27,8 +27,9 @@ class PlanMaster():
     def _select_optimal_robot(self, operation_data):
         robots_cost_dict = {}
         for robot in self.robots:
-            print("[ Estimated cost for: ", robot.robot_name, "] ", robot.get_operation_cost(operation_data))
-            robots_cost_dict[robot] = robot.get_operation_cost(operation_data)
+            robots_cost_dict[robot] = robot.get_operation_cost_from_current_position(operation_data)
+            print("[ Estimated cost for: ", robot.robot_name, "] ", robots_cost_dict[robot])
+            
         
         # robots_cost_dict = sorted(robots_cost_dict.items(), key=lambda x: x[1])
         return min(robots_cost_dict, key = robots_cost_dict.get)
