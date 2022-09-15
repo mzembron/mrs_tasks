@@ -24,13 +24,22 @@ class Turtlebot:
         plan = self._make_path_plan(self.current_odom_data.pose, goal_odom_data)
         return self._approximate_path_length(plan)
 
-    def get_operation_cost_fro_specific_position(self, start_odom_data, goal_odom_data):
+    def get_operation_cost_to_current_goal(self):
+        assert(self.current_goal is not None)
+
+        plan = self._make_path_plan(self.current_odom_data.pose, self.current_goal)
+        return self._approximate_path_length(plan)
+
+    def get_operation_cost_from_specific_position(self, start_odom_data, goal_odom_data):
         plan = self._make_path_plan(start_odom_data, goal_odom_data)
         return self._approximate_path_length(plan)
 
-    
-       
-    
+    def get_operation_cost_from_current_goal_to_spec_position(self, goal_odom_data):
+        assert(self.current_goal is not None)
+
+        plan = self._make_path_plan(self.current_goal, goal_odom_data)
+        return self._approximate_path_length(plan)
+
     def go_to_goal(self, goal_odom_data):
         msg = MoveBaseActionGoal()
         DataManipulation.copy_pose_data(msg.goal.target_pose, goal_odom_data)
