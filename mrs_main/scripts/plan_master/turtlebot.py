@@ -7,12 +7,8 @@ from move_base_msgs.msg import MoveBaseActionResult
 # from actionlib_msgs.msg import GoalStatusArray
 from nav_msgs.srv import GetPlan, GetPlanRequest
 
-from plan_master.helpful_functions import HelpfulFunctions
+from helpful_functions.data_manipulation import DataManipulation
 import math
-
-LATEST_STATUS_INDEX = 0
-PENDING = 0
-ACTIVE = 1
 
 class Turtlebot:
 
@@ -23,7 +19,6 @@ class Turtlebot:
         self.make_plan_srv = rospy.ServiceProxy(robot_name + "/move_base_node/NavfnROS/make_plan", GetPlan)
         self.robot_name = robot_name
         self.current_goal = None
-        # self.current_goal_status = None - 
     
     def get_operation_cost_from_current_position(self, goal_odom_data):
         plan = self._make_path_plan(self.current_odom_data.pose, goal_odom_data)
@@ -38,15 +33,12 @@ class Turtlebot:
     
     def go_to_goal(self, goal_odom_data):
         msg = MoveBaseActionGoal()
-        HelpfulFunctions.copy_pose_data(msg.goal.target_pose, goal_odom_data)
+        DataManipulation.copy_pose_data(msg.goal.target_pose, goal_odom_data)
         self.current_goal = goal_odom_data
         self.goal_publisher.publish(msg)
 
     def _odom_callback(self, data):
         self.current_odom_data = data
-
-        # DEBUG!
-        # print(self.robot_name, "Current_goal: ", self.current_goal)
 
     # def _task_status_callback(self, status):
     #     #TODO! 
@@ -72,8 +64,8 @@ class Turtlebot:
     def _make_path_plan(self, start_odom_data, goal_odom_data):
         req = GetPlanRequest()
 
-        HelpfulFunctions.copy_pose_data(req.start, start_odom_data)
-        HelpfulFunctions.copy_pose_data(req.goal, goal_odom_data)
+        DataManipulation.copy_pose_data(req.start, start_odom_data)
+        DataManipulation.copy_pose_data(req.goal, goal_odom_data)
 
         req.tolerance = 0.1
         service_output = self.make_plan_srv(req)

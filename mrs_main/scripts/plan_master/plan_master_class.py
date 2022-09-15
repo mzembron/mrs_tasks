@@ -1,12 +1,8 @@
 import math
 
 import rospy
-from move_base_msgs.msg import MoveBaseActionGoal
-from nav_msgs.msg import  Odometry
 from geometry_msgs.msg import PoseStamped
 
-from plan_master.turtlebot import Turtlebot
-from plan_master.helpful_functions import HelpfulFunctions
 
 
 class PlanMaster():
@@ -16,6 +12,7 @@ class PlanMaster():
 
     def subscribe(self, robot):
         self.robots.append(robot)
+
     def _move_base_goal_callback(self, data):
         # msg = MoveBaseActionGoal()
         # HelpfulFunctions.copy_pose_data(msg.goal.target_pose, data)
