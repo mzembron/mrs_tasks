@@ -7,7 +7,7 @@ from move_base_msgs.msg import MoveBaseActionResult
 # from actionlib_msgs.msg import GoalStatusArray
 from nav_msgs.srv import GetPlan, GetPlanRequest
 
-from HelpfulFunctions import HelpfulFunctions
+from plan_master.helpful_functions import HelpfulFunctions
 import math
 
 LATEST_STATUS_INDEX = 0
