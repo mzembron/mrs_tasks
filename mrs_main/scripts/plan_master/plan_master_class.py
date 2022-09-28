@@ -18,13 +18,13 @@ class PlanMaster():
         # HelpfulFunctions.copy_pose_data(msg.goal.target_pose, data)
         # print(self.robots[0].get_operation_cost(data))
         optimal_robot = self._select_optimal_robot(data)
-        optimal_robot.go_to_goal(data)
+        optimal_robot.add_task(data)
 
 
     def _select_optimal_robot(self, operation_data):
         robots_cost_dict = {}
         for robot in self.robots:
-            robots_cost_dict[robot] = robot.get_operation_cost_from_current_position(operation_data)
+            robots_cost_dict[robot] = robot.get_estimated_task_cost(operation_data)
             print("[ Estimated cost for: ", robot.robot_name, "] ", robots_cost_dict[robot])
             
         
