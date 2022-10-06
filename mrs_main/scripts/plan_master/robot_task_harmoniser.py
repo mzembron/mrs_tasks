@@ -1,7 +1,13 @@
-from plan_master.turtlebot import Turtlebot
+import threading
 
 import rospy
+import time
+
+from plan_master.turtlebot import Turtlebot
+
 from move_base_msgs.msg import MoveBaseActionResult
+
+from mrs_msgs.msg import TaskBacklog
 
 ###  
 # Wrapper for robot class with purpose of managing tasks
@@ -14,8 +20,12 @@ class RobotTaskHarmoniser:
         ### just assume we use only turtlebots:
         self.robot = Turtlebot(robot_name)
         rospy.Subscriber(robot_name+"/move_base/result", MoveBaseActionResult, self._action_result_callback)
+        self.tasks_backlog_publisher = rospy.Publisher("plan_master/tasks_backlog", TaskBacklog, queue_size=10)
+        self.backlog_publishing_thread = threading.Thread(target=self.backlog_updater, daemon=True)
+        self.backlog_publishing_thread.start()
         self.robot_name = robot_name
         self.task_list = []
+        
 
     def get_estimated_task_cost(self, goal):
         if self.robot.current_goal is not None:
@@ -52,3 +62,16 @@ class RobotTaskHarmoniser:
         # print(self.robot_name, " tasks is:", self.task_list)
         if(len(self.task_list) != 0):
             self.robot.go_to_goal(self.task_list[0].data)
+
+    def backlog_updater(self):
+        while(not rospy.is_shutdown()):
+            time.sleep(5)
+            backlog = TaskBacklog()
+            backlog.robot_name = self.robot_name
+            for task in self.task_list:
+                backlog.tasks.append(task.return_task_desc_msg())
+            
+            self.tasks_backlog_publisher.publish(backlog)
+
+    def __del__(self):
+        self.backlog_publishing_thread.join()

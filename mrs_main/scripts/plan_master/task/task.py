@@ -1,3 +1,4 @@
+from mrs_msgs.msg import TaskDesc
 
 ###
 # Task class
@@ -14,4 +15,16 @@ class Task():
         self.data = data
         self.priority = priority
 
-    
+    def parse_task_from_msg(self, msg):
+        self.type = msg.type
+        # self.data = None
+        self.priority = msg.prioirty
+
+    def return_task_desc_msg(self):
+        #Debug!
+        # self.data = None
+        task_msg = TaskDesc()
+        task_msg.data = "costam"
+        task_msg.priority = self.priority
+        task_msg.type = self.type
+        return task_msg
