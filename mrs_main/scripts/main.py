@@ -2,7 +2,7 @@ from plan_master.turtlebot import Turtlebot
 from plan_master.robot_task_harmoniser import RobotTaskHarmoniser
 
 import rospy
-from nav_msgs.srv import GetPlan, GetPlanRequest
+# from nav_msgs.srv import GetPlan, GetPlanRequest
 
 from plan_master.plan_master_class import PlanMaster
 

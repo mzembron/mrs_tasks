@@ -4,10 +4,15 @@ import rospy
 from geometry_msgs.msg import PoseStamped
 
 
+from plan_master.task.task import Task 
+from mrs_msgs.msg import TaskDesc # - check out why it is not working 
+
+
 
 class PlanMaster():
     def __init__(self):
         rospy.Subscriber("/move_base_simple/goal", PoseStamped, self._move_base_goal_callback)
+        #subscription of task on general topic like /plan_master/ordered_tasks
         self.robots = []
 
     def subscribe(self, robot):
@@ -18,7 +23,8 @@ class PlanMaster():
         # HelpfulFunctions.copy_pose_data(msg.goal.target_pose, data)
         # print(self.robots[0].get_operation_cost(data))
         optimal_robot = self._select_optimal_robot(data)
-        optimal_robot.add_task(data)
+
+        optimal_robot.add_task(Task('GT', data, priority= 8))
 
 
     def _select_optimal_robot(self, operation_data):

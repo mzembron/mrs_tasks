@@ -19,7 +19,7 @@ class RobotTaskHarmoniser:
 
     def get_estimated_task_cost(self, goal):
         if self.robot.current_goal is not None:
-            #cost from task end position to this goal
+            #cost from task end position to specif goal
             return (self.robot.calc_cost_from_curr_position_to_curr_goal()
                 + self.robot.calc_cost_from_curr_goal_to_spec_position(goal))
         else:
@@ -34,20 +34,21 @@ class RobotTaskHarmoniser:
             self.task_list.pop(CURRENT_TASK_INDEX)
             self.order_task()
         else:
+            ### advertise task to plan master 
             print(self.robot_name, " was unable to achive goal! #############")
 
-    def add_task(self, data):
+    def add_task(self, task):
         
         #create task and append but first try:
         if len(self.task_list) == 0:
-            self.task_list.append(data)
+            self.task_list.append(task)
             self.order_task()
         else:
-            self.task_list.append(data) #push front
+            self.task_list.append(task) #push front
         
         # print(self.robot_name, " tasks is:", self.task_list)
     
     def order_task(self):
-        print(self.robot_name, " tasks is:", self.task_list)
+        # print(self.robot_name, " tasks is:", self.task_list)
         if(len(self.task_list) != 0):
-            self.robot.go_to_goal(self.task_list[0])
+            self.robot.go_to_goal(self.task_list[0].data)
