@@ -51,6 +51,7 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
   FILES
   TaskDesc.msg
+  TaskBacklog.msg
 )
 
 ## Generate services in the 'srv' folder
