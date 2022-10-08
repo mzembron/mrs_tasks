@@ -57,6 +57,11 @@ class RobotTaskHarmoniser:
             else:
                 previous_task =  self.task_list[task_index-1]
                 full_cost += self.robot.calc_cost_from_spec_position_to_spec_position(previous_task.data, task.data)/task_dealy_coeficient
+        
+        if was_new_task_counted is False:
+            last_task = self.task_list[-1]
+            full_cost += self.robot.calc_cost_from_spec_position_to_spec_position(last_task.data, new_task.data)
+
         print(self.robot_name, full_cost)
         return full_cost 
 
