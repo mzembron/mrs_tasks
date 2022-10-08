@@ -3,7 +3,7 @@ import threading
 
 import rospy
 import time
-
+from constants import *
 from plan_master.turtlebot import Turtlebot
 
 from move_base_msgs.msg import MoveBaseActionResult
@@ -15,7 +15,7 @@ from mrs_msgs.msg import TaskBacklog
 ###
 
 CURRENT_TASK_INDEX = 0
-DELAY_TASK_PENALTY = 4
+# DELAY_TASK_PENALTY = 4
 
 
 class RobotTaskHarmoniser:
@@ -44,6 +44,7 @@ class RobotTaskHarmoniser:
 
             if task_index == 0:
                 full_cost += self.robot.calc_cost_from_curr_position_to_spec_position(task.data)/task_dealy_coeficient
+                print("first task", full_cost)
 
             elif task_dealy_coeficient == DELAY_TASK_PENALTY and not was_new_task_included:
                 # including new task into estimated cost
@@ -52,8 +53,9 @@ class RobotTaskHarmoniser:
                 # full_cost += self.robot.calc_cost_from_spec_position_to_spec_position(previous_task.data, new_task.data)/task_dealy_coeficient
                 # task_dealy_coeficient = DELAY_TASK_PENALTY
                 # full_cost += self.robot.calc_cost_from_spec_position_to_spec_position(new_task.data, task.data)/task_dealy_coeficient
-                full_cost = self._calculate_cost_of_including_new_task(task_index, new_task)
+                full_cost += self._calculate_cost_of_including_new_task(task_index, new_task)
                 was_new_task_included = True
+                print("cost_after_swap", full_cost)
             
             else:
                 previous_task =  self.task_list[task_index-1]
