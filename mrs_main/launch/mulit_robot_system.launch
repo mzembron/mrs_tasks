@@ -11,9 +11,9 @@
   <!--Simple launch file   -->
   <node name="rviz" pkg="rviz" type="rviz" if="$(arg rviz)" args="-d $(find mrs_main)/rviz/multi_robot.rviz"/>
   <node name="gazebo" pkg="gazebo_ros" type="gazebo" 
-   args="$(find mrs_main)/worlds/multi_robot_house.world" respawn="false" output="screen" />
+   args="$(find mrs_main)/worlds/small_house.world" respawn="false" output="screen" />
    <!-- Navigation planning  -->
-  <node name="map_server" pkg="map_server" type="map_server" args="$(find mrs_main)/map/house.yaml">
+  <node name="map_server" pkg="map_server" type="map_server" args="$(find mrs_main)/map/small_house.yaml">
       <param name="frame_id" value="/map" />
   </node>
 
