@@ -8,25 +8,27 @@
   <!-- BEGIN ROBOT 1-->
   <group ns="robot1">
     <include file="$(find mrs_main)/launch/one_robot.launch" >
-      <arg name="init_pose" value="-x 1 -y 1 -z 0" />
+      <arg name="init_pose" value="-x 1 -y -1 -z 0" />
       <arg name="robot_name"  value="robot1" />
     </include>
   </group>
 
   <!-- statyczna transformacja dla robota 1 -->
-    <node pkg="tf" type="static_transform_publisher" name="robot1_odom_to_map" args="-0.7 -0.5 0 0 0 0  /map /robot1/odom 10" />
+    <node pkg="tf" type="static_transform_publisher" name="robot1_odom_to_map" args=" 0 0 0 0 0 0  /map /robot1/odom 10" />
+    <!-- -0.7 -0.5 0 0 0 0  tak bylo w args -->
   <!-- BEGIN ROBOT 2 -->
   <group ns="robot2">
     <param name="tf_prefix" value="robot2" />
     <include file="$(find mrs_main)/launch/one_robot.launch" >
-      <arg name="init_pose" value="-x -1 -y 1 -z 0" />
+      <arg name="init_pose" value="-x -1 -y -1 -z  0" />
       <arg name="robot_name"  value="robot2" />
     </include>
   </group> 
 
 
   <!-- statyczna transformacja dla robota 2 -->
-  <node pkg="tf" type="static_transform_publisher" name="robot2_odom_to_map" args="-0.5 -0.5 0 0 0 0  /map robot2/odom 10" />
+  <node pkg="tf" type="static_transform_publisher" name="robot2_odom_to_map" args="0 0 0 0 0 0  /map robot2/odom 10" />
+  <!-- -0.5 -0.5 0 0 0 0  -->
 
     <!-- BEGIN ROBOT 3 -->
   <!-- <group ns="robot3">
