@@ -24,7 +24,7 @@ class Task():
         #Debug!
         # self.data = None
         task_msg = TaskDesc()
-        task_msg.data = "costam"
+        task_msg.data = "x: "+str(self.data.pose.position.x) + "y: " + str(self.data.pose.position.y)
         task_msg.priority = self.priority
         task_msg.type = self.type
         return task_msg
