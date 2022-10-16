@@ -1,6 +1,7 @@
 from operator import index
 import pandas as pd
 import os
+
 class RoomCoordinatesParser:
     def __init__(self):
         dirname = os.path.dirname(__file__)

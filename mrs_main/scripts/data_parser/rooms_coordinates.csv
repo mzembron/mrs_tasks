@@ -1,3 +1,7 @@
 "room name", "x", "y"
 "living room",0,0
 "kitchen",-4.5,0
+"entrance",-1,-4.3
+"hall", -4.5, -2.7
+"bedroom",-7.2,-2.8
+"bathroom", -7, 0.3
