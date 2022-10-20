@@ -8,3 +8,20 @@ zabicie procesów gazebo - przydatne gdy gazebo dlugo sie uruchamia
 killall -9 gazebo & killall -9 gzserver  & killall -9 gzclient
 
 Dla ros noetic utuchamianie plików pythona za posrednictwem v3: python3
+
+Skanowanie nowej mapy:
+
+uruchamienie wezla do skanowania: roslaunch mrs_main robot_scanner
+
+wezla SLAM: roslaunch turtlebot3_slam turtlebot3_slam.launch
+
+zapisanie zeskanowanej mapy: rosrun map_server map_saver -f ~/eng_ws/src/mrs_tasks/mrs_main/map/<nazwa_mapy>
+
+Przy symaulacji gazebo na CPU przydatne jest wylaczenie cieni:
+
+<scene>
+  <ambient>0.4 0.4 0.4 1</ambient>
+  <background>0.7 0.7 0.7 1</background>
+  <!-- modified (shadows) to reduce computation effort, default : true -->
+  <shadows>false</shadows>
+</scene>

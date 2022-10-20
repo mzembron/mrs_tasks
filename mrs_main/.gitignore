@@ -1,3 +1,14 @@
 scripts/*.pyc
 scripts/__pycache__
 
+scripts/helpful_functions/*.pyc
+scripts/helpful_functions__pycache__
+
+scripts/plan_master/*.pyc
+scripts/plan_master/__pycache__
+
+scripts/tests/*.pyc
+scripts/tests/__pycache__
+
+scripts/data_parser/*.pyc
+scripts/data_parser/__pycache__

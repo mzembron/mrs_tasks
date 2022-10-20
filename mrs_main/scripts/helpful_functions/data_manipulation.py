@@ -1,5 +1,5 @@
 
-class HelpfulFunctions():
+class DataManipulation():
 
     @staticmethod
     def copy_pose_data(copy_destination_data, source_data) -> None:

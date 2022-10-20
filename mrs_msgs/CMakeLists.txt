@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(mrs_main)
+project(mrs_msgs)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -9,18 +9,9 @@ project(mrs_main)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
-  nav_msgs
   rospy
   std_msgs
-  roscpp
-  genmsg
-  tf2_ros
-  costmap_2d
-  global_planner
-  nav_msgs
-  dwa_local_planner
-  rotate_recovery
-  mrs_msgs
+  message_generation
 )
 
 ## System dependencies are found with CMake's conventions
@@ -57,11 +48,11 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   Message1.msg
-#   Message2.msg
-# )
+add_message_files(
+  FILES
+  TaskDesc.msg
+  TaskBacklog.msg
+)
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -78,10 +69,10 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   geometry_msgs#   nav_msgs#   std_msgs
-# )
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -113,10 +104,10 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES mrs_main
-#  CATKIN_DEPENDS geometry_msgs nav_msgs rospy std_msgs
-#  DEPENDS system_lib
+ INCLUDE_DIRS #include
+#  LIBRARIES mrs_msgs
+ CATKIN_DEPENDS geometry_msgs rospy std_msgs
+ DEPENDS #system_lib
 )
 
 ###########
@@ -132,7 +123,7 @@ include_directories(
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/mrs_main.cpp
+#   src/${PROJECT_NAME}/mrs_msgs.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -143,10 +134,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/mrs_main_node.cpp)
-add_executable(robot1_conf src/robot1_conf.cpp)
-add_executable(robot2_conf src/robot2_conf.cpp)
-
+# add_executable(${PROJECT_NAME}_node src/mrs_msgs_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -157,14 +145,11 @@ add_executable(robot2_conf src/robot2_conf.cpp)
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-# add_dependencies(mrs_planer stero_mobile_init_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
-target_link_libraries(robot1_conf ${catkin_LIBRARIES})
-target_link_libraries(robot2_conf ${catkin_LIBRARIES})
 
 #############
 ## Install ##
@@ -201,15 +186,6 @@ target_link_libraries(robot2_conf ${catkin_LIBRARIES})
 #   PATTERN ".svn" EXCLUDE
 # )
 
-install (DIRECTORY worlds/ DESTINATION share/${CMAKE_PROJECT_NAME}/worlds 
-         FILES_MATCHING PATTERN "*.world")
-install (DIRECTORY launch/ DESTINATION share/${CMAKE_PROJECT_NAME}/launch 
-         FILES_MATCHING PATTERN "*.launch*")
-install (DIRECTORY config/ DESTINATION share/${CMAKE_PROJECT_NAME}/config 
-         FILES_MATCHING PATTERN "*.yaml")
-install (DIRECTORY param/ DESTINATION share/${CMAKE_PROJECT_NAME}/param 
-         FILES_MATCHING PATTERN "*.yaml")
-
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 # install(FILES
 #   # myfile1
@@ -222,7 +198,7 @@ install (DIRECTORY param/ DESTINATION share/${CMAKE_PROJECT_NAME}/param
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_mrs_main.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_mrs_msgs.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
