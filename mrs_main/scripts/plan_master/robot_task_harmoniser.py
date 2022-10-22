@@ -32,11 +32,13 @@ class RobotTaskHarmoniser:
     def __del__(self):
         self.backlog_publishing_thread.join()
 
-    def get_estimated_task_cost(self, new_task):
+    def get_estimated_task_cost_with_scheduled_position(self, new_task):
         full_cost = 0 
         was_new_task_included = False
+        task_position = -1
         if len(self.task_list) == 0:
-            return self.robot.calc_cost_from_curr_position_to_spec_position(new_task.data)
+            task_position = 0
+            return self.robot.calc_cost_from_curr_position_to_spec_position(new_task.data), task_position
 
         for task_index in range(0, len(self.task_list)):
             task = self.task_list[task_index]
@@ -44,19 +46,13 @@ class RobotTaskHarmoniser:
 
             if task_index == 0:
                 full_cost += self.robot.calc_cost_from_curr_position_to_spec_position(task.data)/task_dealy_coeficient
-                print("first task", full_cost)
 
-            elif task_dealy_coeficient == DELAY_TASK_PENALTY and not was_new_task_included:
-                # including new task into estimated cost
- 
-                # previous_task =  self.task_list[task_index-1]
-                # full_cost += self.robot.calc_cost_from_spec_position_to_spec_position(previous_task.data, new_task.data)/task_dealy_coeficient
-                # task_dealy_coeficient = DELAY_TASK_PENALTY
-                # full_cost += self.robot.calc_cost_from_spec_position_to_spec_position(new_task.data, task.data)/task_dealy_coeficient
+            elif self._was_task_delayed(task_dealy_coeficient) and not was_new_task_included:
+                # if new task has higher priority than current task including new task into estimated cost
+                task_position = task_index
                 full_cost += self._calculate_cost_of_including_new_task(task_index, new_task)
                 was_new_task_included = True
-                print("cost_after_swap", full_cost)
-            
+
             else:
                 previous_task =  self.task_list[task_index-1]
                 full_cost += self.robot.calc_cost_from_spec_position_to_spec_position(previous_task.data, task.data)/task_dealy_coeficient
@@ -66,22 +62,19 @@ class RobotTaskHarmoniser:
             full_cost += self.robot.calc_cost_from_spec_position_to_spec_position(last_task.data, new_task.data)
 
         print(self.robot_name, full_cost)
-        return full_cost 
+        return full_cost, task_position 
 
 
-    def add_task(self, task):
-        
-        #create task and append but first try:
+    def add_task(self, task, position):
         if len(self.task_list) == 0:
             self.task_list.append(task)
             self.order_task()
+        elif position == -1:
+            self.task_list.append(task)
         else:
-            self.task_list.append(task) #push front
-        
-        # print(self.robot_name, " tasks is:", self.task_list)
+            self.task_list.insert(position, task)
     
     def order_task(self):
-        # print(self.robot_name, " tasks is:", self.task_list)
         if(len(self.task_list) != 0):
             self.robot.go_to_goal(self.task_list[0].data)
 
@@ -121,3 +114,6 @@ class RobotTaskHarmoniser:
         else:
             ### advertise task to plan master 
             print(self.robot_name, " was unable to achive goal! #############")
+
+    def _was_task_delayed(self, task_dealy_coeficient):
+        return task_dealy_coeficient == DELAY_TASK_PENALTY

@@ -15,19 +15,21 @@ def base_robot_task_harmoniser():
     robot_task_harmoniser.robot = fake_robot
     return robot_task_harmoniser
 
-def test_cost_estimation_only_one_new_task(base_robot_task_harmoniser):
+def test_cost_estimation_and_task_placement_only_one_new_task(base_robot_task_harmoniser):
     fake_task = Task("GT",None)
-    fake_cost = base_robot_task_harmoniser.get_estimated_task_cost(fake_task)
+    fake_cost, position  = base_robot_task_harmoniser.get_estimated_task_cost_with_scheduled_position(fake_task)
     assert(fake_cost == FAKE_BIG_LENGTH)
+    assert(position == 0)
 
 
-def test_cost_estimation_new_task_one_in_backlog(base_robot_task_harmoniser):
+def test_cost_estimation_and_task_placement_new_task_one_in_backlog(base_robot_task_harmoniser):
     fake_task = Task("GT",None)
     base_robot_task_harmoniser.task_list.append(fake_task)
-    fake_cost = base_robot_task_harmoniser.get_estimated_task_cost(fake_task)
+    fake_cost, position = base_robot_task_harmoniser.get_estimated_task_cost_with_scheduled_position(fake_task)
     assert(fake_cost == FAKE_BIG_LENGTH+FAKE_SMALL_LENGTH)
+    assert(position == -1)
 
-def test_cost_estimation_with_task_reorder(base_robot_task_harmoniser):
+def test_cost_estimation_and_task_placement_with_task_reorder(base_robot_task_harmoniser):
     fake_task_high_priority = Task("GT",None, 8)
     fake_task_middle_priority = Task("GT",None, 5)
     fake_task_low_priority = Task("GT", None, 3)
@@ -35,7 +37,8 @@ def test_cost_estimation_with_task_reorder(base_robot_task_harmoniser):
     base_robot_task_harmoniser.task_list.append(fake_task_high_priority)
     base_robot_task_harmoniser.task_list.append(fake_task_low_priority)
     base_robot_task_harmoniser.task_list.append(fake_task_low_priority)
-    fake_cost = base_robot_task_harmoniser.get_estimated_task_cost(fake_task_middle_priority)
+    fake_cost, position = base_robot_task_harmoniser.get_estimated_task_cost_with_scheduled_position(fake_task_middle_priority)
     assert(fake_cost == FAKE_BIG_LENGTH+FAKE_SMALL_LENGTH+FAKE_SMALL_LENGTH/DELAY_TASK_PENALTY
         +FAKE_SMALL_LENGTH/DELAY_TASK_PENALTY)
+    assert(position == 1 )
 
