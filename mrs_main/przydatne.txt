@@ -25,6 +25,3 @@ Przy symaulacji gazebo na CPU przydatne jest wylaczenie cieni:
   <!-- modified (shadows) to reduce computation effort, default : true -->
   <shadows>false</shadows>
 </scene>
-
-TODO:
-  - szregowanie zadan
