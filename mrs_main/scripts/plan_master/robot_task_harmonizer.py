@@ -18,7 +18,7 @@ CURRENT_TASK_INDEX = 0
 # DELAY_TASK_PENALTY = 4
 
 
-class RobotTaskHarmoniser:
+class RobotTaskHarmonizer:
     def __init__(self,robot_name):
         ### just assume we use only turtlebots:
         self.robot = Turtlebot(robot_name)

@@ -1,5 +1,5 @@
 # i rt(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from plan_master.robot_task_harmoniser import RobotTaskHarmoniser
+from plan_master.robot_task_harmonizer import RobotTaskHarmonizer
 from plan_master.task.task import Task
 from tests.fake_test_robot import FakeRobot
 from tests.constats import *
@@ -10,7 +10,7 @@ from enum import Enum
 @pytest.fixture
 def base_robot_task_harmoniser():
     fake_robot = FakeRobot()
-    robot_task_harmoniser = RobotTaskHarmoniser(fake_robot.robot_name)
+    robot_task_harmoniser = RobotTaskHarmonizer(fake_robot.robot_name)
     #incjecting fake robot
     robot_task_harmoniser.robot = fake_robot
     return robot_task_harmoniser
