@@ -1,4 +1,4 @@
-from tests.constats import FAKE_BIG_LENGTH, FAKE_SMALL_LENGTH
+from constants.testing_constats import FAKE_BIG_LENGTH, FAKE_SMALL_LENGTH
 
 class FakeRobot:
 

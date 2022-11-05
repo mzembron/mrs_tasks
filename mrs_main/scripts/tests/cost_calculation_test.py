@@ -2,8 +2,8 @@
 from plan_master.robot_task_harmonizer import RobotTaskHarmonizer
 from plan_master.task.task import Task
 from tests.fake_test_robot import FakeRobot
-from tests.constats import *
-from constants import *
+from constants.testing_constats import *
+from constants.constants import *
 import pytest 
 from enum import Enum
 
