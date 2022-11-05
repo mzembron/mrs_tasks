@@ -14,10 +14,10 @@ class PlanMaster():
         rospy.Subscriber("/move_base_simple/goal", PoseStamped, self._move_base_goal_callback)
         rospy.Subscriber("plan_master/order_task", TaskDesc, self._order_task_callback)
         #subscription of task on general topic like /plan_master/ordered_tasks
-        self.robots = []
+        self.robots_harmonizers = []
 
     def subscribe(self, robot):
-        self.robots.append(robot)
+        self.robots_harmonizers.append(robot)
 
     def _move_base_goal_callback(self, data):
         task = Task('GT', data, priority= 8)
@@ -38,17 +38,16 @@ class PlanMaster():
 
     def _select_optimal_robot(self, task):
         robots_cost_dict = {}
-        robots_task_position_dict = {}
-        for robot in self.robots:
-            if(task.is_suitable_for_robot(robot.robot)):
-                robots_cost_dict[robot], robots_task_position_dict[robot] = robot.get_estimated_task_cost_with_scheduled_position(task)
-                print("[ Estimated cost for: ", robot.robot_name, "] ", robots_cost_dict[robot], 
-                    "Task at position: ", robots_task_position_dict[robot])
+        robots_and_task_position_dict = {}
+        for robot_harmonizer in self.robots_harmonizers:
+            if(task.is_suitable_for_robot(robot_harmonizer.robot)):
+                robots_cost_dict[robot_harmonizer], robots_and_task_position_dict[robot_harmonizer] = robot_harmonizer.get_estimated_task_cost_with_scheduled_position(task)
+                print("[ Estimated cost for: ", robot_harmonizer.robot_name, "] ", robots_cost_dict[robot_harmonizer], 
+                    "Task at position: ", robots_and_task_position_dict[robot_harmonizer])
             
-        
         # robots_cost_dict = sorted(robots_cost_dict.items(), key=lambda x: x[1])
-        optimal_robot = min(robots_cost_dict, key = robots_cost_dict.get) 
-        return optimal_robot, robots_task_position_dict[optimal_robot]
+        optimal_robot_harmonizer = min(robots_cost_dict, key = robots_cost_dict.get) 
+        return optimal_robot_harmonizer, robots_and_task_position_dict[optimal_robot_harmonizer]
         # return
 
     def _prepare_task_data(self, coordinates):
