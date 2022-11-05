@@ -17,6 +17,7 @@
       <param name="frame_id" value="/map" />
   </node>
 
+<!-- move_base data preparation -->
  <group ns="robot1">
     <param name="tf_prefix" value="robot1" />
 
@@ -45,20 +46,22 @@
     </node>
   </group>
 
- <!-- <node name="robot2_conf" pkg="mrs_main" type="robot2_conf" output="screen">
-    <rosparam file="$(find mrs_main)/param/robot2/local_costmap_conf.yaml" command="load" ns="local_costmap" />
-    <rosparam file="$(find mrs_main)/param/robot2/global_costmap_conf.yaml" command="load" ns="global_costmap" />
-    <rosparam file="$(find mrs_main)/param/robot2/local_planer_conf.yaml" command="load" ns="local_planer" />
-    <rosparam file="$(find mrs_main)/param/robot2/global_planer_conf.yaml" command="load" ns="global_planer" />
-  </node>
-  -->
-  <!-- start gui -->
-  <!-- <node name="gazebo_gui" pkg="gazebo_ros" type="gui" respawn="false" output="screen"/> -->
+   <group ns="robot3_manip">
+    <param name="tf_prefix" value="robot3_manip" />
+    <node pkg="move_base" type="move_base" respawn="false" name="move_base_node" output="screen">
+      <remap from="map" to="/map" />
+      <param name="controller_frequency" value="10.0" />
+      <rosparam file="$(find mrs_main)/param/robot3_manip/common_costmap_param.yaml" command="load" ns="global_costmap" />
+      <rosparam file="$(find mrs_main)/param/robot3_manip/common_costmap_param.yaml" command="load" ns="local_costmap" />
+      <rosparam file="$(find mrs_main)/param/robot3_manip/local_costmap_conf.yaml" command="load" />
+      <rosparam file="$(find mrs_main)/param/robot3_manip/global_costmap_conf.yaml" command="load" />
+      <rosparam file="$(find mrs_main)/param/robot3_manip/base_local_planner_params.yaml" command="load" />
+    </node>
+  </group>
+
+
 
   <!-- include our robots -->
   <include file="$(find mrs_main)/launch/robots.launch"/>
-  <!-- TODO Not that elegant - maybe make it better-->
-   <!-- <node pkg="tf" type="static_transform_publisher" name="odom_to_map_robot1" args="0 0 0 0 0 0  /map /robot1_tf/odom 10" /> -->
-   <!-- <node pkg="tf" type="static_transform_publisher" name="odom_to_map_robot2" args="0 0 0 0 0 0  /map /robot2_tf/odom 10" /> -->
 
 </launch>

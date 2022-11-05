@@ -2,6 +2,7 @@
     <arg name="robot_name"/>
     <arg name="init_pose"/>
     <arg name="model" default="waffle_pi"/>
+    <arg name= "desc_name" />
 
     <!-- <node name="spawn_minibot_model" pkg="gazebo" type="spawn_model"
      args="$(arg init_pose) -urdf -param /robot_description -model $(arg robot_name)"
@@ -9,7 +10,7 @@
 
     <node pkg="gazebo_ros" type="spawn_model" name="spawn_urdf"  
     args="$(arg init_pose) -urdf -model turtlebot3_$(arg model)_$(arg robot_name) 
-     -param /robot_description" respawn="false" output="screen" />
+     -param $(arg desc_name)" respawn="false" output="screen" />
     
     <!-- <node pkg="gazebo_ros" type="spawn_model" name="spawn_urdf"  args="-urdf 
       -model turtlebot3_$(arg model)_$(arg robot_name) $(arg init_pose)  -param robot_description" /> -->
