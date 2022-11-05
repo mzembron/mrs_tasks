@@ -18,10 +18,10 @@ def main():
 
     plan_master.subscribe(RobotTaskHarmonizer("/robot1"))
     plan_master.subscribe(RobotTaskHarmonizer("/robot2"))
-    # manipulator = Manipulator("/robot3_manip")
-    # manip_harmonizer = RobotTaskHarmonizer("/robot3_manip")
-    # manip_harmonizer.robot = manipulator
-    # plan_master.subscribe(manip_harmonizer)
+    manipulator = Manipulator("/robot3_manip")
+    manip_harmonizer = RobotTaskHarmonizer("/robot3_manip")
+    manip_harmonizer.robot = manipulator
+    plan_master.subscribe(manip_harmonizer)
 
 
     rospy.spin()

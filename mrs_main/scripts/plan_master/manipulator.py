@@ -64,7 +64,7 @@ class Manipulator:
         self.velocity_publisher.publish(msg)
 
     def _odom_callback(self, data):
-        self.current_odom_data = data
+        self.current_odom_data = data.pose
         if(self.current_goal is not None):
             yaw_delta = self._calculate_yaw_difference(self.current_odom_data, self.current_goal)
             print(yaw_delta)
@@ -80,7 +80,7 @@ class Manipulator:
 
     def _calculate_yaw_difference(self, start_odom_data, goal_odom_data):
         goal_orientation_q = goal_odom_data.pose.orientation
-        current_orientation_q = start_odom_data.pose.pose.orientation 
+        current_orientation_q = start_odom_data.pose.orientation 
 
         goal_orientation_list = [goal_orientation_q.x, goal_orientation_q.y, goal_orientation_q.z, goal_orientation_q.w]
         current_orientation_list = [current_orientation_q.x, current_orientation_q.y, current_orientation_q.z, current_orientation_q.w]
