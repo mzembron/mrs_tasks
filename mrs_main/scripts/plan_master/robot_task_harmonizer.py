@@ -3,7 +3,8 @@ import threading
 
 import rospy
 import time
-from constants import *
+from constants.constants import *
+
 from plan_master.turtlebot import Turtlebot
 
 from move_base_msgs.msg import MoveBaseActionResult
@@ -15,7 +16,6 @@ from mrs_msgs.msg import TaskBacklog
 ###
 
 CURRENT_TASK_INDEX = 0
-# DELAY_TASK_PENALTY = 4
 
 
 class RobotTaskHarmonizer:

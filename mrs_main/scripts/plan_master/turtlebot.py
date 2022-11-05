@@ -7,6 +7,7 @@ from move_base_msgs.msg import MoveBaseActionGoal
 from nav_msgs.srv import GetPlan, GetPlanRequest
 
 from helpful_functions.data_manipulation import DataManipulation
+from constants.robot_type import RobotType
 import math
 
 class Turtlebot:
@@ -16,6 +17,7 @@ class Turtlebot:
         self.goal_publisher = rospy.Publisher(robot_name + "/move_base/goal", MoveBaseActionGoal, queue_size=10)
         self.make_plan_srv = rospy.ServiceProxy(robot_name + "/move_base_node/NavfnROS/make_plan", GetPlan)
         self.robot_name = robot_name
+        self.robot_type = RobotType.MOBILE
         self.current_goal = None
     
     def calc_cost_from_curr_position_to_spec_position(self, goal_odom_data):

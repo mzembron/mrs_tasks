@@ -1,5 +1,5 @@
 from mrs_msgs.msg import TaskDesc
-
+from constants.robots_usecases import *
 ###
 # Task class
 # priority:
@@ -28,3 +28,6 @@ class Task():
         task_msg.priority = self.priority
         task_msg.type = self.type
         return task_msg
+    
+    def is_suitable_for_robot(self, robot):
+        return self.type in ROBOT_USECASE_MAP[robot.robot_type]

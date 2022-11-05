@@ -40,9 +40,10 @@ class PlanMaster():
         robots_cost_dict = {}
         robots_task_position_dict = {}
         for robot in self.robots:
-            robots_cost_dict[robot], robots_task_position_dict[robot] = robot.get_estimated_task_cost_with_scheduled_position(task)
-            print("[ Estimated cost for: ", robot.robot_name, "] ", robots_cost_dict[robot], 
-                "Task at position: ", robots_task_position_dict[robot])
+            if(task.is_suitable_for_robot(robot.robot)):
+                robots_cost_dict[robot], robots_task_position_dict[robot] = robot.get_estimated_task_cost_with_scheduled_position(task)
+                print("[ Estimated cost for: ", robot.robot_name, "] ", robots_cost_dict[robot], 
+                    "Task at position: ", robots_task_position_dict[robot])
             
         
         # robots_cost_dict = sorted(robots_cost_dict.items(), key=lambda x: x[1])
