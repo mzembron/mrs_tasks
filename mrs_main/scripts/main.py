@@ -1,4 +1,5 @@
 from plan_master.turtlebot import Turtlebot
+from plan_master.manipulator import Manipulator
 from plan_master.robot_task_harmonizer import RobotTaskHarmonizer
 
 import rospy
@@ -17,6 +18,11 @@ def main():
 
     plan_master.subscribe(RobotTaskHarmonizer("/robot1"))
     plan_master.subscribe(RobotTaskHarmonizer("/robot2"))
+    # manipulator = Manipulator("/robot3_manip")
+    # manip_harmonizer = RobotTaskHarmonizer("/robot3_manip")
+    # manip_harmonizer.robot = manipulator
+    # plan_master.subscribe(manip_harmonizer)
+
 
     rospy.spin()
 

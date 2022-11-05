@@ -8,6 +8,7 @@ from nav_msgs.srv import GetPlan, GetPlanRequest
 
 from helpful_functions.data_manipulation import DataManipulation
 from constants.robot_type import RobotType
+from constants.constants import ROBOT_AVERAGE_VELOCITY
 import math
 
 class Turtlebot:
@@ -22,23 +23,23 @@ class Turtlebot:
     
     def calc_cost_from_curr_position_to_spec_position(self, goal_odom_data):
         plan = self._make_path_plan(self.current_odom_data.pose, goal_odom_data)
-        return self._approximate_path_length(plan)
+        return self._approximate_path_length(plan)/ROBOT_AVERAGE_VELOCITY
 
     def calc_cost_from_curr_position_to_curr_goal(self):
         assert(self.current_goal is not None)
 
         plan = self._make_path_plan(self.current_odom_data.pose, self.current_goal)
-        return self._approximate_path_length(plan)
+        return self._approximate_path_length(plan)/ROBOT_AVERAGE_VELOCITY
 
     def calc_cost_from_spec_position_to_spec_position(self, start_odom_data, goal_odom_data):
         plan = self._make_path_plan(start_odom_data, goal_odom_data)
-        return self._approximate_path_length(plan)
+        return self._approximate_path_length(plan)/ROBOT_AVERAGE_VELOCITY
 
     def calc_cost_from_curr_goal_to_spec_position(self, goal_odom_data):
         assert(self.current_goal is not None)
 
         plan = self._make_path_plan(self.current_goal, goal_odom_data)
-        return self._approximate_path_length(plan)
+        return self._approximate_path_length(plan)/ROBOT_AVERAGE_VELOCITY
 
     def go_to_goal(self, goal_odom_data):
         msg = MoveBaseActionGoal()

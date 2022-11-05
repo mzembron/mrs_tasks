@@ -27,7 +27,7 @@ class PlanMaster():
         try:
             room_coordinates = RoomCoordinatesParser().get_room_coordinates(task_desc.data)
             task_data = self._prepare_task_data(room_coordinates)
-            task = Task('GT', task_data, priority = task_desc.priority)
+            task = Task(task_desc.type, task_data, priority = task_desc.priority)
             self._order_task(task)
         except(KeyError):
             print("Room name does not exist in system!")
@@ -54,11 +54,11 @@ class PlanMaster():
         task_data = PoseStamped()
         task_data.pose.position.x = coordinates[0]
         task_data.pose.position.y = coordinates[1]
-        task_data.pose.position.z = 0
-        
-        task_data.pose.orientation.x = 0
-        task_data.pose.orientation.y = 0 
-        task_data.pose.orientation.z = 0 
-        task_data.pose.orientation.w = 1 
+        task_data.pose.position.z = coordinates[2]
+   
+        task_data.pose.orientation.x = coordinates[3]
+        task_data.pose.orientation.y = coordinates[4]
+        task_data.pose.orientation.z = coordinates[5]
+        task_data.pose.orientation.w = coordinates[6]
         return task_data
 
