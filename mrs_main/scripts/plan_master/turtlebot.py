@@ -22,13 +22,13 @@ class Turtlebot:
         self.current_goal = None
     
     def calc_cost_from_curr_position_to_spec_position(self, goal_odom_data):
-        plan = self._make_path_plan(self.current_odom_data.pose, goal_odom_data)
+        plan = self._make_path_plan(self.current_odom_data, goal_odom_data)
         return self._approximate_path_length(plan)/ROBOT_AVERAGE_VELOCITY
 
     def calc_cost_from_curr_position_to_curr_goal(self):
         assert(self.current_goal is not None)
 
-        plan = self._make_path_plan(self.current_odom_data.pose, self.current_goal)
+        plan = self._make_path_plan(self.current_odom_data, self.current_goal)
         return self._approximate_path_length(plan)/ROBOT_AVERAGE_VELOCITY
 
     def calc_cost_from_spec_position_to_spec_position(self, start_odom_data, goal_odom_data):
@@ -48,7 +48,7 @@ class Turtlebot:
         self.goal_publisher.publish(msg)
 
     def _odom_callback(self, data):
-        self.current_odom_data = data
+        self.current_odom_data = data.pose
 
 
     def _make_path_plan(self, start_odom_data, goal_odom_data):
