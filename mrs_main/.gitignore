@@ -7,6 +7,13 @@ scripts/helpful_functions__pycache__
 scripts/plan_master/*.pyc
 scripts/plan_master/__pycache__
 
+scripts/plan_master/task/*.pyc
+scripts/plan_master/task/__pycache__
+
+scripts/plan_master/task/task_error/*.pyc
+scripts/plan_master/task/task_error/__pycache__
+
+
 scripts/tests/*.pyc
 scripts/tests/__pycache__
 

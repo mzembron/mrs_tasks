@@ -52,13 +52,11 @@ class Manipulator:
         self._start_manipulation(sign)
 
     def _start_manipulation(self, rotation_direction = 1):
-        print("starting manipualtion")
         msg = Twist()
         msg.angular.z = rotation_direction * FAKE_MANIPULATOR_ANGULAR_VELOCITY
         self.velocity_publisher.publish(msg)
 
     def _stop_manipulation(self):
-        print("stoping manipualtion")
         msg = Twist()
         msg.angular.z = 0
         self.velocity_publisher.publish(msg)
@@ -67,7 +65,6 @@ class Manipulator:
         self.current_odom_data = data.pose
         if(self.current_goal is not None):
             yaw_delta = self._calculate_yaw_difference(self.current_odom_data, self.current_goal)
-            print(yaw_delta)
             if (abs(yaw_delta) < ORIENTATION_ACCURACY):
                 self._stop_manipulation()
                 self._publish_action_outcome()

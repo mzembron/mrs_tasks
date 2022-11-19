@@ -1,3 +1,3 @@
 string type
-string data
+string[] data
 int8 priority

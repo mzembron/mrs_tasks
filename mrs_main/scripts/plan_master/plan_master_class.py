@@ -5,6 +5,7 @@ from geometry_msgs.msg import PoseStamped
 
 
 from plan_master.task.task import Task
+from plan_master.task.task_type_not_introduced_error import TaskTypeNotIntroducedError
 from mrs_msgs.msg import TaskDesc
 from data_parser.room_coordinates_parser import RoomCoordinatesParser
 
@@ -25,12 +26,24 @@ class PlanMaster():
 
     def _order_task_callback(self, task_desc):
         try:
-            room_coordinates = RoomCoordinatesParser().get_room_coordinates(task_desc.data)
-            task_data = self._prepare_task_data(room_coordinates)
-            task = Task(task_desc.type, task_data, priority = task_desc.priority)
-            self._order_task(task)
+            if(Task.is_task_type_scenario(task_desc.type)):
+                #TODO take care of scenario
+                pass
+
+            elif(Task.does_task_type_exists_in_system(task_desc.type)):
+                room_coordinates = RoomCoordinatesParser().get_room_coordinates(task_desc.data[0]) # as simple task have just one attribute
+                task_data = self._prepare_task_data(room_coordinates)
+                task = Task(task_desc.type, task_data, priority = task_desc.priority)
+                self._order_task(task)
+
+            else: 
+                raise TaskTypeNotIntroducedError()
+                
         except(KeyError):
             print("Room name does not exist in system!")
+
+        except TaskTypeNotIntroducedError as type_task_error:
+            print(type_task_error.message)
 
     def _order_task(self, task):
         optimal_robot, position = self._select_optimal_robot(task)
@@ -44,11 +57,9 @@ class PlanMaster():
                 robots_cost_dict[robot_harmonizer], robots_and_task_position_dict[robot_harmonizer] = robot_harmonizer.get_estimated_task_cost_with_scheduled_position(task)
                 print("[ Estimated cost for: ", robot_harmonizer.robot_name, "] ", robots_cost_dict[robot_harmonizer], 
                     "Task at position: ", robots_and_task_position_dict[robot_harmonizer])
-            
-        # robots_cost_dict = sorted(robots_cost_dict.items(), key=lambda x: x[1])
+
         optimal_robot_harmonizer = min(robots_cost_dict, key = robots_cost_dict.get) 
         return optimal_robot_harmonizer, robots_and_task_position_dict[optimal_robot_harmonizer]
-        # return
 
     def _prepare_task_data(self, coordinates):
         task_data = PoseStamped()
