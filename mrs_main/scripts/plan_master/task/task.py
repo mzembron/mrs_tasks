@@ -1,5 +1,6 @@
 from mrs_msgs.msg import TaskDesc
 from constants.robots_usecases import *
+from constants.scenario_list import SCENARIO_LIST
 ###
 # Task class
 # priority:
@@ -14,6 +15,9 @@ class Task():
         self.type = type
         self.data = data
         self.priority = priority
+        self.is_scenario = self._determine_if_task_is_scenario()
+        if self.is_scenario:
+            self._generate_subtasks()
 
     def parse_task_from_msg(self, msg):
         self.type = msg.type
@@ -31,3 +35,12 @@ class Task():
     
     def is_suitable_for_robot(self, robot):
         return self.type in ROBOT_USECASE_MAP[robot.robot_type]
+
+    def _determine_if_task_is_scenario(self):
+        return self.type in SCENARIO_LIST
+
+    def _generate_subtasks(self):
+        self.subtasks_list = []
+        for task_type in SCENARIO_LIST[self.type]:
+            subtask = Task(task_type, self.data, self.priority)
+            self.subtasks_list.append(subtask)
