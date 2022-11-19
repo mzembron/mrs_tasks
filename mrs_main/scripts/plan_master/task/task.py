@@ -43,7 +43,7 @@ class Task():
 
     def _generate_subtasks(self):
         self.subtasks_list = []
-        for task_type in SCENARIO_LIST[self.type]:
+        for task_type in SCENARIO_LIST[self.type]["subtasks"]:
             subtask = Task(task_type, self.data, self.priority)
             self.subtasks_list.append(subtask)
 
@@ -54,7 +54,7 @@ class Task():
                 return True
 
         return False
-        
+
     @staticmethod
     def is_task_type_scenario(task_type):
         return task_type in SCENARIO_LIST
