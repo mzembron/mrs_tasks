@@ -12,3 +12,7 @@ scripts/tests/__pycache__
 
 scripts/data_parser/*.pyc
 scripts/data_parser/__pycache__
+
+scripts/constants/*.pyc
+scripts/constants/__pycache__
+
