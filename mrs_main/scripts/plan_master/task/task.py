@@ -1,23 +1,23 @@
-from mrs_msgs.msg import TaskDesc
-from constants.robots_usecases import *
+from constants.robots_usecases import ROBOT_USECASE_MAP
 from constants.scenario_list import SCENARIO_LIST
-###
-# Task class
-# priority:
-#   int from 0 to 10
-#   0 - most important 
-#   10 - least important
-###
+
+from mrs_msgs.msg import TaskDesc
+
 
 class Task():
-    
-    def __init__(self, type, data, priority = 10):
-        self.type = type
+    """ Task class - representation of Task_desc message.
+    Priority:
+        - int from 0 to 10
+        - 0 - most important
+        -  10 - least important
+    """
+    def __init__(self, task_type, data, priority=10):
+        self.type = task_type
         self.priority = priority
         self.data = data
         self.is_scenario = self._determine_if_task_is_scenario()
         if self.is_scenario:
-            #TODO - how to split task data
+            # TODO - how to split task data
             self._generate_subtasks()
 
     def parse_task_from_msg(self, msg):
@@ -26,14 +26,15 @@ class Task():
         self.priority = msg.prioirty
 
     def return_task_desc_msg(self):
-        #Debug!
+        # Debug!
         # self.data = None
         task_msg = TaskDesc()
-        task_msg.data = "x: "+str(self.data.pose.position.x) + "y: " + str(self.data.pose.position.y)
+        task_msg.data = "x: "+str(self.data.pose.position.x) + "y: " \
+            + str(self.data.pose.position.y)
         task_msg.priority = self.priority
         task_msg.type = self.type
         return task_msg
-    
+
     def is_suitable_for_robot(self, robot):
         return self.type in ROBOT_USECASE_MAP[robot.robot_type]
 
@@ -44,9 +45,13 @@ class Task():
         return self.type in SCENARIO_LIST
 
     def _generate_subtasks(self):
+        from plan_master.task.subtask import Subtask
         self.subtasks_list = []
-        for subtask in SCENARIO_LIST[self.type]["subtasks"]:
-            subtask = Task(subtask["type"], self.data[subtask["appropriate data index"]], self.priority)
+        for subtask_desc in SCENARIO_LIST[self.type]["subtasks"]:
+            subtask = Subtask(
+                subtask_desc,
+                self.data[subtask_desc["appropriate data index"]],
+                self.priority)
             self.subtasks_list.append(subtask)
 
     @staticmethod
