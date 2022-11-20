@@ -38,6 +38,9 @@ class Task():
     def is_suitable_for_robot(self, robot):
         return self.type in ROBOT_USECASE_MAP[robot.robot_type]
 
+    def has_highier_priorty_than(self, other_task):
+        return self.priority < other_task.priority
+
     def _determine_if_task_is_scenario(self):
         return self.type in SCENARIO_LIST
 

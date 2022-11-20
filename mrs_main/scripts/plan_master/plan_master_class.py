@@ -22,7 +22,7 @@ class PlanMaster():
 
     def _move_base_goal_callback(self, data):
         task = Task('GT', data, priority= 8)
-        self._order_task(task)
+        self._order_task_execution(task)
 
     def _order_task_callback(self, task_desc):
         try:
@@ -34,7 +34,7 @@ class PlanMaster():
                 room_coordinates = RoomCoordinatesParser().get_room_coordinates(task_desc.data[0]) # as simple task have just one attribute
                 task_data = self._prepare_task_data(room_coordinates)
                 task = Task(task_desc.type, task_data, priority = task_desc.priority)
-                self._order_task(task)
+                self._order_task_execution(task)
 
             else: 
                 raise TaskTypeNotIntroducedError()
@@ -45,7 +45,7 @@ class PlanMaster():
         except TaskTypeNotIntroducedError as type_task_error:
             print(type_task_error.message)
 
-    def _order_task(self, task):
+    def _order_task_execution(self, task):
         optimal_robot, position = self._select_optimal_robot(task)
         optimal_robot.add_task(task, position)
 

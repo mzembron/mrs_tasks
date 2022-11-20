@@ -47,7 +47,7 @@ class RobotTaskHarmonizer:
             if task_index == 0:
                 full_cost += self.robot.calc_cost_from_curr_position_to_spec_position(task.data)/task_dealy_coeficient
 
-            elif self._was_task_delayed(task_dealy_coeficient) and not was_new_task_included:
+            elif (new_task.has_highier_priorty_than(task)) and not was_new_task_included:
                 # if new task has higher priority than current task including new task into estimated cost
                 task_position = task_index
                 full_cost += self._calculate_cost_of_including_new_task(task_index, new_task)
@@ -98,7 +98,7 @@ class RobotTaskHarmonizer:
 
     def _calculate_delay_coeficient(self, curr_task, new_task):
         task_dealy_coeficient = 1
-        if new_task.priority > curr_task.priority:
+        if new_task.priority < curr_task.priority:  # lower number highier priority
             task_dealy_coeficient = DELAY_TASK_PENALTY
         return task_dealy_coeficient
 

@@ -4,7 +4,7 @@
 ###
 SCENARIO_LIST = {  
                     'BG' : {    #BRING GOOD SCENARIO
-                            "subtasks": ['MT', 'GT', 'MT'],
-                            "data distribution": [0, 0, 1 ]
+                            "subtasks" : ['MT', 'GT', 'MT'],
+                            "data distribution" : [0, 0, 1 ]
                         } 
                 }

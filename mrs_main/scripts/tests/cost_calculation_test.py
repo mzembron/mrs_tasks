@@ -30,9 +30,9 @@ def test_cost_estimation_and_task_placement_new_task_one_in_backlog(base_robot_t
     assert(position == -1)
 
 def test_cost_estimation_and_task_placement_with_task_reorder(base_robot_task_harmoniser):
-    fake_task_high_priority = Task("GT",None, 8)
+    fake_task_high_priority = Task("GT",None, 3)
     fake_task_middle_priority = Task("GT",None, 5)
-    fake_task_low_priority = Task("GT", None, 3)
+    fake_task_low_priority = Task("GT", None, 8)
     
     base_robot_task_harmoniser.task_list.append(fake_task_high_priority)
     base_robot_task_harmoniser.task_list.append(fake_task_low_priority)
