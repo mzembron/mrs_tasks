@@ -46,8 +46,8 @@ class Task():
 
     def _generate_subtasks(self):
         self.subtasks_list = []
-        for task_type in SCENARIO_LIST[self.type]["subtasks"]:
-            subtask = Task(task_type, self.data, self.priority)
+        for subtask in SCENARIO_LIST[self.type]["subtasks"]:
+            subtask = Task(subtask["type"], self.data[subtask["appropriate data index"]], self.priority)
             self.subtasks_list.append(subtask)
 
     @staticmethod
