@@ -1,6 +1,5 @@
 import threading
 
-
 import rospy
 import time
 from constants.constants import *
@@ -35,7 +34,7 @@ class RobotTaskHarmonizer:
     def get_estimated_task_cost_with_scheduled_position(self, new_task):
         full_cost = 0 
         was_new_task_included = False
-        task_position = -1
+        task_position = -1 # initial position is last in task list
         if len(self.task_list) == 0:
             task_position = 0
             return self.robot.calc_cost_from_curr_position_to_spec_position(new_task.data), task_position
@@ -47,7 +46,7 @@ class RobotTaskHarmonizer:
             if task_index == 0:
                 full_cost += self.robot.calc_cost_from_curr_position_to_spec_position(task.data)/task_dealy_coeficient
 
-            elif (new_task.has_highier_priorty_than(task)) and not was_new_task_included:
+            elif (new_task.has_higher_priority_than(task)) and not was_new_task_included:
                 # if new task has higher priority than current task including new task into estimated cost
                 task_position = task_index
                 full_cost += self._calculate_cost_of_including_new_task(task_index, new_task)

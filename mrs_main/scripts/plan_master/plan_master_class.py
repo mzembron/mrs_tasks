@@ -28,13 +28,10 @@ class PlanMaster():
         try:
             if(Task.is_task_type_scenario(task_desc.type)):
                 #TODO take care of scenario
-                pass
+                self._handle_scenario(task_desc)
 
             elif(Task.does_task_type_exists_in_system(task_desc.type)):
-                room_coordinates = RoomCoordinatesParser().get_room_coordinates(task_desc.data[0]) # as simple task have just one attribute
-                task_data = self._prepare_task_data(room_coordinates)
-                task = Task(task_desc.type, task_data, priority = task_desc.priority)
-                self._order_task_execution(task)
+                self._handale_simple_task(task_desc)
 
             else: 
                 raise TaskTypeNotIntroducedError()
@@ -44,6 +41,15 @@ class PlanMaster():
 
         except TaskTypeNotIntroducedError as type_task_error:
             print(type_task_error.message)
+
+    def _handale_simple_task(self, task_desc):
+        room_coordinates = RoomCoordinatesParser().get_room_coordinates(task_desc.data[0]) # as simple task have just one attribute
+        task_data = self._prepare_task_data(room_coordinates)
+        task = Task(task_desc.type, task_data, priority = task_desc.priority)
+        self._order_task_execution(task)
+
+    def _handle_scenario(self, task_desc):
+        pass
 
     def _order_task_execution(self, task):
         optimal_robot, position = self._select_optimal_robot(task)
