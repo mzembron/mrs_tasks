@@ -13,7 +13,6 @@ class Task():
     
     def __init__(self, type, data, priority = 10):
         self.type = type
-        
         self.priority = priority
         self.data = data
         self.is_scenario = self._determine_if_task_is_scenario()

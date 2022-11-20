@@ -16,12 +16,24 @@ SCENARIO_LIST = {
                             "subtasks" : [
                                 {
                                         "type": 'MT',
-                                        "appropriate data index": 0 }, 
+                                        "index": 0,
+                                        "appropriate data index": 0, # refers to data list passed as Task class atribute 
+                                        "requires to start": [],
+                                        "requires to end": [],
+                                        "same robot as task": None }, 
                                 {       
                                         "type": 'GT',
-                                        "appropriate data index": 0 },      
+                                        "index": 1,
+                                        "appropriate data index": 0,
+                                        "requires to start": [],
+                                        "requires to end": [0],
+                                        "same robot as task": None },      
                                 {        
                                         "type": 'MT',
-                                        "appropriate data index": 1 }] 
+                                        "index": 2,
+                                        "appropriate data index": 1,
+                                        "requires to start": [1],
+                                        "requires to end": [],
+                                        "same robot as task": 0 }] 
                         } 
                 }
