@@ -10,16 +10,15 @@ from move_base_msgs.msg import MoveBaseActionResult
 
 from mrs_msgs.msg import TaskBacklog
 
-###  
-# Wrapper for robot class with purpose of managing tasks
-###
 
 CURRENT_TASK_INDEX = 0
 
 
 class RobotTaskHarmonizer:
-    def __init__(self,robot_name):
-        ### just assume we use only turtlebots:
+    """ Wrapper for robot class with purpose of managing tasks """
+    def __init__(self, robot_name):
+        """
+        Just assume we use only turtlebots:"""
         self.robot = Turtlebot(robot_name)
         rospy.Subscriber(robot_name+"/move_base/result", MoveBaseActionResult, self._action_result_callback)
         self.tasks_backlog_publisher = rospy.Publisher("plan_master/tasks_backlog", TaskBacklog, queue_size=10)

@@ -7,7 +7,7 @@ BRING_GOOD_TYPE = 'BG'
 FAKE_SCENARIO_TYPE = 'FS'
 GO_TO_TYPE = 'GT'
 MANIPULATE_TYPE = 'MT'
-TEST_DATA =  ["botle", "Tomek"]
+TEST_DATA = ["botle", "Tomek"]
 
 
 

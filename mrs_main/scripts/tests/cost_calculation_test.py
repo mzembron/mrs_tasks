@@ -4,7 +4,7 @@ from plan_master.task.task import Task
 from tests.fake_test_robot import FakeRobot
 from constants.testing_constats import *
 from constants.constants import *
-import pytest 
+import pytest
 from enum import Enum
 
 @pytest.fixture

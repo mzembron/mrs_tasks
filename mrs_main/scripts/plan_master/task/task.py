@@ -57,7 +57,7 @@ class Task():
     @staticmethod
     def does_task_type_exists_in_system(task_type):
         for _, supported_task_types_list in ROBOT_USECASE_MAP.items():
-            if(task_type in supported_task_types_list):
+            if (task_type in supported_task_types_list):
                 return True
 
         return False
