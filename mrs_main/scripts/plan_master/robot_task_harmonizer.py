@@ -5,11 +5,13 @@ import time
 from constants.constants import DELAY_TASK_PENALTY
 
 from plan_master.turtlebot import Turtlebot
+from plan_master.task.subtask import Subtask
 
 from move_base_msgs.msg import MoveBaseActionResult
 
 from mrs_msgs.msg import TaskBacklog
 
+from std_msgs.msg import String
 
 CURRENT_TASK_INDEX = 0
 
@@ -29,6 +31,14 @@ class RobotTaskHarmonizer:
                 "plan_master/tasks_backlog",
                 TaskBacklog,
                 queue_size=10)
+
+        # Debug! trying with scenarios!
+        self.scenario_publisher = \
+            rospy.Publisher(
+                "plan_master/scenarios_conditions",
+                String,
+                queue_size=10)
+
         self.backlog_publishing_thread = \
             threading.Thread(
                 target=self.backlog_updater,
@@ -130,6 +140,13 @@ class RobotTaskHarmonizer:
 
         if (result.status.status == 3):
             print(self.robot_name, " achieved goal! #############")
+            ## scenarios debug!
+            if  (type(self.task_list[CURRENT_TASK_INDEX]) is Subtask):
+                print(" Subtask! Publishing subtask condition ")
+                cos = String()
+                cos.data = str(self.task_list[CURRENT_TASK_INDEX].index)
+                self.scenario_publisher.publish(cos)
+
             if (len(self.task_list) != 0):
                 self.task_list.pop(CURRENT_TASK_INDEX)
                 self.order_task()

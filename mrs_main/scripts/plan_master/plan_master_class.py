@@ -8,6 +8,7 @@ from plan_master.task.task_type_not_introduced_error \
 from mrs_msgs.msg import TaskDesc
 from data_parser.room_coordinates_parser import RoomCoordinatesParser
 
+from std_msgs.msg import String
 
 class PlanMaster():
     """Main system planner class."""
@@ -22,8 +23,14 @@ class PlanMaster():
             "plan_master/order_task",
             TaskDesc,
             self._order_task_callback)
+
+        rospy.Subscriber(
+            "plan_master/scenarios_conditions",
+            String,
+            self._scenario_callback)
         # subscription of task on general topic like /plan_master/ordered_tasks
         self.robots_harmonizers = []
+        self.scenarios_data_list = {}
 
     def subscribe(self, robot):
         self.robots_harmonizers.append(robot)
@@ -44,13 +51,17 @@ class PlanMaster():
             else: 
                 raise TaskTypeNotIntroducedError()
                 
-        except(KeyError):
-            print("Room name does not exist in system!")
+        # except(KeyError):
+        #     print("Room name does not exist in system!")
 
         except TaskTypeNotIntroducedError as type_task_error:
             print(type_task_error.message)
 
+    def _scenario_callback(self, subtask_index):
+        print("Got that subtask ", subtask_index, " has ended" )
+
     def _handale_simple_task(self, task_desc):
+        print(task_desc.data[0])
         room_coordinates = RoomCoordinatesParser() \
             .get_room_coordinates(task_desc.data[0])
         # as simple task have just one attribute
@@ -59,7 +70,21 @@ class PlanMaster():
         self._order_task_execution(task)
 
     def _handle_scenario(self, task_desc):
-        pass
+        scenario_data = []
+        for data_desc in task_desc.data:
+            room_coordinates = RoomCoordinatesParser() \
+                .get_room_coordinates(data_desc)
+            task_data = self._prepare_task_data(room_coordinates)
+            scenario_data.append(task_data)
+        task_data = self._prepare_task_data(room_coordinates)
+        scenario = Task(task_desc.type, scenario_data, task_desc.priority)
+
+        for subtask in scenario.subtasks_list:
+            # in here scenario planning and execution
+            # just debg! take care of the first batch of tasks
+            if len(subtask.tasks_indicies_required_to_start) == 0:
+                optimal_robot, position = self._select_optimal_robot(subtask)
+                optimal_robot.add_task(subtask, position)
 
     def _order_task_execution(self, task):
         optimal_robot, position = self._select_optimal_robot(task)
@@ -69,15 +94,17 @@ class PlanMaster():
         robots_cost_dict = {}
         robots_and_task_position_dict = {}
         for robot_harmonizer in self.robots_harmonizers:
-            if(task.is_suitable_for_robot(robot_harmonizer.robot)):
+            if (task.is_suitable_for_robot(robot_harmonizer.robot)):
                 robots_cost_dict[robot_harmonizer], robots_and_task_position_dict[robot_harmonizer] = robot_harmonizer.get_estimated_task_cost_with_scheduled_position(task)
-                print("[ Estimated cost for: ", robot_harmonizer.robot_name, "] ", robots_cost_dict[robot_harmonizer],
+                print("[ Estimated cost for: ", robot_harmonizer.robot_name,
+                    "] ", robots_cost_dict[robot_harmonizer],
                     "Task at position: ", robots_and_task_position_dict[robot_harmonizer])
 
         optimal_robot_harmonizer = min(robots_cost_dict, key=robots_cost_dict.get) 
         return optimal_robot_harmonizer, robots_and_task_position_dict[optimal_robot_harmonizer]
 
     def _prepare_task_data(self, coordinates):
+        # TODO move it to task !!!!
         task_data = PoseStamped()
         task_data.pose.position.x = coordinates[0]
         task_data.pose.position.y = coordinates[1]

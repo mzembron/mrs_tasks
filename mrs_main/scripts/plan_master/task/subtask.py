@@ -15,3 +15,6 @@ class Subtask(Task):
             subtask_param_dict['requires to end']
         self.index_of_task_with_same_robot_requirement = \
             subtask_param_dict['same robot as task']
+
+    # def assign_id(self, id):
+    #     self.subtask_id
