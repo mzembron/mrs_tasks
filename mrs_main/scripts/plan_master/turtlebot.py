@@ -1,7 +1,7 @@
 import math
 
 import rospy
-from nav_msgs.msg import  Odometry
+from nav_msgs.msg import Odometry
 from move_base_msgs.msg import MoveBaseActionGoal
 # from actionlib_msgs.msg import GoalStatusArray
 from nav_msgs.srv import GetPlan, GetPlanRequest
@@ -9,7 +9,7 @@ from nav_msgs.srv import GetPlan, GetPlanRequest
 from helpful_functions.data_manipulation import DataManipulation
 from constants.robot_type import RobotType
 from constants.constants import ROBOT_AVERAGE_VELOCITY
-import math
+
 
 class Turtlebot:
 
@@ -20,23 +20,25 @@ class Turtlebot:
         self.robot_name = robot_name
         self.robot_type = RobotType.MOBILE
         self.current_goal = None
-    
+
     def calc_cost_from_curr_position_to_spec_position(self, goal_odom_data):
         plan = self._make_path_plan(self.current_odom_data, goal_odom_data)
         return self._approximate_path_length(plan)/ROBOT_AVERAGE_VELOCITY
 
     def calc_cost_from_curr_position_to_curr_goal(self):
-        assert(self.current_goal is not None)
+        assert (self.current_goal is not None)
 
         plan = self._make_path_plan(self.current_odom_data, self.current_goal)
         return self._approximate_path_length(plan)/ROBOT_AVERAGE_VELOCITY
 
-    def calc_cost_from_spec_position_to_spec_position(self, start_odom_data, goal_odom_data):
+    def calc_cost_from_spec_position_to_spec_position(
+            self, start_odom_data,
+            goal_odom_data):
         plan = self._make_path_plan(start_odom_data, goal_odom_data)
         return self._approximate_path_length(plan)/ROBOT_AVERAGE_VELOCITY
 
     def calc_cost_from_curr_goal_to_spec_position(self, goal_odom_data):
-        assert(self.current_goal is not None)
+        assert (self.current_goal is not None)
 
         plan = self._make_path_plan(self.current_goal, goal_odom_data)
         return self._approximate_path_length(plan)/ROBOT_AVERAGE_VELOCITY
@@ -50,7 +52,6 @@ class Turtlebot:
     def _odom_callback(self, data):
         self.current_odom_data = data.pose
 
-
     def _make_path_plan(self, start_odom_data, goal_odom_data):
         req = GetPlanRequest()
 
@@ -59,22 +60,16 @@ class Turtlebot:
 
         req.tolerance = 0.1
         service_output = self.make_plan_srv(req)
-        return  service_output.plan
+        return service_output.plan
 
     def _approximate_path_length(self, plan):
         path_length = 0.0
 
-        for index in range(1, len(plan.poses) -1):
-            previous = plan.poses[index -1].pose.position
+        for index in range(1, len(plan.poses) - 1):
+            previous = plan.poses[index - 1].pose.position
             current = plan.poses[index].pose.position
             #  Euclidean distance
             distance = math.sqrt((previous.x - current.x)**2 + (previous.y - current.y)**2)
             path_length += distance
 
         return path_length
-
-
-
-
-
-
