@@ -52,6 +52,8 @@ add_message_files(
   FILES
   TaskDesc.msg
   TaskBacklog.msg
+  TaskId.msg
+  TaskStatus.msg
 )
 
 ## Generate services in the 'srv' folder
