@@ -19,8 +19,8 @@ class Task():
         self.id = str(uuid.uuid4())  # uniqe id generator 
         self.data = data
         self.is_scenario = self._determine_if_task_is_scenario()
+        self._add_distinguisher_to_id()
         if self.is_scenario:
-            # TODO - how to split task data
             self._generate_subtasks()
 
     def parse_task_from_msg(self, msg):
@@ -58,6 +58,11 @@ class Task():
                 priority=self.priority)
             self.subtasks_list.append(subtask)
 
+    def _add_distinguisher_to_id(self):
+        if self.is_scenario:
+            self.id += "-scenario"
+        else:
+            self.id += "-ordinary"
     @staticmethod
     def does_task_type_exists_in_system(task_type):
         for _, supported_task_types_list in ROBOT_USECASE_MAP.items():

@@ -8,7 +8,7 @@ FAKE_SCENARIO_TYPE = 'FS'
 GO_TO_TYPE = 'GT'
 MANIPULATE_TYPE = 'MT'
 TEST_DATA = ["botle", "Tomek"]
-
+SCENARIO_DISTINGUISHER = 'scenario'
 
 def test_subtask_generation():
     bring_good_scenario = Task(BRING_GOOD_TYPE, TEST_DATA)
@@ -17,7 +17,7 @@ def test_subtask_generation():
     subtask_list = bring_good_scenario.subtasks_list
     for subtask in subtask_list:
         subtasks_types.append(subtask.type)
-
+    assert(bring_good_scenario.id.endswith(SCENARIO_DISTINGUISHER))
     assert(GO_TO_TYPE in subtasks_types)
     assert(MANIPULATE_TYPE in subtasks_types)
     for task_index in range(len(subtask_list)):

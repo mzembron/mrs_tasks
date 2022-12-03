@@ -102,6 +102,10 @@ class RobotTaskHarmonizer:
         print(self.robot_name, full_cost)
         return full_cost, task_position
 
+    def receive_scenario_signal(self):
+        print(self.robot_name, " received signal")
+
+
     def add_task(self, task, position):
         if len(self.task_list) == 0:
             self.task_list.append(task)

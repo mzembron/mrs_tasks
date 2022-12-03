@@ -3,6 +3,8 @@ from geometry_msgs.msg import PoseStamped
 
 
 from plan_master.task.task import Task
+from plan_master.task.scenarios_controller \
+    import ScenariosController
 from plan_master.task.task_type_not_introduced_error \
     import TaskTypeNotIntroducedError
 from mrs_msgs.msg import TaskDesc, TaskStatus
@@ -28,7 +30,7 @@ class PlanMaster():
             self._task_status_callback)
         # subscription of task on general topic like /plan_master/ordered_tasks
         self.robots_harmonizers = []
-        self.scenarios_data_list = {}
+        self.scenarios_controller = ScenariosController(self.robots_harmonizers)
 
     def subscribe(self, robot):
         self.robots_harmonizers.append(robot)
@@ -50,13 +52,19 @@ class PlanMaster():
                 raise TaskTypeNotIntroducedError()
                 
         # except(KeyError):
+            # create specific error for room name (or tag) not found!
         #     print("Room name does not exist in system!")
 
         except TaskTypeNotIntroducedError as type_task_error:
             print(type_task_error.message)
 
     def _task_status_callback(self, task_status):
-        print("[ INFO ] Got that task of id: ", task_status.id.id, " and index: ", task_status.id.index, " has ended" )
+        if(str(task_status.id.id).endswith('scenario')):
+            self.scenarios_controller.handle_completed_subtask(task_status)
+        else:
+            print('Simple task has ended!')
+        # print("[ INFO ] Got that task of id: ", task_status.id.id, " and index: ",
+        # task_status.id.index, " has ended" )
 
     def _handale_simple_task(self, task_desc):
         print(task_desc.data[0])
@@ -68,6 +76,7 @@ class PlanMaster():
         self._order_task_execution(task)
 
     def _handle_scenario(self, task_desc):
+        # exclude parsing of scenario data
         scenario_data = []
         for data_desc in task_desc.data:
             room_coordinates = RoomCoordinatesParser() \
@@ -80,26 +89,30 @@ class PlanMaster():
         for subtask in scenario.subtasks_list:
             # in here scenario planning and execution
             # just debg! take care of the first batch of tasks
-            if len(subtask.tasks_indicies_required_to_start) == 0:
-                optimal_robot, position = self._select_optimal_robot(subtask)
-                optimal_robot.add_task(subtask, position)
+            if len(subtask.required_to_start_if_met_dict) == 0:
+                optimal_harmonizer, position = self._select_optimal_harmonizer(subtask)
+                optimal_harmonizer.add_task(subtask, position)
+                self.scenarios_controller\
+                    .subtask_harmonizer_dict[subtask] = optimal_harmonizer
+
 
     def _order_task_execution(self, task):
-        optimal_robot, position = self._select_optimal_robot(task)
-        optimal_robot.add_task(task, position)
+        optimal_harmonizer, position = self._select_optimal_harmonizer(task)
+        optimal_harmonizer.add_task(task, position)
 
-    def _select_optimal_robot(self, task):
-        robots_cost_dict = {}
-        robots_and_task_position_dict = {}
-        for robot_harmonizer in self.robots_harmonizers:
-            if (task.is_suitable_for_robot(robot_harmonizer.robot)):
-                robots_cost_dict[robot_harmonizer], robots_and_task_position_dict[robot_harmonizer] = robot_harmonizer.get_estimated_task_cost_with_scheduled_position(task)
-                print("[ Estimated cost for: ", robot_harmonizer.robot_name,
-                    "] ", robots_cost_dict[robot_harmonizer],
-                    "Task at position: ", robots_and_task_position_dict[robot_harmonizer])
+    def _select_optimal_harmonizer(self, task):
+        harmonizer_cost_dict = {}
+        harmonizer_task_position_dict = {}
+        for harmonizer in self.robots_harmonizers:
+            if (task.is_suitable_for_robot(harmonizer.robot)):
+                harmonizer_cost_dict[harmonizer], harmonizer_task_position_dict[harmonizer] \
+                = harmonizer.get_estimated_task_cost_with_scheduled_position(task)
+                print("[ Estimated cost for: ", harmonizer.robot_name,
+                    "] ", harmonizer_cost_dict[harmonizer],
+                    "Task at position: ", harmonizer_task_position_dict[harmonizer])
 
-        optimal_robot_harmonizer = min(robots_cost_dict, key=robots_cost_dict.get) 
-        return optimal_robot_harmonizer, robots_and_task_position_dict[optimal_robot_harmonizer]
+        optimal_robot_harmonizer = min(harmonizer_cost_dict, key=harmonizer_cost_dict.get) 
+        return optimal_robot_harmonizer, harmonizer_task_position_dict[optimal_robot_harmonizer]
 
     def _prepare_task_data(self, coordinates):
         # TODO move it to task !!!!
