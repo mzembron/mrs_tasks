@@ -10,9 +10,6 @@ MANIPULATE_TYPE = 'MT'
 TEST_DATA = ["botle", "Tomek"]
 
 
-
-
-
 def test_subtask_generation():
     bring_good_scenario = Task(BRING_GOOD_TYPE, TEST_DATA)
     assert(bring_good_scenario.is_scenario)
@@ -27,6 +24,9 @@ def test_subtask_generation():
         task = subtask_list[task_index]
         assert(task.type == SCENARIO_LIST[BRING_GOOD_TYPE]["subtasks"][task_index]["type"])
         assert(task.data == TEST_DATA[SCENARIO_LIST[BRING_GOOD_TYPE]["subtasks"][task_index]["appropriate data index"]])
+
+        assert(bring_good_scenario.id == task.id)
+        assert(task_index == task.index)
 
 def test_spot_real_scenario():
     assert(Task.is_task_type_scenario(BRING_GOOD_TYPE))

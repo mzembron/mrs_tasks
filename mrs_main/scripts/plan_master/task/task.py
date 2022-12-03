@@ -3,6 +3,8 @@ from constants.scenario_list import SCENARIO_LIST
 
 from mrs_msgs.msg import TaskDesc
 
+import uuid
+
 
 class Task():
     """ Task class - representation of Task_desc message.
@@ -14,6 +16,7 @@ class Task():
     def __init__(self, task_type, data, priority=10):
         self.type = task_type
         self.priority = priority
+        self.id = str(uuid.uuid4())  # uniqe id generator 
         self.data = data
         self.is_scenario = self._determine_if_task_is_scenario()
         if self.is_scenario:
@@ -51,7 +54,8 @@ class Task():
             subtask = Subtask(
                 subtask_desc,
                 self.data[subtask_desc["appropriate data index"]],
-                self.priority)
+                parent_id=self.id,
+                priority=self.priority)
             self.subtasks_list.append(subtask)
 
     @staticmethod

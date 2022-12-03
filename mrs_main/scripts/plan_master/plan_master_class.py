@@ -5,10 +5,8 @@ from geometry_msgs.msg import PoseStamped
 from plan_master.task.task import Task
 from plan_master.task.task_type_not_introduced_error \
     import TaskTypeNotIntroducedError
-from mrs_msgs.msg import TaskDesc
+from mrs_msgs.msg import TaskDesc, TaskStatus
 from data_parser.room_coordinates_parser import RoomCoordinatesParser
-
-from std_msgs.msg import String
 
 class PlanMaster():
     """Main system planner class."""
@@ -26,8 +24,8 @@ class PlanMaster():
 
         rospy.Subscriber(
             "plan_master/scenarios_conditions",
-            String,
-            self._scenario_callback)
+            TaskStatus,
+            self._task_status_callback)
         # subscription of task on general topic like /plan_master/ordered_tasks
         self.robots_harmonizers = []
         self.scenarios_data_list = {}
@@ -57,8 +55,8 @@ class PlanMaster():
         except TaskTypeNotIntroducedError as type_task_error:
             print(type_task_error.message)
 
-    def _scenario_callback(self, subtask_index):
-        print("Got that subtask ", subtask_index, " has ended" )
+    def _task_status_callback(self, task_status):
+        print("[ INFO ] Got that task of id: ", task_status.id.id, " and index: ", task_status.id.index, " has ended" )
 
     def _handale_simple_task(self, task_desc):
         print(task_desc.data[0])

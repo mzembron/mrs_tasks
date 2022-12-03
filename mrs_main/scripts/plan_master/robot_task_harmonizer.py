@@ -9,7 +9,7 @@ from plan_master.task.subtask import Subtask
 
 from move_base_msgs.msg import MoveBaseActionResult
 
-from mrs_msgs.msg import TaskBacklog
+from mrs_msgs.msg import TaskBacklog, TaskStatus
 
 from std_msgs.msg import String
 
@@ -33,10 +33,10 @@ class RobotTaskHarmonizer:
                 queue_size=10)
 
         # Debug! trying with scenarios!
-        self.scenario_publisher = \
+        self.task_status_publisher = \
             rospy.Publisher(
                 "plan_master/scenarios_conditions",
-                String,
+                TaskStatus,
                 queue_size=10)
 
         self.backlog_publishing_thread = \
@@ -51,6 +51,14 @@ class RobotTaskHarmonizer:
         self.backlog_publishing_thread.join()
 
     def get_estimated_task_cost_with_scheduled_position(self, new_task):
+        """ create new class that will be returned, requirements:
+         - cost,
+         - scheduled position in backlog,
+         - predicted task execution time (time of executing only this task)
+         - predicted task start time, task end time
+            (to determine period of time for executing this task)
+
+        """
         full_cost = 0
         was_new_task_included = False
         task_position = -1  # initial position is last in task list
@@ -135,24 +143,31 @@ class RobotTaskHarmonizer:
         return task_dealy_coeficient
 
     def _action_result_callback(self, result):
+        # Debug!
         print(self.robot.current_goal)
-        self.robot.current_goal = None
-
+        self.robot.current_goal = None # rethink if current goal is needed!!
+        current_task = self.task_list[CURRENT_TASK_INDEX]
+        task_status = TaskStatus()
+        task_status.status = result.status.status
+        task_status.id.id = current_task.id
         if (result.status.status == 3):
             print(self.robot_name, " achieved goal! #############")
+            ## publish output for all tasks 
             ## scenarios debug!
-            if  (type(self.task_list[CURRENT_TASK_INDEX]) is Subtask):
-                print(" Subtask! Publishing subtask condition ")
-                cos = String()
-                cos.data = str(self.task_list[CURRENT_TASK_INDEX].index)
-                self.scenario_publisher.publish(cos)
-
+            if  (type(current_task) is Subtask):
+                task_status.id.index = current_task.index
+            else:
+                task_status.id.index = 0 # as ordinary task does not have subtasks
             if (len(self.task_list) != 0):
                 self.task_list.pop(CURRENT_TASK_INDEX)
                 self.order_task()
         else:
             # advertise task to plan master
+
+            # Here robot should go to the next task !!!!
             print(self.robot_name, " was unable to achive goal! #############")
+
+        self.task_status_publisher.publish(task_status)
 
     def _was_task_delayed(self, task_dealy_coeficient):
         return task_dealy_coeficient == DELAY_TASK_PENALTY

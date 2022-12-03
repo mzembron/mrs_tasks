@@ -1,2 +1,2 @@
-int16 id
+string id
 int8 index
