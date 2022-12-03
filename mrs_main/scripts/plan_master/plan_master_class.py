@@ -67,7 +67,6 @@ class PlanMaster():
         # task_status.id.index, " has ended" )
 
     def _handale_simple_task(self, task_desc):
-        print(task_desc.data[0])
         room_coordinates = RoomCoordinatesParser() \
             .get_room_coordinates(task_desc.data[0])
         # as simple task have just one attribute
@@ -84,8 +83,9 @@ class PlanMaster():
             task_data = self._prepare_task_data(room_coordinates)
             scenario_data.append(task_data)
         task_data = self._prepare_task_data(room_coordinates)
+        ## leve here just this:
         scenario = Task(task_desc.type, scenario_data, task_desc.priority)
-
+        print(self.scenarios_controller.get_tasks_groups_for_one_robot(scenario))
         for subtask in scenario.subtasks_list:
             # in here scenario planning and execution
             # just debg! take care of the first batch of tasks

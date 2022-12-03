@@ -27,3 +27,26 @@ class ScenariosController:
     def _send_scenario_signal(self, robot):
         print("sending signal to robot!")
         robot.receive_scenario_signal()
+
+    @staticmethod
+    def get_tasks_groups_for_one_robot(scenario):
+        """ 
+        Method returns dict with:
+            - key: index of first task to be executed 
+            - value: group(list) of subtasks to be executed
+                by the same robot 
+                
+        Abstract: some subtasks of scenario requires to be 
+        executed by the same robot
+        """
+        tasks_group_for_same_robot = {}
+        for subtask in scenario.subtasks_list:
+            if subtask.same_robot_as_task_req is None:
+                # create new group of tasks 
+                tasks_group_for_same_robot[subtask.index] = [subtask]
+            
+            else:
+                other_task_index = subtask.same_robot_as_task_req
+                tasks_group_for_same_robot[other_task_index].append(subtask)
+
+        return tasks_group_for_same_robot
