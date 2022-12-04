@@ -6,7 +6,7 @@ from constants.constants import DELAY_TASK_PENALTY
 
 from plan_master.turtlebot import Turtlebot
 from plan_master.task.subtask import Subtask
-
+from plan_master.task.task_execution_estimation import TaskExecutionEstimation
 from move_base_msgs.msg import MoveBaseActionResult
 
 from mrs_msgs.msg import TaskBacklog, TaskStatus
@@ -111,6 +111,86 @@ class RobotTaskHarmonizer:
         print(self.robot_name, full_cost)
         return full_cost, task_position
 
+
+    def get_scenario_execution_estimation(self, new_tasks_list):
+        ## Debug method for harmonizing scenarios
+        """ create new class that will be returned, requirements:
+            - cost,
+            - scheduled position in backlog,
+            - predicted task execution time (time of executing only this task)
+            - predicted task start time, task end time
+            (to determine period of time for executing this task)
+
+        """
+        # full_cost = 0
+        was_new_task_included = False
+        # task_position = -1  # initial position is last in task list
+        REPRESENTANT_INDEX = 0
+        # if no tasks in backlog:
+        if len(self.task_list) == 0:
+            return self._generate_scenario_exec_estimation(new_tasks_list)
+        
+        # including in betweeen current tasks
+        full_cost_of_scenario = 0
+        execution_estimation_list = []
+        for task_idx, task in enumerate(self.task_list):
+            
+            ## calculate whether new tasks are going to move this task
+            ## (beacuse of highier priority)
+            task_dealy_coeficient = \
+                self._calculate_delay_coeficient(task, new_tasks_list[REPRESENTANT_INDEX])
+
+            # we do not disturb current task (no interuption while executing task so far)
+            if task_idx == 0:
+                full_cost_of_scenario += self.robot. \
+                    calc_cost_from_curr_position_to_spec_position(
+                        task.data)/task_dealy_coeficient
+
+            elif (new_tasks_list[REPRESENTANT_INDEX].has_higher_priority_than(task)) and \
+                    not was_new_task_included:
+                # if new task has higher priority than current task -> including
+                # # new task into estimated cost
+                # full_cost_of_scenario += self._calculate_cost_of_including_scenario(
+                #     task, task_idx , new_tasks_list)
+                execution_estimation_list = self._estimate_including_scenario(
+                    task,
+                    task_idx,
+                    new_tasks_list,
+                    full_cost_of_scenario
+                )
+                was_new_task_included = True
+
+            else:
+                # include cost of task in backlog
+                previous_task = self.task_list[task_idx-1]
+                task_cost = self.robot. \
+                    calc_cost_from_spec_position_to_spec_position(
+                        previous_task.data, task.data)/task_dealy_coeficient
+                full_cost_of_scenario += task_cost
+
+                if(len(execution_estimation_list)>0):
+                    #update estimated costs
+                    self._update_cost_for_scenario(task_cost)
+
+        # including at the end of current tasks
+        if was_new_task_included is False:
+            assert(len(execution_estimation_list)==0)
+            last_task = self.task_list[-1]
+            starting_index = len(self.task_list) - 1 # index convertion
+
+            execution_estimation_list = self._estimate_including_scenario(
+                last_task,
+                starting_index,
+                new_tasks_list,
+                full_cost_of_scenario
+            )
+
+        # make some debug print
+
+        # print(self.robot_name, full_cost)
+        
+        return execution_estimation_list
+
     def receive_scenario_signal(self):
         print(self.robot_name, " received signal")
         if (self.robot_status == STATUS_IDLE_BEFORE_TASK_START):
@@ -124,7 +204,7 @@ class RobotTaskHarmonizer:
         if len(self.task_list) == 0:
             self.task_list.append(task)
             self.order_task()
-        elif position == -1:
+        elif position == -1 or position > len(self.task_list)-1:
             self.task_list.append(task)
         else:
             self.task_list.insert(position, task)
@@ -162,6 +242,59 @@ class RobotTaskHarmonizer:
         cost += self.robot.calc_cost_from_spec_position_to_spec_position(
             new_task.data, curr_task.data)/DELAY_TASK_PENALTY
         return cost
+
+##### Additional methods for planning scenarios
+
+    def _generate_scenario_exec_estimation(self, new_tasks_list, starting_idx=0, 
+        starting_cost=0, prev_task=None):
+
+        execution_estimation_list = []
+        cost = starting_cost
+        for idx, task in enumerate(new_tasks_list):
+            single_execution_estimation = TaskExecutionEstimation()
+            single_execution_estimation.task_position = idx + starting_idx
+            if (idx==0 and starting_idx==0):
+                cost += self.robot.calc_cost_from_curr_position_to_spec_position(
+                    task.data
+                )
+            elif (idx == 0 and starting_idx != 0):
+                assert(prev_task is not None)
+                cost += self.robot.calc_cost_from_spec_position_to_spec_position(
+                    prev_task.data, 
+                    task.data
+                )
+            else:
+                prev_scenario_task = new_tasks_list[idx-1]
+                cost += self.robot.calc_cost_from_spec_position_to_spec_position(
+                    prev_scenario_task.data, 
+                    task.data
+                )
+
+            single_execution_estimation.full_cost = cost + starting_cost
+            execution_estimation_list.append(
+                single_execution_estimation
+            )
+        return execution_estimation_list
+
+    def _estimate_including_scenario(self, curr_task, curr_task_idx, new_tasks_list, curr_cost):
+        prev_task = self.task_list[curr_task_idx-1]
+        #including moved task cost 
+        temp_cost = curr_cost + self.robot.calc_cost_from_spec_position_to_spec_position(
+                    new_tasks_list[-1].data, 
+                    curr_task.data
+                )/DELAY_TASK_PENALTY
+        execution_estimation_list = self._generate_scenario_exec_estimation(
+            new_tasks_list,
+            starting_idx=curr_task_idx,
+            starting_cost=temp_cost,
+            prev_task=prev_task
+        )
+        return execution_estimation_list
+
+    def _update_cost_for_scenario(self, estimations_list, additional_cost):
+        for estimation in estimations_list:
+            estimation.full_cost += additional_cost
+##### End Additional methods for planning scenarios
 
     def _calculate_delay_coeficient(self, curr_task, new_task):
         task_dealy_coeficient = 1
