@@ -37,5 +37,25 @@ SCENARIO_LIST = {
                                         "requires to start": [1],
                                         "requires to end": [],
                                         "same robot as task": 0}]
+                        },
+
+                        'DBG1': {    # Debug 1 scenario
+                            "subtasks": [
+                                {
+                                        "type": 'GT',
+                                        "index": 0,
+                                        "appropriate data index": 0,  
+                                        # refers to data list passed as Task
+                                        #  class atribute
+                                        "requires to start": [],
+                                        "requires to end": [],
+                                        "same robot as task": None}, 
+                                {
+                                        "type": 'MT',
+                                        "index": 1,
+                                        "appropriate data index": 1,
+                                        "requires to start": [0],
+                                        "requires to end": [],
+                                        "same robot as task": None}]
                         } 
                 }

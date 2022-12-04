@@ -85,15 +85,18 @@ class PlanMaster():
         task_data = self._prepare_task_data(room_coordinates)
         ## leve here just this:
         scenario = Task(task_desc.type, scenario_data, task_desc.priority)
-        print(self.scenarios_controller.get_tasks_groups_for_one_robot(scenario))
+
+        # grouping subtasks
+        # print(self.scenarios_controller.get_tasks_groups_for_one_robot(scenario))
         for subtask in scenario.subtasks_list:
             # in here scenario planning and execution
             # just debg! take care of the first batch of tasks
-            if len(subtask.required_to_start_if_met_dict) == 0:
-                optimal_harmonizer, position = self._select_optimal_harmonizer(subtask)
-                optimal_harmonizer.add_task(subtask, position)
-                self.scenarios_controller\
-                    .subtask_harmonizer_dict[subtask] = optimal_harmonizer
+            # Debug! works while using debug 1 scenario
+            # if len(subtask.required_to_start_if_met_dict) == 0:
+            optimal_harmonizer, position = self._select_optimal_harmonizer(subtask)
+            optimal_harmonizer.add_task(subtask, position)
+            self.scenarios_controller\
+                .subtask_harmonizer_dict[subtask] = optimal_harmonizer
 
 
     def _order_task_execution(self, task):

@@ -11,9 +11,15 @@ from move_base_msgs.msg import MoveBaseActionResult
 
 from mrs_msgs.msg import TaskBacklog, TaskStatus
 
-from std_msgs.msg import String
 
 CURRENT_TASK_INDEX = 0
+# possible robot status:
+
+STATUS_READY = 0
+STATUS_RUNNING = 1
+STATUS_IDLE_BEFORE_TASK_START = 2
+STATUS_IDLE_AFTER_TASK_END = 3
+
 
 
 class RobotTaskHarmonizer:
@@ -45,7 +51,9 @@ class RobotTaskHarmonizer:
                 daemon=True)
         self.backlog_publishing_thread.start()
         self.robot_name = robot_name
+        self.robot_status = STATUS_READY
         self.task_list = []
+
 
     def __del__(self):
         self.backlog_publishing_thread.join()
@@ -104,6 +112,11 @@ class RobotTaskHarmonizer:
 
     def receive_scenario_signal(self):
         print(self.robot_name, " received signal")
+        if (self.robot_status == STATUS_IDLE_BEFORE_TASK_START):
+            # distinguish idle befor start and after ending
+            self.order_task()
+        elif (self.robot_status == STATUS_IDLE_AFTER_TASK_END):
+            self._handle_unfinished_task()
 
 
     def add_task(self, task, position):
@@ -117,7 +130,18 @@ class RobotTaskHarmonizer:
 
     def order_task(self):
         if (len(self.task_list) != 0):
-            self.robot.go_to_goal(self.task_list[0].data)
+            # Debug!
+            current_task = self.task_list[0]
+            if ((type(current_task) is Subtask)):
+                if (not current_task.is_start_req_met()):
+                    self.robot_status = STATUS_IDLE_BEFORE_TASK_START
+                    print(" [ ", self.robot_name)
+                    print(" [ ", self.robot_name, " ] ", " status: ", self.robot_status)
+                    return 
+            self.robot.go_to_goal(current_task.data)
+            self.robot_status = STATUS_RUNNING
+
+            print(" [ ", self.robot_name, " ] ", " status: ", self.robot_status)
 
     def backlog_updater(self):
         while (not rospy.is_shutdown()):
@@ -160,8 +184,15 @@ class RobotTaskHarmonizer:
             ## scenarios debug!
             if  (type(current_task) is Subtask):
                 task_status.id.index = current_task.index
+                #  if (not current_task.is_start_req_met()):
+                #   self.robot_status = STATUS_IDLE_AFTER_TASK_END
+                #   # remember taks statuts
+                #   # self.task_status_before = task_status
+                #   # return # end callback!
             else:
                 task_status.id.index = 0 # as ordinary task does not have subtasks
+
+            ## here take care of end cases !!!
             if (len(self.task_list) != 0):
                 self.task_list.pop(CURRENT_TASK_INDEX)
                 self.order_task()
@@ -172,6 +203,16 @@ class RobotTaskHarmonizer:
             print(self.robot_name, " was unable to achive goal! #############")
 
         self.task_status_publisher.publish(task_status)
+
+
+    def _handle_unfinished_task(self):
+        current_task = self.task_list[0]
+        if (current_task.is_end_req_met()):
+            assert(self._unfinished_task_status is not None)
+            self.task_list.pop(CURRENT_TASK_INDEX)
+            self.order_task()
+            self.task_status_publisher.publish(self._unfinished_task_status)
+            self._unfinished_task_status = None
 
     def _was_task_delayed(self, task_dealy_coeficient):
         return task_dealy_coeficient == DELAY_TASK_PENALTY

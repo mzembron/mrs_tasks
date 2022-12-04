@@ -37,22 +37,37 @@ class Subtask(Task):
         """ changes requirements state to fullfiled
              - returns True if state of requirement has changed
              - returns False otherwise """
-        for task_index, _ in self.required_to_end_if_met_dict.items():
-            if task_index == task_req_index:
-                self.required_to_end_if_met_dict[task_index] = True
-                print('Requirement of task ', task_req_index,
-                ' ending for task ', self.index, ' fullfilled!')
-                return True# can be found only once (cannot be in start and end req)
 
         for task_index, _ in self.required_to_start_if_met_dict.items():
             if task_index == task_req_index:
                 print('Requirement of task ', task_req_index,\
                 ' ending for task ', self.index, ' fullfilled!')
+                self.required_to_start_if_met_dict[task_index] = True
+                return True# can be found only once (cannot be in start and end req)
+
+        for task_index, _ in self.required_to_end_if_met_dict.items():
+            if task_index == task_req_index:
                 self.required_to_end_if_met_dict[task_index] = True
+                print('Requirement of task ', task_req_index,
+                ' ending for task ', self.index, ' fullfilled!')
                 return True# can be found only once
+
+
 
         return False
 
+    def is_start_req_met(self):
+        for _, is_met in self.required_to_start_if_met_dict.items():
+            if (not is_met):
+                return False
+        return True
+
+    def is_end_req_met(self):
+        for _, is_met in self.required_to_end_if_met_dict.items():
+            if (not is_met):
+                return False
+        return True
+    
     def _parse_task_requirements(self, req_list):
         req_if_met_dict = {}
         for requirement in req_list:
