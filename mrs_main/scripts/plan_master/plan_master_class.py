@@ -67,10 +67,8 @@ class PlanMaster():
         # task_status.id.index, " has ended" )
 
     def _handale_simple_task(self, task_desc):
-        room_coordinates = RoomCoordinatesParser() \
-            .get_room_coordinates(task_desc.data[0])
-        # as simple task have just one attribute
-        task_data = self._prepare_task_data(room_coordinates)
+        task_data = RoomCoordinatesParser() \
+            .get_room_pose(task_desc.data[0])
         task = Task(task_desc.type, task_data, priority=task_desc.priority)
         self._order_task_execution(task)
 
@@ -78,11 +76,9 @@ class PlanMaster():
         # exclude parsing of scenario data
         scenario_data = []
         for data_desc in task_desc.data:
-            room_coordinates = RoomCoordinatesParser() \
-                .get_room_coordinates(data_desc)
-            task_data = self._prepare_task_data(room_coordinates)
+            task_data = RoomCoordinatesParser() \
+                .get_room_pose(data_desc)
             scenario_data.append(task_data)
-        task_data = self._prepare_task_data(room_coordinates)
         ## leve here just this:
         scenario = Task(task_desc.type, scenario_data, task_desc.priority)
 
@@ -116,17 +112,3 @@ class PlanMaster():
 
         optimal_robot_harmonizer = min(harmonizer_cost_dict, key=harmonizer_cost_dict.get) 
         return optimal_robot_harmonizer, harmonizer_task_position_dict[optimal_robot_harmonizer]
-
-    def _prepare_task_data(self, coordinates):
-        # TODO move it to task !!!!
-        task_data = PoseStamped()
-        task_data.pose.position.x = coordinates[0]
-        task_data.pose.position.y = coordinates[1]
-        task_data.pose.position.z = coordinates[2]
-   
-        task_data.pose.orientation.x = coordinates[3]
-        task_data.pose.orientation.y = coordinates[4]
-        task_data.pose.orientation.z = coordinates[5]
-        task_data.pose.orientation.w = coordinates[6]
-        return task_data
-

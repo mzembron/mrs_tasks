@@ -20,6 +20,7 @@ STATUS_RUNNING = 1
 STATUS_IDLE_BEFORE_TASK_START = 2
 STATUS_IDLE_AFTER_TASK_END = 3
 
+ACTION_SUCCEEDED = 3
 
 
 class RobotTaskHarmonizer:
@@ -132,12 +133,11 @@ class RobotTaskHarmonizer:
         if (len(self.task_list) != 0):
             # Debug!
             current_task = self.task_list[0]
-            if ((type(current_task) is Subtask)):
-                if (not current_task.is_start_req_met()):
-                    self.robot_status = STATUS_IDLE_BEFORE_TASK_START
-                    print(" [ ", self.robot_name)
-                    print(" [ ", self.robot_name, " ] ", " status: ", self.robot_status)
-                    return 
+            if ((type(current_task) is Subtask) and (not current_task.is_start_req_met())) :
+                self.robot_status = STATUS_IDLE_BEFORE_TASK_START
+                print(" [ ", self.robot_name)
+                print(" [ ", self.robot_name, " ] ", " status: ", self.robot_status)
+                return 
             self.robot.go_to_goal(current_task.data)
             self.robot_status = STATUS_RUNNING
 
@@ -178,17 +178,18 @@ class RobotTaskHarmonizer:
         task_status = TaskStatus()
         task_status.status = result.status.status
         task_status.id.id = current_task.id
-        if (result.status.status == 3):
+        if (result.status.status == ACTION_SUCCEEDED):
             print(self.robot_name, " achieved goal! #############")
             ## publish output for all tasks 
             ## scenarios debug!
             if  (type(current_task) is Subtask):
                 task_status.id.index = current_task.index
-                #  if (not current_task.is_start_req_met()):
-                #   self.robot_status = STATUS_IDLE_AFTER_TASK_END
-                #   # remember taks statuts
-                #   # self.task_status_before = task_status
-                #   # return # end callback!
+                if (not current_task.is_end_req_met()):
+                    self.robot_status = STATUS_IDLE_AFTER_TASK_END
+                  # remember taks statuts
+                    self._unfinished_task_status = task_status
+                    print("Task could not be finished - going into idle state!")
+                    return  # end callback!
             else:
                 task_status.id.index = 0 # as ordinary task does not have subtasks
 
@@ -197,8 +198,7 @@ class RobotTaskHarmonizer:
                 self.task_list.pop(CURRENT_TASK_INDEX)
                 self.order_task()
         else:
-            # advertise task to plan master
-
+            # TODO advertise task to plan master
             # Here robot should go to the next task !!!!
             print(self.robot_name, " was unable to achive goal! #############")
 
@@ -209,10 +209,10 @@ class RobotTaskHarmonizer:
         current_task = self.task_list[0]
         if (current_task.is_end_req_met()):
             assert(self._unfinished_task_status is not None)
-            self.task_list.pop(CURRENT_TASK_INDEX)
-            self.order_task()
             self.task_status_publisher.publish(self._unfinished_task_status)
             self._unfinished_task_status = None
+            self.task_list.pop(CURRENT_TASK_INDEX)
+            self.order_task()
 
     def _was_task_delayed(self, task_dealy_coeficient):
         return task_dealy_coeficient == DELAY_TASK_PENALTY
