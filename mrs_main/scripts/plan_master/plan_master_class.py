@@ -85,24 +85,13 @@ class PlanMaster():
         # grouping subtasks
         subtasks_group_dict = self.scenarios_controller.get_tasks_groups_for_one_robot(scenario)
         self._order_scenario_subtasks(subtasks_group_dict)
-        # for subtask in scenario.subtasks_list:
-        #     # in here scenario planning and execution
-        #     # just debg! take care of the first batch of tasks
-        #     # Debug! works while using debug 1 scenario
-        #     # if len(subtask.required_to_start_if_met_dict) == 0:
-        #     optimal_harmonizer, position = self._select_optimal_harmonizer(subtask)
-        #     optimal_harmonizer.add_task(subtask, position)
-
-        #     ## very very important
-        #     self.scenarios_controller\
-        #         .subtask_harmonizer_dict[subtask] = optimal_harmonizer
 
 #### ordering scenario subtasks
     def _select_optimal_harmonizer_scenario(self, subtask_list):
         harmonizer_estimation_dict = {}
         for harmonizer in self.robots_harmonizers:
             if (subtask_list[0].is_suitable_for_robot(harmonizer.robot)):
-                estimations_list = harmonizer.get_scenario_execution_estimation(subtask_list)
+                estimations_list = harmonizer.get_execution_estimation_of(subtask_list)
                 harmonizer_estimation_dict[harmonizer] = estimations_list
                 print("======== Scenario selection ========")
                 print("[ Estimated cost for: ", harmonizer.robot_name,
@@ -116,12 +105,12 @@ class PlanMaster():
         # to not assign more than one group to same robot
         #### TODO very important
         # used_robots = []
-
         for _, subtasks_list in subtasks_group_dict.items():
             optimal_harmonizer, estimations = self._select_optimal_harmonizer_scenario(subtasks_list)
 
             for idx, subtask in enumerate(subtasks_list):
                 task_index_in_backlog = estimations[idx].task_position
+                
                 optimal_harmonizer.add_task(subtask, task_index_in_backlog)
                 ## adding to scenario controller !!!!
                 self.scenarios_controller\
@@ -141,29 +130,9 @@ class PlanMaster():
             harmonizer_cost_dict[harmonizer] = avg_cost
         optimal_harmonizer = min(harmonizer_cost_dict, key=harmonizer_cost_dict.get)
         return optimal_harmonizer
-###
-    def _order_task_execution(self, task):
-        optimal_harmonizer, position = self._select_optimal_harmonizer(task)
-        # optimal_harmonizer.add_task(task, position)
 
-        # scenario changes: 
+    def _order_task_execution(self, task):
         optimal_harmonizer, estimations = self._select_optimal_harmonizer_scenario([task])
         task_index_in_backlog = estimations[0].task_position
         optimal_harmonizer.add_task(task, task_index_in_backlog)
 
-
-    def _select_optimal_harmonizer(self, task):
-        harmonizer_cost_dict = {}
-        harmonizer_task_position_dict = {}
-        for harmonizer in self.robots_harmonizers:
-            if (task.is_suitable_for_robot(harmonizer.robot)):
-                harmonizer_cost_dict[harmonizer], harmonizer_task_position_dict[harmonizer] \
-                = harmonizer.get_estimated_task_cost_with_scheduled_position(task)
-                
-                print("======== Previous selection ========")
-                print("[ Estimated cost for: ", harmonizer.robot_name,
-                    "] ", harmonizer_cost_dict[harmonizer],
-                    "Task at position: ", harmonizer_task_position_dict[harmonizer])
-
-        optimal_robot_harmonizer = min(harmonizer_cost_dict, key=harmonizer_cost_dict.get) 
-        return optimal_robot_harmonizer, harmonizer_task_position_dict[optimal_robot_harmonizer]
