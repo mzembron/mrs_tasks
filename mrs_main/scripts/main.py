@@ -1,6 +1,6 @@
 from plan_master.turtlebot import Turtlebot
 from plan_master.manipulator import Manipulator
-from plan_master.robot_task_harmonizer import RobotTaskHarmonizer
+from plan_master.task_harmonizer import TaskHarmonizer
 
 import rospy
 # from nav_msgs.srv import GetPlan, GetPlanRequest
@@ -15,13 +15,13 @@ def main():
     plan_master = PlanMaster()
     # plan_master.subscribe(Turtlebot("/robot1"))
     # plan_master.subscribe(Turtlebot("/robot2"))
-
-    plan_master.subscribe(RobotTaskHarmonizer("/robot1"))
-    plan_master.subscribe(RobotTaskHarmonizer("/robot2"))
-    manipulator = Manipulator("/robot3_manip")
-    manip_harmonizer = RobotTaskHarmonizer("/robot3_manip")
-    manip_harmonizer.robot = manipulator
-    plan_master.subscribe(manip_harmonizer)
+    
+    plan_master.subscribe(Turtlebot("/robot1"))
+    plan_master.subscribe(Turtlebot("/robot2"))
+    # manipulator = Manipulator("/robot3_manip")
+    # manip_harmonizer = TaskHarmonizer("/robot3_manip")
+    # manip_harmonizer.robot = manipulator
+    plan_master.subscribe(Manipulator("/robot3_manip"))
 
 
     rospy.spin()

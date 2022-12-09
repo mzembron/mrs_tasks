@@ -5,6 +5,8 @@ from geometry_msgs.msg import PoseStamped
 from plan_master.task.task import Task
 from plan_master.task.scenarios_controller \
     import ScenariosController
+from plan_master.task_harmonizer import \
+    TaskHarmonizer
 from plan_master.task.task_type_not_introduced_error \
     import TaskTypeNotIntroducedError
 from mrs_msgs.msg import TaskDesc, TaskStatus
@@ -33,8 +35,9 @@ class PlanMaster():
         self.scenarios_controller = ScenariosController(self.robots_harmonizers)
 
     def subscribe(self, robot):
+        task_harmonizer = TaskHarmonizer(robot)
         """ add the robot to be managed by Plan Master """
-        self.robots_harmonizers.append(robot)
+        self.robots_harmonizers.append(task_harmonizer)
 
     def _move_base_goal_callback(self, data):
         task = Task('GT', data, priority=8)

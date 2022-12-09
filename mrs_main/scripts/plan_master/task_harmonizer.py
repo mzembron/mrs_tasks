@@ -26,14 +26,14 @@ STAUTS_FINAL_ENDING_MOVE = 4
 ACTION_SUCCEEDED = 3
 
 
-class RobotTaskHarmonizer:
+class TaskHarmonizer:
     """ Wrapper for robot class with purpose of managing tasks """
-    def __init__(self, robot_name):
+    def __init__(self, robot):
         """
         Just assume we use only turtlebots:"""
-        self.robot = Turtlebot(robot_name)
+        self.robot = robot
         rospy.Subscriber(
-            robot_name+"/move_base/result",
+            self.robot.robot_name+"/move_base/result",
             MoveBaseActionResult,
             self._action_result_callback)
         self.tasks_backlog_publisher = \
@@ -54,7 +54,7 @@ class RobotTaskHarmonizer:
                 target=self.backlog_updater,
                 daemon=True)
         self.backlog_publishing_thread.start()
-        self.robot_name = robot_name
+        self.robot_name = self.robot.robot_name
         self.robot_status = STATUS_READY
         self.task_list = []
 
