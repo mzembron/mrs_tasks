@@ -21,6 +21,7 @@ STATUS_READY = 0
 STATUS_RUNNING = 1
 STATUS_IDLE_BEFORE_TASK_START = 2
 STATUS_IDLE_AFTER_TASK_END = 3
+STAUTS_FINAL_ENDING_MOVE = 4
 
 ACTION_SUCCEEDED = 3
 
@@ -124,7 +125,7 @@ class RobotTaskHarmonizer:
 
                 if(len(execution_estimation_list)>0):
                     #update estimated costs
-                    self._update_cost_for_scenario(execution_estimation_list, task_cost)
+                    self._update_cost_for_estimations(execution_estimation_list, task_cost)
 
         # including at the end of current tasks
         if was_new_task_included is False:
@@ -242,7 +243,7 @@ class RobotTaskHarmonizer:
         )
         return execution_estimation_list
 
-    def _update_cost_for_scenario(self, estimations_list, additional_cost):
+    def _update_cost_for_estimations(self, estimations_list, additional_cost):
         for estimation in estimations_list:
             estimation.full_cost += additional_cost
 
@@ -255,7 +256,6 @@ class RobotTaskHarmonizer:
 
     def _action_result_callback(self, result):
         # Debug!
-        # print(self.robot.current_goal)
         self.robot.current_goal = None 
         current_task = self.task_list[CURRENT_TASK_INDEX]
         task_status = TaskStatus()
@@ -287,9 +287,8 @@ class RobotTaskHarmonizer:
 
         self.task_status_publisher.publish(task_status)
 
-
     def _handle_unfinished_task(self):
-        current_task = self.task_list[0]
+        current_task = self.task_list[CURRENT_TASK_INDEX]
         if (current_task.is_end_req_met()):
             assert(self._unfinished_task_status is not None)
             self.task_status_publisher.publish(self._unfinished_task_status)

@@ -33,6 +33,7 @@ class PlanMaster():
         self.scenarios_controller = ScenariosController(self.robots_harmonizers)
 
     def subscribe(self, robot):
+        """ add the robot to be managed by Plan Master """
         self.robots_harmonizers.append(robot)
 
     def _move_base_goal_callback(self, data):
@@ -86,17 +87,16 @@ class PlanMaster():
         subtasks_group_dict = self.scenarios_controller.get_tasks_groups_for_one_robot(scenario)
         self._order_scenario_subtasks(subtasks_group_dict)
 
-#### ordering scenario subtasks
-    def _select_optimal_harmonizer_scenario(self, subtask_list):
+    def _select_optimal_harmonizer(self, subtask_list):
         harmonizer_estimation_dict = {}
         for harmonizer in self.robots_harmonizers:
             if (subtask_list[0].is_suitable_for_robot(harmonizer.robot)):
                 estimations_list = harmonizer.get_execution_estimation_of(subtask_list)
                 harmonizer_estimation_dict[harmonizer] = estimations_list
-                print("======== Scenario selection ========")
-                print("[ Estimated cost for: ", harmonizer.robot_name,
-                    "] ",  harmonizer_estimation_dict[harmonizer][0].full_cost,
-                    "Task at position: ",  harmonizer_estimation_dict[harmonizer][0].task_position)
+                # print("======== Scenario selection ========")
+                # print("[ Estimated cost for: ", harmonizer.robot_name,
+                #     "] ",  harmonizer_estimation_dict[harmonizer][0].full_cost,
+                #     "Task at position: ",  harmonizer_estimation_dict[harmonizer][0].task_position)
         
         optimal_harmonizer = self._find_harmonizer_with_lowest_cost(harmonizer_estimation_dict)
         return optimal_harmonizer, harmonizer_estimation_dict[optimal_harmonizer]
@@ -106,7 +106,7 @@ class PlanMaster():
         #### TODO very important
         # used_robots = []
         for _, subtasks_list in subtasks_group_dict.items():
-            optimal_harmonizer, estimations = self._select_optimal_harmonizer_scenario(subtasks_list)
+            optimal_harmonizer, estimations = self._select_optimal_harmonizer(subtasks_list)
 
             for idx, subtask in enumerate(subtasks_list):
                 task_index_in_backlog = estimations[idx].task_position
@@ -132,7 +132,7 @@ class PlanMaster():
         return optimal_harmonizer
 
     def _order_task_execution(self, task):
-        optimal_harmonizer, estimations = self._select_optimal_harmonizer_scenario([task])
+        optimal_harmonizer, estimations = self._select_optimal_harmonizer([task])
         task_index_in_backlog = estimations[0].task_position
         optimal_harmonizer.add_task(task, task_index_in_backlog)
 
