@@ -103,6 +103,23 @@ SCENARIO_LIST = {
                                         "requires to end": [],
                                         "same robot as task": 0}]
                         },
+                        'DBG4': {    
+                            "subtasks": [
+                                {
+                                        "type": 'GT',
+                                        "index": 0,
+                                        "appropriate data index": 0,  
+                                        "requires to start": [],
+                                        "requires to end": [],
+                                        "same robot as task": None}, 
+                                {
+                                        "type": 'GT',
+                                        "index": 1,
+                                        "appropriate data index": 1,
+                                        "requires to start": [0],
+                                        "requires to end": [],
+                                        "same robot as task": None}]
+                        },
 
 
                 }

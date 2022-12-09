@@ -104,6 +104,10 @@ class PlanMaster():
             if (subtask_list[0].is_suitable_for_robot(harmonizer.robot)):
                 estimations_list = harmonizer.get_scenario_execution_estimation(subtask_list)
                 harmonizer_estimation_dict[harmonizer] = estimations_list
+                print("======== Scenario selection ========")
+                print("[ Estimated cost for: ", harmonizer.robot_name,
+                    "] ",  harmonizer_estimation_dict[harmonizer][0].full_cost,
+                    "Task at position: ",  harmonizer_estimation_dict[harmonizer][0].task_position)
         
         optimal_harmonizer = self._find_harmonizer_with_lowest_cost(harmonizer_estimation_dict)
         return optimal_harmonizer, harmonizer_estimation_dict[optimal_harmonizer]
@@ -140,7 +144,13 @@ class PlanMaster():
 ###
     def _order_task_execution(self, task):
         optimal_harmonizer, position = self._select_optimal_harmonizer(task)
-        optimal_harmonizer.add_task(task, position)
+        # optimal_harmonizer.add_task(task, position)
+
+        # scenario changes: 
+        optimal_harmonizer, estimations = self._select_optimal_harmonizer_scenario([task])
+        task_index_in_backlog = estimations[0].task_position
+        optimal_harmonizer.add_task(task, task_index_in_backlog)
+
 
     def _select_optimal_harmonizer(self, task):
         harmonizer_cost_dict = {}
@@ -149,6 +159,8 @@ class PlanMaster():
             if (task.is_suitable_for_robot(harmonizer.robot)):
                 harmonizer_cost_dict[harmonizer], harmonizer_task_position_dict[harmonizer] \
                 = harmonizer.get_estimated_task_cost_with_scheduled_position(task)
+                
+                print("======== Previous selection ========")
                 print("[ Estimated cost for: ", harmonizer.robot_name,
                     "] ", harmonizer_cost_dict[harmonizer],
                     "Task at position: ", harmonizer_task_position_dict[harmonizer])

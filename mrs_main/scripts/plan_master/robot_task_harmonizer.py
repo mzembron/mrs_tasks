@@ -15,6 +15,8 @@ from mrs_msgs.msg import TaskBacklog, TaskStatus
 CURRENT_TASK_INDEX = 0
 # possible robot status:
 
+
+# move to consts
 STATUS_READY = 0
 STATUS_RUNNING = 1
 STATUS_IDLE_BEFORE_TASK_START = 2
@@ -59,60 +61,62 @@ class RobotTaskHarmonizer:
     def __del__(self):
         self.backlog_publishing_thread.join()
 
-    def get_estimated_task_cost_with_scheduled_position(self, new_task):
-        """ create new class that will be returned, requirements:
-         - cost,
-         - scheduled position in backlog,
-         - predicted task execution time (time of executing only this task)
-         - predicted task start time, task end time
-            (to determine period of time for executing this task)
+    # def get_estimated_task_cost_with_scheduled_position(self, new_task):
+    #     """ create new class that will be returned, requirements:
+    #      - cost,
+    #      - scheduled position in backlog,
+    #      - predicted task execution time (time of executing only this task)
+    #      - predicted task start time, task end time
+    #         (to determine period of time for executing this task)
 
-        """
-        full_cost = 0
-        was_new_task_included = False
-        task_position = -1  # initial position is last in task list
-        if len(self.task_list) == 0:
-            task_position = 0
-            return self.robot.calc_cost_from_curr_position_to_spec_position(
-                new_task.data), task_position
+    #     """
+    #     full_cost = 0
+    #     was_new_task_included = False
+    #     task_position = -1  # initial position is last in task list
+    #     if len(self.task_list) == 0:
+    #         task_position = 0
+    #         return self.robot.calc_cost_from_curr_position_to_spec_position(
+    #             new_task.data), task_position
 
-        for task_index in range(0, len(self.task_list)):
-            task = self.task_list[task_index]
-            task_dealy_coeficient = \
-                self._calculate_delay_coeficient(task, new_task)
+    #     for task_index in range(0, len(self.task_list)):
+    #         task = self.task_list[task_index]
+    #         task_dealy_coeficient = \
+    #             self._calculate_delay_coeficient(task, new_task)
 
-            if task_index == 0:
-                full_cost += self.robot. \
-                    calc_cost_from_curr_position_to_spec_position(
-                        task.data)/task_dealy_coeficient
+    #         if task_index == 0:
+    #             full_cost += self.robot. \
+    #                 calc_cost_from_curr_position_to_spec_position(
+    #                     task.data)/task_dealy_coeficient
 
-            elif (new_task.has_higher_priority_than(task)) and \
-                    not was_new_task_included:
-                # if new task has higher priority than current task including
-                # new task into estimated cost
-                task_position = task_index
-                full_cost += self._calculate_cost_of_including_new_task(
-                    task_index, new_task)
-                was_new_task_included = True
+    #         elif (new_task.has_higher_priority_than(task)) and \
+    #                 not was_new_task_included:
+    #             # if new task has higher priority than current task including
+    #             # new task into estimated cost
+    #             task_position = task_index
+    #             full_cost += self._calculate_cost_of_including_new_task(
+    #                 task_index, new_task)
+    #             was_new_task_included = True
 
-            else:
-                previous_task = self.task_list[task_index-1]
-                full_cost += self.robot. \
-                    calc_cost_from_spec_position_to_spec_position(
-                        previous_task.data, task.data)/task_dealy_coeficient
+    #         else:
+    #             previous_task = self.task_list[task_index-1]
+    #             full_cost += self.robot. \
+    #                 calc_cost_from_spec_position_to_spec_position(
+    #                     previous_task.data, task.data)/task_dealy_coeficient
 
-        if was_new_task_included is False:
-            last_task = self.task_list[-1]
-            full_cost += self.robot. \
-                calc_cost_from_spec_position_to_spec_position(
-                    last_task.data,
-                    new_task.data)
+    #     if was_new_task_included is False:
+    #         last_task = self.task_list[-1]
+    #         full_cost += self.robot. \
+    #             calc_cost_from_spec_position_to_spec_position(
+    #                 last_task.data,
+    #                 new_task.data)
 
-        print(self.robot_name, full_cost)
-        return full_cost, task_position
+    #     # print(self.robot_name, full_cost)
+    #     return full_cost, task_position
 
 
     def get_scenario_execution_estimation(self, new_tasks_list):
+
+        ## after merge rename to get_task_execution_estiamtion
         ## Debug method for harmonizing scenarios
         """ create new class that will be returned, requirements:
             - cost,
@@ -122,6 +126,7 @@ class RobotTaskHarmonizer:
             (to determine period of time for executing this task)
 
         """
+        new_tasks_list = self._prepare_task_for_estimation(new_tasks_list)
         # full_cost = 0
         was_new_task_included = False
         # task_position = -1  # initial position is last in task list
@@ -142,14 +147,15 @@ class RobotTaskHarmonizer:
 
             # we do not disturb current task (no interuption while executing task so far)
             if task_idx == 0:
+                print("========= Cost before adding first task: ", full_cost_of_scenario, " =========")
                 full_cost_of_scenario += self.robot. \
                     calc_cost_from_curr_position_to_spec_position(
                         task.data)/task_dealy_coeficient
-
+                print("========= Cost after adding first task: ", full_cost_of_scenario, " =========")
             elif (new_tasks_list[REPRESENTANT_INDEX].has_higher_priority_than(task)) and \
                     not was_new_task_included:
                 # if new task has higher priority than current task -> including
-                # # new task into estimated cost
+                # new task into estimated cost
                 # full_cost_of_scenario += self._calculate_cost_of_including_scenario(
                 #     task, task_idx , new_tasks_list)
                 execution_estimation_list = self._estimate_including_scenario(
@@ -170,20 +176,22 @@ class RobotTaskHarmonizer:
 
                 if(len(execution_estimation_list)>0):
                     #update estimated costs
-                    self._update_cost_for_scenario(task_cost)
+                    self._update_cost_for_scenario(execution_estimation_list, task_cost)
 
         # including at the end of current tasks
         if was_new_task_included is False:
             assert(len(execution_estimation_list)==0)
             last_task = self.task_list[-1]
-            starting_index = len(self.task_list) - 1 # index convertion
+            starting_index = len(self.task_list) # index of 
 
-            execution_estimation_list = self._estimate_including_scenario(
-                last_task,
-                starting_index,
+            print("========= Cost before adding first task: ", full_cost_of_scenario, " =========")
+            execution_estimation_list = self._generate_scenario_exec_estimation(
                 new_tasks_list,
-                full_cost_of_scenario
+                starting_index,
+                full_cost_of_scenario,
+                last_task
             )
+            print("========= Cost after adding first task: ", execution_estimation_list[0].full_cost, " =========")
 
         # make some debug print
 
@@ -192,7 +200,7 @@ class RobotTaskHarmonizer:
         return execution_estimation_list
 
     def receive_scenario_signal(self):
-        print(self.robot_name, " received signal")
+        print("[ ",self.robot_name, " ]"," received signal - continuing task execution")
         if (self.robot_status == STATUS_IDLE_BEFORE_TASK_START):
             # distinguish idle befor start and after ending
             self.order_task()
@@ -215,8 +223,8 @@ class RobotTaskHarmonizer:
             current_task = self.task_list[0]
             if ((type(current_task) is Subtask) and (not current_task.is_start_req_met())) :
                 self.robot_status = STATUS_IDLE_BEFORE_TASK_START
-                print(" [ ", self.robot_name)
-                print(" [ ", self.robot_name, " ] ", " status: ", self.robot_status)
+                # print(" [ ", self.robot_name)
+                print(" [ ", self.robot_name, " ] ", "condition to start task not met. Going into idle mode and waiting!")
                 return 
             self.robot.go_to_goal(current_task.data)
             self.robot_status = STATUS_RUNNING
@@ -233,16 +241,21 @@ class RobotTaskHarmonizer:
 
             self.tasks_backlog_publisher.publish(backlog)
 
-    def _calculate_cost_of_including_new_task(self, curr_task_index, new_task):
-        cost = 0
-        previous_task = self.task_list[curr_task_index-1]
-        curr_task = self.task_list[curr_task_index]
-        cost += self.robot.calc_cost_from_spec_position_to_spec_position(
-            previous_task.data, new_task.data)
-        cost += self.robot.calc_cost_from_spec_position_to_spec_position(
-            new_task.data, curr_task.data)/DELAY_TASK_PENALTY
-        return cost
+    # def _calculate_cost_of_including_new_task(self, curr_task_index, new_task):
+    #     cost = 0
+    #     previous_task = self.task_list[curr_task_index-1]
+    #     curr_task = self.task_list[curr_task_index]
+    #     cost += self.robot.calc_cost_from_spec_position_to_spec_position(
+    #         previous_task.data, new_task.data)
+    #     cost += self.robot.calc_cost_from_spec_position_to_spec_position(
+    #         new_task.data, curr_task.data)/DELAY_TASK_PENALTY
+    #     return cost
 
+    def _prepare_task_for_estimation(self, task_or_task_list):
+        if(type(task_or_task_list) is list):
+            return task_or_task_list
+        else:
+            return [task_or_task_list]
 ##### Additional methods for planning scenarios
 
     def _generate_scenario_exec_estimation(self, new_tasks_list, starting_idx=0, 
@@ -250,6 +263,7 @@ class RobotTaskHarmonizer:
 
         execution_estimation_list = []
         cost = starting_cost
+        print("== len of new taks: ", len(new_tasks_list), " ==")
         for idx, task in enumerate(new_tasks_list):
             single_execution_estimation = TaskExecutionEstimation()
             single_execution_estimation.task_position = idx + starting_idx
@@ -259,10 +273,12 @@ class RobotTaskHarmonizer:
                 )
             elif (idx == 0 and starting_idx != 0):
                 assert(prev_task is not None)
+                print("==== before ading last task cost: ", cost, " ====")
                 cost += self.robot.calc_cost_from_spec_position_to_spec_position(
                     prev_task.data, 
                     task.data
                 )
+                print("==== after ading last task cost: ", cost, " ====")
             else:
                 prev_scenario_task = new_tasks_list[idx-1]
                 cost += self.robot.calc_cost_from_spec_position_to_spec_position(
@@ -270,10 +286,11 @@ class RobotTaskHarmonizer:
                     task.data
                 )
 
-            single_execution_estimation.full_cost = cost + starting_cost
+            single_execution_estimation.full_cost = cost 
             execution_estimation_list.append(
                 single_execution_estimation
             )
+        print("task cos: ",execution_estimation_list[0].full_cost)
         return execution_estimation_list
 
     def _estimate_including_scenario(self, curr_task, curr_task_idx, new_tasks_list, curr_cost):
@@ -305,14 +322,14 @@ class RobotTaskHarmonizer:
 
     def _action_result_callback(self, result):
         # Debug!
-        print(self.robot.current_goal)
+        # print(self.robot.current_goal)
         self.robot.current_goal = None # rethink if current goal is needed!!
         current_task = self.task_list[CURRENT_TASK_INDEX]
         task_status = TaskStatus()
         task_status.status = result.status.status
         task_status.id.id = current_task.id
         if (result.status.status == ACTION_SUCCEEDED):
-            print(self.robot_name, " achieved goal! #############")
+            print("[ " ,self.robot_name, " ]", " achieved goal! #############")
             ## publish output for all tasks 
             ## scenarios debug!
             if  (type(current_task) is Subtask):
@@ -321,7 +338,7 @@ class RobotTaskHarmonizer:
                     self.robot_status = STATUS_IDLE_AFTER_TASK_END
                   # remember taks statuts
                     self._unfinished_task_status = task_status
-                    print("Task could not be finished - going into idle state!")
+                    print("Task can not be finished currently - going into idle state and waiting!")
                     return  # end callback!
             else:
                 task_status.id.index = 0 # as ordinary task does not have subtasks
@@ -333,7 +350,7 @@ class RobotTaskHarmonizer:
         else:
             # TODO advertise task to plan master
             # Here robot should go to the next task !!!!
-            print(self.robot_name, " was unable to achive goal! #############")
+            print("[ " ,self.robot_name, " ]", " was unable to achive goal! #############")
 
         self.task_status_publisher.publish(task_status)
 

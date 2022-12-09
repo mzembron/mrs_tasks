@@ -15,21 +15,54 @@ def base_robot_task_harmoniser():
     robot_task_harmoniser.robot = fake_robot
     return robot_task_harmoniser
 
-def test_cost_estimation_and_task_placement_only_one_new_task(base_robot_task_harmoniser):
+# def test_cost_estimation_and_task_placement_only_one_new_task(base_robot_task_harmoniser):
+#     fake_task = Task("GT",None)
+#     fake_cost, position  = base_robot_task_harmoniser.get_estimated_task_cost_with_scheduled_position(fake_task)
+#     assert(fake_cost == FAKE_BIG_LENGTH)
+#     assert(position == 0)
+
+
+# def test_cost_estimation_and_task_placement_new_task_one_in_backlog(base_robot_task_harmoniser):
+#     fake_task = Task("GT",None)
+#     base_robot_task_harmoniser.task_list.append(fake_task)
+#     fake_cost, position = base_robot_task_harmoniser.get_estimated_task_cost_with_scheduled_position(fake_task)
+#     assert(fake_cost == FAKE_BIG_LENGTH+FAKE_SMALL_LENGTH)
+#     assert(position == -1)
+
+# def test_cost_estimation_and_task_placement_with_task_reorder(base_robot_task_harmoniser):
+#     fake_task_high_priority = Task("GT",None, 3)
+#     fake_task_middle_priority = Task("GT",None, 5)
+#     fake_task_low_priority = Task("GT", None, 8)
+    
+#     base_robot_task_harmoniser.task_list.append(fake_task_high_priority)
+#     base_robot_task_harmoniser.task_list.append(fake_task_low_priority)
+#     base_robot_task_harmoniser.task_list.append(fake_task_low_priority)
+#     fake_cost, position = base_robot_task_harmoniser.get_estimated_task_cost_with_scheduled_position(fake_task_middle_priority)
+#     assert(fake_cost == FAKE_BIG_LENGTH+FAKE_SMALL_LENGTH+FAKE_SMALL_LENGTH/DELAY_TASK_PENALTY
+#         +FAKE_SMALL_LENGTH/DELAY_TASK_PENALTY)
+#     assert(position == 1 )
+
+
+# simple task tests 
+def test_cost_estimation_and_task_placement_only_one_new_task_sc(base_robot_task_harmoniser):
     fake_task = Task("GT",None)
-    fake_cost, position  = base_robot_task_harmoniser.get_estimated_task_cost_with_scheduled_position(fake_task)
-    assert(fake_cost == FAKE_BIG_LENGTH)
-    assert(position == 0)
+    execution_estimation_list  = base_robot_task_harmoniser.get_scenario_execution_estimation(fake_task)
+    assert(len(execution_estimation_list) == 1)
+    task_execution_estimation = execution_estimation_list[0]
+    assert(task_execution_estimation.full_cost == FAKE_BIG_LENGTH)
+    assert(task_execution_estimation.task_position == 0)
 
 
-def test_cost_estimation_and_task_placement_new_task_one_in_backlog(base_robot_task_harmoniser):
+def test_cost_estimation_and_task_placement_new_task_one_in_backlog_sc(base_robot_task_harmoniser):
     fake_task = Task("GT",None)
     base_robot_task_harmoniser.task_list.append(fake_task)
-    fake_cost, position = base_robot_task_harmoniser.get_estimated_task_cost_with_scheduled_position(fake_task)
-    assert(fake_cost == FAKE_BIG_LENGTH+FAKE_SMALL_LENGTH)
-    assert(position == -1)
+    execution_estimation_list  = base_robot_task_harmoniser.get_scenario_execution_estimation(fake_task)
+    assert(len(execution_estimation_list) == 1)
+    task_execution_estimation = execution_estimation_list[0]
+    assert(task_execution_estimation.full_cost == FAKE_BIG_LENGTH+FAKE_SMALL_LENGTH)
+    assert(task_execution_estimation.task_position == 1)
 
-def test_cost_estimation_and_task_placement_with_task_reorder(base_robot_task_harmoniser):
+def test_cost_estimation_and_task_placement_with_task_reorder_sc(base_robot_task_harmoniser):
     fake_task_high_priority = Task("GT",None, 3)
     fake_task_middle_priority = Task("GT",None, 5)
     fake_task_low_priority = Task("GT", None, 8)
@@ -37,8 +70,12 @@ def test_cost_estimation_and_task_placement_with_task_reorder(base_robot_task_ha
     base_robot_task_harmoniser.task_list.append(fake_task_high_priority)
     base_robot_task_harmoniser.task_list.append(fake_task_low_priority)
     base_robot_task_harmoniser.task_list.append(fake_task_low_priority)
-    fake_cost, position = base_robot_task_harmoniser.get_estimated_task_cost_with_scheduled_position(fake_task_middle_priority)
-    assert(fake_cost == FAKE_BIG_LENGTH+FAKE_SMALL_LENGTH+FAKE_SMALL_LENGTH/DELAY_TASK_PENALTY
+    execution_estimation_list  = base_robot_task_harmoniser.get_scenario_execution_estimation(fake_task_middle_priority)
+    assert(len(execution_estimation_list) == 1)
+    task_execution_estimation = execution_estimation_list[0]
+    assert(task_execution_estimation.full_cost == FAKE_BIG_LENGTH+FAKE_SMALL_LENGTH+FAKE_SMALL_LENGTH/DELAY_TASK_PENALTY
         +FAKE_SMALL_LENGTH/DELAY_TASK_PENALTY)
-    assert(position == 1 )
-
+    assert(task_execution_estimation.task_position == 1)
+    # assert(fake_cost == FAKE_BIG_LENGTH+FAKE_SMALL_LENGTH+FAKE_SMALL_LENGTH/DELAY_TASK_PENALTY
+    #     +FAKE_SMALL_LENGTH/DELAY_TASK_PENALTY)
+    # assert(position == 1 )

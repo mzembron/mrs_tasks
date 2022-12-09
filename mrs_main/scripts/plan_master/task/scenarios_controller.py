@@ -25,7 +25,7 @@ class ScenariosController:
                     self._send_scenario_signal(robot)
 
     def _send_scenario_signal(self, robot):
-        print("sending signal to robot!")
+        print("Task ended - sending signal to robots!")
         robot.receive_scenario_signal()
 
     @staticmethod
