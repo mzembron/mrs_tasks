@@ -26,4 +26,11 @@ Przy symaulacji gazebo na CPU przydatne jest wylaczenie cieni:
   <shadows>false</shadows>
 </scene>
 
-Aktualnie an drugim branchu scenarios_implementation rozwijana jest obsługa scenariuszy. 
+Mozliwy manipulator:
+https://github.com/justagist/panda_simulator#building-the-package
+
+uwagi:
+  - przed zainstalowanie koniecznie, trzeba zainstalować wszystkie zależności
+  - budowanie z komendy catkin build
+  - budowanie pakietu pandy za pomocą skryptu /build_ws.sh 
+
