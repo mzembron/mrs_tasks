@@ -15,7 +15,7 @@ from moveit_commander.conversions import pose_to_list
 # Plan master imports 
 
 from constants.robot_type import RobotType
-from franka_gripper.msg import MoveActionGoal
+from franka_gripper.msg import MoveActionGoal, MoveActionResult
 from move_base_msgs.msg import MoveBaseActionResult
 
 from constants.testing_constats import FAKE_BIG_LENGTH, FAKE_SMALL_LENGTH
@@ -24,6 +24,7 @@ class PandaManip:
     def __init__(self, robot_name):
         self.outcome_publisher = rospy.Publisher(robot_name+"/move_base/result", MoveBaseActionResult, queue_size=10)
         self.gripper_publisher = rospy.Publisher("/franka_gripper/move/goal", MoveActionGoal, queue_size=10)
+        rospy.Subscriber("/franka_gripper/move/result", MoveActionResult, self._gripper_result)
         self.robot_name = robot_name
         self.robot_type = RobotType.MANIPULATOR
         self.current_goal = None
@@ -104,7 +105,6 @@ class PandaManip:
     def calc_cost_from_spec_position_to_spec_position(self, start_odom_data, goal_odom_data):
         return FAKE_SMALL_LENGTH
 
-
     def go_to_goal(self, goal_odom_data):
         # yaw_delta = self._calculate_yaw_difference(self.current_odom_data, goal_odom_data)
         # sign = yaw_delta/abs(yaw_delta)
@@ -117,6 +117,12 @@ class PandaManip:
         self.thread_handles.append(move_thread)
         self.current_goal = goal_odom_data
         move_thread.start()
+
+    def task_ending_move(self):
+        grip_msg = MoveActionGoal()
+        grip_msg.goal.width = 0.08
+        grip_msg.goal.speed = 0.1
+        self.gripper_publisher.publish(grip_msg)
 
     def _move_to_goal(self):
         move_group = self.move_group
@@ -183,8 +189,14 @@ class PandaManip:
         msg.status.status = 3
         self.current_goal = None
         self.outcome_publisher.publish(msg)
+        # grip_msg = MoveActionGoal()
+        # grip_msg.goal.width = 0.08
+        # grip_msg.goal.speed = 0.1
+        # self.gripper_publisher.publish(grip_msg)
 
-        grip_msg = MoveActionGoal()
-        grip_msg.goal.width = 0.08
-        grip_msg.goal.speed = 0.1
-        self.gripper_publisher.publish(grip_msg)
+    def _gripper_result(self, msg):
+        print("Franka opened gripper!!!")
+        mb_msg = MoveBaseActionResult()
+        mb_msg.status.status = 3
+        self.current_goal = None
+        self.outcome_publisher.publish(mb_msg)

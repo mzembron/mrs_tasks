@@ -150,6 +150,7 @@ class TaskHarmonizer:
         print("[ ",self.robot_name, " ]"," received signal - continuing task execution")
         if (self.robot_status == STATUS_IDLE_BEFORE_TASK_START):
             # distinguish idle befor start and after ending
+            print("[ ",self.robot_name, " ]"," going to goal!")
             self.order_task()
         elif (self.robot_status == STATUS_IDLE_AFTER_TASK_END):
             self._handle_unfinished_task()
@@ -263,6 +264,8 @@ class TaskHarmonizer:
         task_status.id.id = current_task.id
         if (result.status.status == ACTION_SUCCEEDED):
             print("[ " ,self.robot_name, " ]", " achieved goal! #############")
+            print("robot status: ", self.robot_status)
+
             ## publish output for all tasks 
             ## scenarios debug!
             if  (type(current_task) is Subtask):
@@ -273,6 +276,11 @@ class TaskHarmonizer:
                     self._unfinished_task_status = task_status
                     print("Task can not be finished currently - going into idle state and waiting!")
                     return  # end callback!
+                elif (self.robot_status == STATUS_RUNNING) or (self.robot_status == STATUS_IDLE_AFTER_TASK_END):
+                    print("robot status: ", self.robot_status)
+                    self.robot_status = STAUTS_FINAL_ENDING_MOVE
+                    self.robot.task_ending_move()
+                    return
             else:
                 task_status.id.index = 0 # as ordinary task does not have subtasks
 

@@ -5,6 +5,7 @@ from nav_msgs.msg import Odometry
 from move_base_msgs.msg import MoveBaseActionGoal
 # from actionlib_msgs.msg import GoalStatusArray
 from nav_msgs.srv import GetPlan, GetPlanRequest
+from move_base_msgs.msg import MoveBaseActionResult
 
 from helpful_functions.data_manipulation import DataManipulation
 from constants.robot_type import RobotType
@@ -16,6 +17,7 @@ class Turtlebot:
     def __init__(self, robot_name):
         rospy.Subscriber(robot_name + "/odom", Odometry, self._odom_callback)
         self.goal_publisher = rospy.Publisher(robot_name + "/move_base/goal", MoveBaseActionGoal, queue_size=10)
+        self.outcome_publisher = rospy.Publisher(robot_name+"/move_base/result", MoveBaseActionResult, queue_size=10)
         self.make_plan_srv = rospy.ServiceProxy(robot_name + "/move_base_node/NavfnROS/make_plan", GetPlan)
         self.robot_name = robot_name
         self.robot_type = RobotType.MOBILE
@@ -48,6 +50,12 @@ class Turtlebot:
         DataManipulation.copy_pose_data(msg.goal.target_pose, goal_odom_data)
         self.current_goal = goal_odom_data
         self.goal_publisher.publish(msg)
+
+    def task_ending_move(self):
+        msg = MoveBaseActionResult()
+        msg.status.status = 3
+        self.current_goal = None
+        self.outcome_publisher.publish(msg)
 
     def _odom_callback(self, data):
         self.current_odom_data = data.pose
