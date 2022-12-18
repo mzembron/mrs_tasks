@@ -37,14 +37,14 @@
   <!-- -0.5 -0.5 0 0 0 0  -->
 
 
-    <!-- BEGIN ROBOT 3 -->
+  <!-- BEGIN ROBOT 3 -->
   <group ns="robot3_manip">
     <arg name="model" value="burger"/>
     <param name="robot_description"
         command="$(find xacro)/xacro --inorder $(find turtlebot3_description)/urdf/turtlebot3_$(arg model).urdf.xacro" />
     <param name="tf_prefix" value="robot3_manip" />
     <include file="$(find mrs_main)/launch/one_robot.launch" >
-      <arg name="init_pose" value="-x -4.3 -y 1 -z 0" />
+      <arg name="init_pose" value="-x -4.5 -y 0 -z 0" />
       <arg name="model" value="burger"/>
       <arg name="robot_name"  value="robot3_manip" />
       <arg name = "desc_name" value = "/robot3_manip/robot_description" />
@@ -53,6 +53,12 @@
 
   <!-- statyczna transformacja dla robota 3 -->
   <node pkg="tf" type="static_transform_publisher" name="robot3_odom_to_map" args="0 0 0 0 0 0  /map robot3_manip/odom 10" />
+
+  <!-- Spawn Panda -->
+  <!-- <group ns="robot_panda"> -->
+    <include file="$(find mrs_main)/launch/panda.launch" />
+  <!-- </group>  -->
+<node pkg="tf" type="static_transform_publisher" name="world_to_map" args="0 0 0 0 0 0  world /map 10" />
 
 
 </launch>
