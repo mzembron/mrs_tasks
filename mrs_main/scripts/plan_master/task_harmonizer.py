@@ -298,9 +298,12 @@ class TaskHarmonizer:
     def _handle_unfinished_task(self):
         current_task = self.task_list[CURRENT_TASK_INDEX]
         if (current_task.is_end_req_met()):
-            assert(self._unfinished_task_status is not None)
-            self.task_status_publisher.publish(self._unfinished_task_status)
-            self._unfinished_task_status = None
-            self.task_list.pop(CURRENT_TASK_INDEX)
-            self.order_task()
+            # assert(self._unfinished_task_status is not None)
+            # self.task_status_publisher.publish(self._unfinished_task_status)
+            # self._unfinished_task_status = None
+            # self.task_list.pop(CURRENT_TASK_INDEX)
+            # self.order_task()
+            print("robot status: ", self.robot_status)
+            self.robot_status = STAUTS_FINAL_ENDING_MOVE
+            self.robot.task_ending_move()
 
