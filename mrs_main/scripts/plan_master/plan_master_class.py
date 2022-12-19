@@ -7,6 +7,9 @@ from plan_master.task.scenarios_controller \
     import ScenariosController
 from plan_master.task_harmonizer import \
     TaskHarmonizer
+
+from plan_master.knowledge_base.\
+    knowledge_base_handler import KnowledgeBaseHandler
 from plan_master.task.task_type_not_introduced_error \
     import TaskTypeNotIntroducedError
 from mrs_msgs.msg import TaskDesc, TaskStatus
@@ -33,6 +36,7 @@ class PlanMaster():
         # subscription of task on general topic like /plan_master/ordered_tasks
         self.robots_harmonizers = []
         self.scenarios_controller = ScenariosController(self.robots_harmonizers)
+        self.knowledge_base_handler = KnowledgeBaseHandler()
 
     def subscribe(self, robot):
         task_harmonizer = TaskHarmonizer(robot)
@@ -46,7 +50,6 @@ class PlanMaster():
     def _order_task_callback(self, task_desc):
         try:
             if(Task.is_task_type_scenario(task_desc.type)):
-                # TODO take care of scenario
                 self._handle_scenario(task_desc)
 
             elif(Task.does_task_type_exists_in_system(task_desc.type)):
@@ -91,6 +94,10 @@ class PlanMaster():
         self._order_scenario_subtasks(subtasks_group_dict)
 
     def _select_optimal_harmonizer(self, subtask_list):
+        print("####################")
+        print(self.knowledge_base_handler.get_correlation("/robot3_dirty","kitchen"))
+        print("####################")
+
         harmonizer_estimation_dict = {}
         for harmonizer in self.robots_harmonizers:
             if (subtask_list[0].is_suitable_for_robot(harmonizer.robot)):
