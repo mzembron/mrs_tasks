@@ -433,8 +433,8 @@ Visualization Manager:
           Show Trail: false
           Value: true
       Name: RobotModel
-      Robot Description: /robot3_manip/robot_description
-      TF Prefix: robot3_manip
+      Robot Description: /robot3_dirty/robot_description
+      TF Prefix: robot3_dirty
       Update Interval: 0
       Value: true
       Visual Enabled: true
@@ -715,4 +715,4 @@ Window Geometry:
     collapsed: false
   Width: 1920
   X: 400
-  Y: 162
+  Y: 125

@@ -4,7 +4,7 @@ global_costmap:
   transform_tolerance: 0.5
   #Set the global and robot frames for the costmap
   global_frame: map
-  robot_base_frame: robot3_manip/base_link
+  robot_base_frame: robot3_dirty/base_link
 
   #Set the update and publish frequency of the costmap
   update_frequency: 10.0

@@ -19,6 +19,8 @@ def main():
     
     plan_master.subscribe(Turtlebot("/robot1"))
     plan_master.subscribe(Turtlebot("/robot2"))
+    plan_master.subscribe(Turtlebot("/robot3_dirty"))
+
     # manipulator = Manipulator("/robot3_manip")
     # manip_harmonizer = TaskHarmonizer("/robot3_manip")
     # manip_harmonizer.robot = manipulator
