@@ -76,7 +76,7 @@ class PlanMaster():
     def _handale_simple_task(self, task_desc):
         task_data = RoomCoordinatesParser() \
             .get_room_pose(task_desc.data[0])
-        task = Task(task_desc.type, task_data, priority=task_desc.priority)
+        task = Task(task_desc.type, task_data,tag_name=task_desc.data[0], priority=task_desc.priority)
         self._order_task_execution(task)
 
     def _handle_scenario(self, task_desc):
@@ -102,6 +102,16 @@ class PlanMaster():
         for harmonizer in self.robots_harmonizers:
             if (subtask_list[0].is_suitable_for_robot(harmonizer.robot)):
                 estimations_list = harmonizer.get_execution_estimation_of(subtask_list)
+                ### Debug! TODO make it properly!
+                for subtsk_idx, subtask in enumerate(subtask_list):
+                    correlation = self.knowledge_base_handler.get_correlation(harmonizer.robot_name,subtask.tag_name)
+                    if(correlation == 0.0):
+                        SOMETHING_HUDGE = 100
+                        estimations_list[subtsk_idx].full_cost = estimations_list[subtsk_idx].full_cost * SOMETHING_HUDGE
+                        print("Very low correlation for: ",harmonizer.robot_name, " and ", subtask.tag_name)
+
+                ### END TODO
+
                 harmonizer_estimation_dict[harmonizer] = estimations_list
                 # print("======== Scenario selection ========")
                 # print("[ Estimated cost for: ", harmonizer.robot_name,
