@@ -46,16 +46,16 @@
     </node>
   </group>
 
-   <group ns="robot3_manip">
-    <param name="tf_prefix" value="robot3_manip" />
+   <group ns="robot3_dirty">
+    <param name="tf_prefix" value="robot3_dirty" />
     <node pkg="move_base" type="move_base" respawn="false" name="move_base_node" output="screen">
       <remap from="map" to="/map" />
       <param name="controller_frequency" value="10.0" />
-      <rosparam file="$(find mrs_main)/param/robot3_manip/common_costmap_param.yaml" command="load" ns="global_costmap" />
-      <rosparam file="$(find mrs_main)/param/robot3_manip/common_costmap_param.yaml" command="load" ns="local_costmap" />
-      <rosparam file="$(find mrs_main)/param/robot3_manip/local_costmap_conf.yaml" command="load" />
-      <rosparam file="$(find mrs_main)/param/robot3_manip/global_costmap_conf.yaml" command="load" />
-      <rosparam file="$(find mrs_main)/param/robot3_manip/base_local_planner_params.yaml" command="load" />
+      <rosparam file="$(find mrs_main)/param/robot3_dirty/common_costmap_param.yaml" command="load" ns="global_costmap" />
+      <rosparam file="$(find mrs_main)/param/robot3_dirty/common_costmap_param.yaml" command="load" ns="local_costmap" />
+      <rosparam file="$(find mrs_main)/param/robot3_dirty/local_costmap_conf.yaml" command="load" />
+      <rosparam file="$(find mrs_main)/param/robot3_dirty/global_costmap_conf.yaml" command="load" />
+      <rosparam file="$(find mrs_main)/param/robot3_dirty/base_local_planner_params.yaml" command="load" />
     </node>
   </group>
 

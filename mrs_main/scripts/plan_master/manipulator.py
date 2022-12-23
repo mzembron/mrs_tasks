@@ -51,6 +51,12 @@ class Manipulator:
         self.current_goal = goal_odom_data
         self._start_manipulation(sign)
 
+    def task_ending_move(self):
+        msg = MoveBaseActionResult()
+        msg.status.status = 3
+        self.current_goal = None
+        self.outcome_publisher.publish(msg)
+
     def _start_manipulation(self, rotation_direction = 1):
         msg = Twist()
         msg.angular.z = rotation_direction * FAKE_MANIPULATOR_ANGULAR_VELOCITY

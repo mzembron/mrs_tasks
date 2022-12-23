@@ -91,9 +91,9 @@ SCENARIO_LIST = {
                                 {
                                         "type": 'MT',
                                         "index": 1,
-                                        "appropriate data index": 0,
+                                        "appropriate data index": 1,
                                         "requires to start": [],
-                                        "requires to end": [0],
+                                        "requires to end": [0], # debug 0 deleted
                                         "same robot as task": None},
                                 {
                                         "type": 'GT',

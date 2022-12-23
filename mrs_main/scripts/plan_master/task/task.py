@@ -13,10 +13,11 @@ class Task():
         - 0 - most important
         -  10 - least important
     """
-    def __init__(self, task_type, data, priority=10):
+    def __init__(self, task_type, data, tag_name='' ,priority=10):
         self.type = task_type
         self.priority = priority
-        self.id = str(uuid.uuid4())  # uniqe id generator 
+        self.id = str(uuid.uuid4())  # uniqe id generator
+        self.tag_name = tag_name
         self.data = data
         self.is_scenario = self._determine_if_task_is_scenario()
         self._add_distinguisher_to_id()
@@ -51,6 +52,7 @@ class Task():
         from plan_master.task.subtask import Subtask
         self.subtasks_list = []
         for subtask_desc in SCENARIO_LIST[self.type]["subtasks"]:
+            # TODO remeber tag_name also for scenarios!
             subtask = Subtask(
                 subtask_desc,
                 self.data[subtask_desc["appropriate data index"]],

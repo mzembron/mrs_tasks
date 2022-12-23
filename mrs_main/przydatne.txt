@@ -29,6 +29,7 @@ Przy symaulacji gazebo na CPU przydatne jest wylaczenie cieni:
 Mozliwy manipulator:
 https://github.com/justagist/panda_simulator#building-the-package
   - panda:
+  https://rickstaa.dev/panda-gazebo/get_started/install.html
       https://rickstaa.dev/panda-gazebo/get_started/install.html
       https://frankaemika.github.io/docs/installation_linux.html#building-from-source) 
 
