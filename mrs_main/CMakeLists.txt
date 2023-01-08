@@ -21,6 +21,9 @@ find_package(catkin REQUIRED COMPONENTS
   dwa_local_planner
   rotate_recovery
   mrs_msgs
+  # genmsg
+  # actionlib_msgs
+  # actionlib
 )
 
 ## System dependencies are found with CMake's conventions
@@ -72,9 +75,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 ## Generate actions in the 'action' folder
 # add_action_files(
-#   FILES
-#   Action1.action
-#   Action2.action
+#   DIRECTORY /home/mateusz/eng_ws/src/mrs_tasks/mrs_msgs/action FILES TaskRequest.action
 # )
 
 ## Generate added messages and services with any dependencies listed here

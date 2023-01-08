@@ -1,4 +1,6 @@
 import rospy
+import actionlib
+
 from geometry_msgs.msg import PoseStamped
 
 
@@ -14,6 +16,8 @@ from plan_master.task.task_type_not_introduced_error \
     import TaskTypeNotIntroducedError
 from mrs_msgs.msg import TaskDesc, TaskStatus
 from data_parser.room_coordinates_parser import RoomCoordinatesParser
+
+from mrs_msgs.msg import TaskRequestAction, TaskRequestGoal, TaskRequestResult
 
 class PlanMaster():
     """Main system planner class."""
@@ -37,6 +41,24 @@ class PlanMaster():
         self.robots_harmonizers = []
         self.scenarios_controller = ScenariosController(self.robots_harmonizers)
         self.knowledge_base_handler = KnowledgeBaseHandler()
+        self.tasks = []
+        self.server = actionlib.ActionServer('do_dishes', TaskRequestAction, self.execute, False)
+        self.server.start()
+
+    def execute(self, goal):
+        print("jesteeem")
+        print(type(goal))
+        goal.set_accepted(" zaakceptowano")
+        result = TaskRequestResult()
+        print(result)
+        result.task_outcome.status = 1
+        # print(result.result)
+        # goal.set_succeeded(result)
+        print(goal.goal.goal.task_description)
+        self._handale_simple_task(goal.goal.goal.task_description, goal_handle=goal)
+        # Do lots of awesome groundbreaking robot stuff here
+        # self.server.set_succeeded()
+
 
     def subscribe(self, robot):
         task_harmonizer = TaskHarmonizer(robot)
@@ -70,13 +92,19 @@ class PlanMaster():
             self.scenarios_controller.handle_completed_subtask(task_status)
         else:
             print('Simple task has ended!')
+            for tsk in self.tasks:
+                print("Znalazlem!")
+                if tsk.id == task_status.id.id:
+                    if tsk.goal_handle is not None:
+                        tsk.goal_handle.set_succeeded()
         # print("[ INFO ] Got that task of id: ", task_status.id.id, " and index: ",
         # task_status.id.index, " has ended" )
 
-    def _handale_simple_task(self, task_desc):
+    def _handale_simple_task(self, task_desc, goal_handle=None):
         task_data = RoomCoordinatesParser() \
             .get_room_pose(task_desc.data[0])
-        task = Task(task_desc.type, task_data,tag_name=task_desc.data[0], priority=task_desc.priority)
+        task = Task(task_desc.type, task_data,tag_name=task_desc.data[0], priority=task_desc.priority, goal_handle=goal_handle)
+        self.tasks.append(task)
         self._order_task_execution(task)
 
     def _handle_scenario(self, task_desc):
