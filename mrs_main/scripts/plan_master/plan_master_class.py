@@ -42,7 +42,7 @@ class PlanMaster():
         self.scenarios_controller = ScenariosController(self.robots_harmonizers)
         self.knowledge_base_handler = KnowledgeBaseHandler()
         self.tasks = []
-        self.server = actionlib.ActionServer('do_dishes', TaskRequestAction, self.execute, False)
+        self.server = actionlib.ActionServer('plan_master/order_task', TaskRequestAction, self.execute, False)
         self.server.start()
 
     def execute(self, goal):

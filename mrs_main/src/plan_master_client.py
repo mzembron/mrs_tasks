@@ -7,8 +7,8 @@ import actionlib
 from mrs_msgs.msg import TaskRequestAction, TaskRequestGoal
 
 if __name__ == '__main__':
-    rospy.init_node('do_dishes_client')
-    client = actionlib.SimpleActionClient('do_dishes', TaskRequestAction)
+    rospy.init_node('order_task_client')
+    client = actionlib.SimpleActionClient('plan_master/order_task', TaskRequestAction)
     client.wait_for_server()
 
     goal = TaskRequestGoal()
