@@ -1,11 +1,21 @@
 import sqlite3
 import os
+import rospy
+from mrs_msgs.srv import TaskScore, TaskScoreResponse
+
 DIRNAME = os.path.dirname(__file__)
 DB_DIR = os.path.join(DIRNAME, 'knowledge_database.db')
 
 class KnowledgeBaseHandler:
     def __init__(self) -> None:
-        pass
+        self.service  = rospy.Service('plan_master/score_task', TaskScore, self.score_task)
+
+    def score_task(self, req):
+        print("Scoring")
+        return TaskScoreResponse("good")
+
+
+
 # Querry i am looking for:
 
 # SELECT c.correlation FROM 
