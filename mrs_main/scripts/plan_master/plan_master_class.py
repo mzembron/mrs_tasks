@@ -56,7 +56,6 @@ class PlanMaster():
         # goal.set_succeeded(result)
         print(goal.goal.goal.task_description)
         self._handale_simple_task(goal.goal.goal.task_description, goal_handle=goal)
-        # Do lots of awesome groundbreaking robot stuff here
         # self.server.set_succeeded()
 
 
@@ -96,7 +95,9 @@ class PlanMaster():
                 print("Znalazlem!")
                 if tsk.id == task_status.id.id:
                     if tsk.goal_handle is not None:
-                        tsk.goal_handle.set_succeeded()
+                        result = TaskRequestResult()
+                        result.task_outcome.status = 2
+                        tsk.goal_handle.set_succeeded(result)
         # print("[ INFO ] Got that task of id: ", task_status.id.id, " and index: ",
         # task_status.id.index, " has ended" )
 

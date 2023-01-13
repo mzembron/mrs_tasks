@@ -17,3 +17,4 @@ if __name__ == '__main__':
     goal.task_description.data.append('kitchen')
     client.send_goal(goal)
     print(client.wait_for_result())
+    print(client.get_result())
