@@ -9,9 +9,13 @@ DB_DIR = os.path.join(DIRNAME, 'knowledge_database.db')
 class KnowledgeBaseHandler:
     def __init__(self) -> None:
         self.service  = rospy.Service('plan_master/score_task', TaskScore, self.score_task)
+        self.tasks_to_be_scored = []
 
     def score_task(self, req):
-        print("Scoring")
+        print(req.TaskId, req.score)
+        for tsk in self.tasks_to_be_scored:
+            if tsk.id == req.TaskId:
+                print("Scoring")
         return TaskScoreResponse("good")
 
 

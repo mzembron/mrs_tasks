@@ -13,8 +13,9 @@ if __name__ == '__main__':
 
     goal = TaskRequestGoal()
     # Fill in the goal here
-    goal.task_description.type = "GT"
-    goal.task_description.data.append('kitchen')
+    goal.task_description.type = 'GT'
+    goal.task_description.data.append('hall')
     client.send_goal(goal)
     print(client.wait_for_result())
+    print(client.feedback_cb())
     print(client.get_result())

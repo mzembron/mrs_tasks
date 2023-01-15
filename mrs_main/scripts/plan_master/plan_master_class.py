@@ -17,7 +17,7 @@ from plan_master.task.task_type_not_introduced_error \
 from mrs_msgs.msg import TaskDesc, TaskStatus
 from data_parser.room_coordinates_parser import RoomCoordinatesParser
 
-from mrs_msgs.msg import TaskRequestAction, TaskRequestGoal, TaskRequestResult
+from mrs_msgs.msg import TaskRequestAction, TaskRequestGoal, TaskRequestResult, TaskRequestFeedback
 
 class PlanMaster():
     """Main system planner class."""
@@ -50,8 +50,13 @@ class PlanMaster():
         print(type(goal))
         goal.set_accepted(" zaakceptowano")
         result = TaskRequestResult()
-        print(result)
-        result.task_outcome.status = 1
+
+        ## feedback
+        # feedback = TaskRequestFeedback()
+        # feedback.task_status.id.id = 'test'
+        # goal.publish_feedback(feedback)
+        # print(result)
+        # result.task_outcome.status = 1
         # print(result.result)
         # goal.set_succeeded(result)
         print(goal.goal.goal.task_description)
@@ -92,11 +97,12 @@ class PlanMaster():
         else:
             print('Simple task has ended!')
             for tsk in self.tasks:
-                print("Znalazlem!")
                 if tsk.id == task_status.id.id:
+                    self.knowledge_base_handler.tasks_to_be_scored.append(tsk)
                     if tsk.goal_handle is not None:
                         result = TaskRequestResult()
                         result.task_outcome.status = 2
+                        result.task_outcome.id.id = tsk.id
                         tsk.goal_handle.set_succeeded(result)
         # print("[ INFO ] Got that task of id: ", task_status.id.id, " and index: ",
         # task_status.id.index, " has ended" )
