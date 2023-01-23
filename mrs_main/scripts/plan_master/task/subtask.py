@@ -5,7 +5,7 @@ class Subtask(Task):
     """Subtask - task that is part of a more complex task
         (called Scenario)"""
 
-    def __init__(self, subtask_param_dict, data, parent_id, priority=10):
+    def __init__(self, subtask_param_dict, data, parent_id, priority=10, tags = []):
         """Subtask.
             - id - subtask has same id as parent, subtasks can be
                 distinguished by theis indices
@@ -18,7 +18,7 @@ class Subtask(Task):
                 but refers to end conditions
             - same_robot_as_task_req -index of task which requires
                 same robot to be used """
-        super().__init__(subtask_param_dict['type'], data, priority)
+        super().__init__(subtask_param_dict['type'], data, priority=priority, tags=tags)
         self.id = parent_id
         self.index = \
             subtask_param_dict['index']

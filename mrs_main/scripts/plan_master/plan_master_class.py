@@ -29,7 +29,7 @@ class PlanMaster():
             PoseStamped,
             self._move_base_goal_callback)
         rospy.Subscriber(
-            "plan_master/order_task",
+            "plan_master/order_task_pub",
             TaskDesc,
             self._order_task_callback)
 
@@ -110,7 +110,8 @@ class PlanMaster():
     def _handale_simple_task(self, task_desc, goal_handle=None):
         task_data = RoomCoordinatesParser() \
             .get_room_pose(task_desc.data[0])
-        task = Task(task_desc.type, task_data,tag_name=task_desc.data[0], priority=task_desc.priority, goal_handle=goal_handle)
+        print("dataaa", task_desc.data)
+        task = Task(task_desc.type, task_data,tags=task_desc.data, priority=task_desc.priority, goal_handle=goal_handle)
         self.tasks.append(task)
         self._order_task_execution(task)
 
@@ -122,7 +123,7 @@ class PlanMaster():
                 .get_room_pose(data_desc)
             scenario_data.append(task_data)
         ## leve here just this:
-        scenario = Task(task_desc.type, scenario_data, task_desc.priority)
+        scenario = Task(task_desc.type, scenario_data, priority=task_desc.priority, tags=task_desc.data)
 
         # grouping subtasks
         subtasks_group_dict = self.scenarios_controller.get_tasks_groups_for_one_robot(scenario)
@@ -139,11 +140,13 @@ class PlanMaster():
                 estimations_list = harmonizer.get_execution_estimation_of(subtask_list)
                 ### Debug! TODO make it properly!
                 for subtsk_idx, subtask in enumerate(subtask_list):
-                    correlation = self.knowledge_base_handler.get_correlation(harmonizer.robot_name,subtask.tag_name)
-                    if(correlation == 0.0):
-                        SOMETHING_HUDGE = 100
-                        estimations_list[subtsk_idx].full_cost = estimations_list[subtsk_idx].full_cost * SOMETHING_HUDGE
-                        print("Very low correlation for: ",harmonizer.robot_name, " and ", subtask.tag_name)
+                    correlation = self.knowledge_base_handler.get_avg_correlation(harmonizer.robot_name, subtask.tags)
+                    # include cost!
+                    estimations_list[subtsk_idx].full_cost = estimations_list[subtsk_idx].full_cost / correlation
+                    # if(correlation == 0.0):
+                    #     SOMETHING_HUDGE = 100
+                    #     estimations_list[subtsk_idx].full_cost = estimations_list[subtsk_idx].full_cost * SOMETHING_HUDGE
+                    #     print("Very low correlation for: ",harmonizer.robot_name, " and ", subtask.tags)
 
                 ### END TODO
 

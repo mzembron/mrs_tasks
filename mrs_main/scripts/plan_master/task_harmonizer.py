@@ -157,6 +157,7 @@ class TaskHarmonizer:
 
 
     def add_task(self, task, position):
+        task.assigned_robot_name = self.robot.robot_name
         if len(self.task_list) == 0:
             self.task_list.append(task)
             self.order_task()

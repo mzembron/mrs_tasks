@@ -13,16 +13,17 @@ class Task():
         - 0 - most important
         -  10 - least important
     """
-    def __init__(self, task_type, data, tag_name='' ,priority=10, goal_handle=None):
+    def __init__(self, task_type, data, tags = [] ,priority=10, goal_handle=None):
         self.type = task_type
         self.priority = priority
         self.id = str(uuid.uuid4())  # uniqe id generator
-        self.tag_name = tag_name
+        self.tags = tags
         self.data = data
         self.fulfilled = False
         self.goal_handle = goal_handle
         self.is_scenario = self._determine_if_task_is_scenario()
         self._add_distinguisher_to_id()
+        self.assigned_robot_name = None
         if self.is_scenario:
             self._generate_subtasks()
 
@@ -59,7 +60,9 @@ class Task():
                 subtask_desc,
                 self.data[subtask_desc["appropriate data index"]],
                 parent_id=self.id,
-                priority=self.priority)
+                priority=self.priority,
+                tags=[self.tags[subtask_desc["appropriate data index"]]]
+                )
             self.subtasks_list.append(subtask)
 
     def _add_distinguisher_to_id(self):
