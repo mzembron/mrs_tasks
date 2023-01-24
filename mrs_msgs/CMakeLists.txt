@@ -57,6 +57,7 @@ add_message_files(
   TaskBacklog.msg
   TaskId.msg
   TaskStatus.msg
+  TaskOutcome.msg
 )
 
 ## Generate services in the 'srv' folder
