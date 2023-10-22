@@ -1,5 +1,0 @@
-recovery_behaviors:
-   - name: 'recovery_behaviour'
-     type: 'clear_costmap_recovery/ClearCostmapRecovery'
-recovery_behaviour:
-     reset_distance: 0.0
