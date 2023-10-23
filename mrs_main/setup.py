@@ -20,7 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'robo_agent = mrs_main.mrs_main:main',
+            'robo_agent = mrs_main.agent_entrypoint:main',
         ],
     },
 )
