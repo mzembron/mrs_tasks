@@ -1,4 +1,0 @@
-string TaskId
-int8 score
----
-string result
