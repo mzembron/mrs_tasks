@@ -1,0 +1,1 @@
+TASKS_DEFINITION_TOPIC_NAME = 'mrs_tasks/task_definition'
