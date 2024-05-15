@@ -5,7 +5,7 @@ from mrs_main.agent.agent import Agent
 def main(args=None):
     rclpy.init()
 
-    agent = Agent(agent_number='123')
+    agent = Agent()
     agent.start_agent()
 
 
