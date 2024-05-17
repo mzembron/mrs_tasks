@@ -13,6 +13,7 @@ find_package(rosidl_default_generators REQUIRED)
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/TaskBacklog.msg"
   "msg/TaskDesc.msg"
+  "msg/TaskConv.msg"
   "msg/TaskId.msg"
   "msg/TaskOutcome.msg"
   "msg/TaskStatus.msg"
