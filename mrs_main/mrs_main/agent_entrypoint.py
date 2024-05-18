@@ -1,5 +1,5 @@
 import rclpy
-from mrs_main.agent.agent import Agent
+from agent.agent import Agent
 
 
 def main(args=None):

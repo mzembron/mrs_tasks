@@ -1,7 +1,7 @@
 import rclpy
 from rclpy.node import Node
 from mrs_msgs.msg import TaskDesc
-import mrs_main.common.constants as mrs_const
+import common.constants as mrs_const
 
 class MinimalPublisher(Node):
 

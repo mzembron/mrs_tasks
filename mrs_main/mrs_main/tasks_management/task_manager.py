@@ -1,5 +1,5 @@
-from mrs_main.tasks_management.task import Task
-from mrs_main.common.objects import IntrestDescription
+from tasks_management.task import Task
+from common.objects import IntrestDescription
 import random
 
 class TaskManager():
@@ -16,3 +16,6 @@ class TaskManager():
         intrest_description.execution = self.intrest_exec
         intrest_description.coordination = self.intrest_coord
         return intrest_description
+    
+    def define_next_behaviour(self, task_id):
+        pass

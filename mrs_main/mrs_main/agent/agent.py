@@ -1,7 +1,7 @@
 import rclpy
 import uuid
-from mrs_main.communication.orders_manager import OrdersManager
-from mrs_main.tasks_management.task_manager import TaskManager
+from communication.orders_manager import OrdersManager
+from tasks_management.task_manager import TaskManager
 
 
 class Agent():
