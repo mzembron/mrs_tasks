@@ -4,6 +4,9 @@ ARG OVERLAY_WS=/opt/ros/overlay_ws
 # multi-stage for caching
 FROM $FROM_IMAGE AS cacher
 
+ENV TERM=xterm-256color
+RUN echo "PS1='\e[92m\u\e[0m@\e[94m\h\e[0m:\e[35m\w\e[0m# '" >> /root/.bashrc
+
 # # clone overlay source
 # ARG OVERLAY_WS
 # WORKDIR $OVERLAY_WS/src
