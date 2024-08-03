@@ -7,5 +7,7 @@
         "DISPLAY": "${localEnv:DISPLAY}"
     },
     "postCreateCommand": ["sh", ".devcontainer/update_bashrc.sh"],
-    "runArgs": ["--net=host"]
+    "runArgs": ["--net=host"],
+    "workspaceMount": "source=${localWorkspaceFolder},target=/opt/mrs_ws/src,type=bind",
+    "workspaceFolder": "/opt/mrs_ws/src"
 }

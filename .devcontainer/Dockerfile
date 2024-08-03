@@ -1,26 +1,56 @@
-FROM mcr.microsoft.com/devcontainers/base:ubuntu-22.04
-ARG WORKSPACE_FOLDER=/workspace
-ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update
-RUN apt-get upgrade -qy
-RUN apt-get install -qy --no-install-recommends build-essential curl python3 python3-dev
-RUN curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
-RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null
-RUN apt-get update
-RUN apt-get upgrade -qy
-RUN apt-get install -qy --no-install-recommends ros-humble-ros-base
-RUN apt-get install -qy --no-install-recommends ros-dev-tools
+ARG FROM_IMAGE=ros:humble
+ARG OVERLAY_WS=/opt/ros/overlay_ws
 
-# RUN echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list
-# RUN curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
-# RUN apt-get update
-# RUN apt-get install -qy --no-install-recommends python3-rosdep python3-rosinstall python3-rosinstall-generator ros-noetic-desktop
-# RUN ["sh", "-c", "set -ex; . /opt/ros/noetic/setup.sh; rosdep init; rosdep update"]
-# RUN apt-get install -qy --no-install-recommends qtbase5-dev python3-tk python3-catkin-tools python3-pip
-# RUN pip install tensorflow
+# multi-stage for caching
+FROM $FROM_IMAGE AS cacher
 
-# WORKDIR /opt/siu_ws/src
-# RUN git clone --branch noetic-devel --depth 1 https://github.com/RCPRG-ROS-pkg/ros_tutorials
-# WORKDIR /opt/siu_ws
-# RUN ["sh", "-c", "set -ex; . /opt/ros/noetic/setup.sh; catkin build"]
-# RUN ln -fs "$WORKSPACE_FOLDER/roads.png" /opt/siu_ws/src/ros_tutorials/turtlesim/images/roads.png
+# # clone overlay source
+# ARG OVERLAY_WS
+# WORKDIR $OVERLAY_WS/src
+# RUN echo "\
+# repositories: \n\
+#   ros2/demos: \n\
+#     type: git \n\
+#     url: https://github.com/ros2/demos.git \n\
+#     version: ${ROS_DISTRO} \n\
+# " > ../overlay.repos
+# RUN vcs import ./ < ../overlay.repos
+
+# # copy manifests for caching
+# WORKDIR /opt
+# RUN mkdir -p /tmp/opt && \
+#     find ./ -name "package.xml" | \
+#       xargs cp --parents -t /tmp/opt && \
+#     find ./ -name "COLCON_IGNORE" | \
+#       xargs cp --parents -t /tmp/opt || true
+
+# multi-stage for building
+# FROM $FROM_IMAGE AS builder
+
+# # install overlay dependencies
+# ARG OVERLAY_WS
+# WORKDIR $OVERLAY_WS
+# COPY --from=cacher /tmp/$OVERLAY_WS/src ./src
+# RUN . /opt/ros/$ROS_DISTRO/setup.sh && \
+#     apt-get update && rosdep install -y \
+#       --from-paths \
+#         src/ros2/demos/demo_nodes_cpp \
+#         src/ros2/demos/demo_nodes_py \
+#       --ignore-src \
+#     && rm -rf /var/lib/apt/lists/*
+
+# # build overlay source
+# COPY --from=cacher $OVERLAY_WS/src ./src
+# ARG OVERLAY_MIXINS="release"
+# RUN . /opt/ros/$ROS_DISTRO/setup.sh && \
+#     colcon build \
+#       --packages-select \
+#         demo_nodes_cpp \
+#         demo_nodes_py \
+#       --mixin $OVERLAY_MIXINS
+
+# # source entrypoint setup
+# ENV OVERLAY_WS $OVERLAY_WS
+# RUN sed --in-place --expression \
+#       '$isource "$OVERLAY_WS/install/setup.bash"' \
+#       /ros_entrypoint.sh
