@@ -16,7 +16,6 @@ class TaskManager():
         self.id_task_dict[task.short_id] = task
         return self.intrest_desc
     
-    def define_next_behaviour(self, task_conv_msg: TaskConvMsg) -> TaskConvMsg:
-        print(f'Recived msg about task: {task_conv_msg.short_id}!')
+    def define_next_behavior(self, task_conv_msg: TaskConvMsg) -> TaskConvMsg:
+        print(f'Received msg about task: {task_conv_msg.short_id}!')
         return self.id_task_dict[task_conv_msg.short_id].get_response(task_conv_msg)
-        

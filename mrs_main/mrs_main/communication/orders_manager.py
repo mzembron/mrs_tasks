@@ -64,7 +64,7 @@ class OrdersManager(Node):
             self.get_logger().info(f'I heard msg from {msg.sender}, \
                                    performative: {msg.performative}, task data: {msg.data}')
             conv_msg = TaskConvMsg(msg)
-            anwser_msg = self.__task_manager.define_next_behaviour(conv_msg)
+            answer_msg = self.__task_manager.define_next_behavior(conv_msg)
 
 
 if __name__ == '__main__':
