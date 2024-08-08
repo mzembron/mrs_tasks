@@ -10,8 +10,8 @@ from common.conversation_data import MrsConvPerform
 
 
 class OrdersManager(Node):
-    """ OrdersManager - responsible for taking care of communication
-    when it comes to task management.
+    """ Orders Manager takes care of communication in the contexts of 
+    diffrent tasks - every task has its own ROS topic.
     """
     def __init__(self, agent_name: str, task_manager: TaskManager):
         """
