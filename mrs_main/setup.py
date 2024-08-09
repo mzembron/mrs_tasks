@@ -13,7 +13,7 @@ setup(
     ],
     install_requires=['setuptools'],
     zip_safe=True,
-    maintainer='mateusz',
+    maintainer='Mateusz Zembron',
     maintainer_email='mateuszzembron@gmail.com',
     description='Framework for task allocation and coordination in distributed system',
     license='BSD',
