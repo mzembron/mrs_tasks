@@ -3,10 +3,10 @@ from rclpy.node import Node
 from mrs_msgs.msg import TaskDesc
 import common.constants as mrs_const
 
-class MinimalPublisher(Node):
+class DummyTaskGenerator(Node):
 
     def __init__(self):
-        super().__init__('minimal_publisher')
+        super().__init__('dummy_task_generator')
         self.publisher_ = self.create_publisher(TaskDesc, mrs_const.TASKS_DEFINITION_TOPIC_NAME, 10)
         timer_period = 0.5  # seconds
         self.timer = self.create_timer(timer_period, self.timer_callback)
@@ -24,7 +24,7 @@ class MinimalPublisher(Node):
 def main(args=None):
     rclpy.init(args=args)
 
-    minimal_publisher = MinimalPublisher()
+    minimal_publisher = DummyTaskGenerator()
 
     rclpy.spin(minimal_publisher)
 
