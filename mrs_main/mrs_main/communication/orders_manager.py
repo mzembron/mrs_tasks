@@ -3,7 +3,7 @@ import common.constants as mrs_const
 
 from rclpy.node import Node, Subscription, Publisher
 from mrs_msgs.msg import TaskDesc, TaskConv
-from tasks_management.task_manager import TaskManager
+from tasks_management.task_manager_interface import TaskManagerInterface
 from tasks_management.task import Task
 from common.objects import IntrestDescription, TopicSubPub, TaskConvMsg
 from common.conversation_data import MrsConvPerform
@@ -13,7 +13,7 @@ class OrdersManager(Node):
     """ Orders Manager takes care of communication in the contexts of 
     diffrent tasks - every task has its own ROS topic.
     """
-    def __init__(self, agent_name: str, task_manager: TaskManager):
+    def __init__(self, agent_name: str, task_manager: TaskManagerInterface):
         """
         """
         self.agent_name = agent_name
@@ -35,7 +35,8 @@ class OrdersManager(Node):
         self.get_logger().info(f'I heard task: {msg.type}')
         task = Task(short_id=msg.short_id, task_desc=msg.data)
         self.__create_sub_pub_for_task(task.short_id)
-        intrest_estimation: IntrestDescription = self.__task_manager.append_task(task)
+        self.__task_manager.receive_task(task)
+        intrest_estimation: IntrestDescription = self.__task_manager.get_intrest(task.short_id)
         self.__publish_intrest(task.short_id, intrest_estimation)
 
     def __create_sub_pub_for_task(self, task_id):

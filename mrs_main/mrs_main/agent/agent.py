@@ -13,7 +13,7 @@ class Agent():
                                           intrest_exec=0.6,
                                           intrest_coord=0.4)
         self.__orders_manager = OrdersManager(agent_name=self.agent_name,
-                                              task_manager=self.__task_manager)
+                                              task_manager=self.__task_manager.interface)
 
     def start_agent(self):
 
