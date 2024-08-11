@@ -7,14 +7,14 @@ class TaskFSM:
     intrest: IntrestDescription
 
     def __init__(self):
-        self._state = DefineCoordIntrest()
+        self.transition_to(DefineTaskIntrest())
 
     def get_next_message(self, msg: TaskConvMsg):
         self._state.define_next(msg)
 
     def transition_to(self, state):
         self._state = state
-        self._state.task_fsm = self
+        self._state.task = self
 
 
 class State(ABC):
@@ -24,23 +24,28 @@ class State(ABC):
 
     @task.setter
     def task(self, task_fsm: TaskFSM):
-        self.task_fsm = task_fsm
+        self._task_fsm = task_fsm
 
     @abstractmethod
     def define_next(self, msg: TaskConvMsg):
         pass
-    
-class DefineCoordIntrest(State):
+
+class DefineTaskIntrest(State):
     INTREST_THRESHOLD = 0.5
     def define_next(self, msg: TaskConvMsg):
         partner_intrest = float(msg.data[0])
         if (partner_intrest > 0.2):
             print(f'received partners intrest: {partner_intrest}')
+            self._task_fsm.transition_to(WaitForExec())
 
-class DefineExecIntrestAsCoord(State):
+class WaitForExec(State):
+    def define_next(self, msg: TaskConvMsg):
+        print('Waiting for the right time...')
+
+class ExecTask(State):
     def define_next(self, msg: TaskConvMsg):
         pass
 
-class DefineExecintrestAsNonCoord(State):
+class SuperviseTask(State):
     def define_next(self, msg: TaskConvMsg):
         pass
