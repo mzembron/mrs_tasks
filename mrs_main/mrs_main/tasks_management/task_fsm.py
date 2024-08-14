@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from common.objects import IntrestDescription, TaskConvMsg
+from common.conversation_data import MrsConvPerform
 
 
 class TaskFSM:
@@ -27,16 +28,31 @@ class State(ABC):
         self._task_fsm = task_fsm
 
     @abstractmethod
-    def define_next(self, msg: TaskConvMsg):
+    def define_next(self, msg: TaskConvMsg) -> TaskConvMsg:
+        """ Returns msg with the content specific to the current state """
         pass
 
 class DefineTaskIntrest(State):
     INTREST_THRESHOLD = 0.5
-    def define_next(self, msg: TaskConvMsg):
-        partner_intrest = float(msg.data[0])
-        if (partner_intrest > 0.2):
-            print(f'received partners intrest: {partner_intrest}')
-            self._task_fsm.transition_to(WaitForExec())
+    def define_next(self, msg: TaskConvMsg) -> TaskConvMsg:
+        if (msg.performative == MrsConvPerform.declare_coord_intrest):
+            partner_intrest = float(msg.data[0])
+            reply_msg = TaskConvMsg()
+            if (partner_intrest > self.INTREST_THRESHOLD):
+                print(f'received partners intrest: {partner_intrest}')
+                reply_msg.performative = MrsConvPerform.propose_exec_role
+                reply_msg.data = [msg.sender]
+                print(f'Proposing coord role to: {msg.sender}')
+                self._task_fsm.transition_to(WaitForExec())
+            else:
+                reply_msg.performative = MrsConvPerform.declare_coord_intrest
+                temp_coord_intrest = '0.4' #TODO: remove coord intrest at all, 
+                                                # every agent should take part in supervising
+                reply_msg.data = [temp_coord_intrest]
+            reply_msg.short_id = msg.short_id
+            return reply_msg
+        else:
+            print(f'Received msg with performative {msg.performative}')
 
 class WaitForExec(State):
     def define_next(self, msg: TaskConvMsg):

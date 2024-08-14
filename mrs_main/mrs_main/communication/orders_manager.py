@@ -64,8 +64,14 @@ class OrdersManager(Node):
         if msg.sender != self.agent_name:
             self.get_logger().info(f'I heard msg from {msg.sender}, \
                                    performative: {msg.performative}, task data: {msg.data}')
-            conv_msg = TaskConvMsg(msg)
+            conv_msg = TaskConvMsg()
+            conv_msg.deserialize(msg=msg)
             answer_msg = self.__task_manager.define_next_behavior(conv_msg)
+            if (answer_msg is None): return
+            answer_msg.add_conversation_context(sender_name=self.agent_name, id=conv_msg.short_id)
+            print(f'Answer msg data {answer_msg.data[0]}')
+            conv_answer_msg= answer_msg.serialize()
+            self.task_topic_subpub_dict[msg.short_id].pub.publish(conv_answer_msg)
 
 
 if __name__ == '__main__':
