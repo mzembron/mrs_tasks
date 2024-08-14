@@ -10,7 +10,7 @@ class TaskFSM:
         self.transition_to(DefineTaskIntrest())
 
     def get_next_message(self, msg: TaskConvMsg):
-        self._state.define_next(msg)
+        return self._state.define_next(msg)
 
     def transition_to(self, state):
         self._state = state

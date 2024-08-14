@@ -7,8 +7,8 @@ class Task():
         self.desc: list[str] = task_desc
         self.fsm = TaskFSM()
 
-    def get_response(self, msg: TaskConvMsg):
-        self.fsm.get_next_message(msg=msg)
+    def get_response(self, msg: TaskConvMsg) -> TaskConvMsg:
+        return self.fsm.get_next_message(msg=msg)
 
     @property
     def intrest(self) -> IntrestDescription:
