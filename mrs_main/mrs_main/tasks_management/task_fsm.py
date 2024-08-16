@@ -16,6 +16,7 @@ class TaskFSM:
     def transition_to(self, state):
         self._state = state
         self._state.task = self
+        self._state.change_state_routine()
 
 
 class State(ABC):
@@ -40,7 +41,11 @@ class State(ABC):
             return self.respond_to_exec_acceptance(msg)
         else:
             raise InvalidMsgPerformative
-        
+
+    def change_state_routine(self):
+        """ transition method, allows for state specific behavior on transition """    
+        pass
+
     def respond_to_coord_intrest_declaration(self, msg: TaskConvMsg):
         return
     
