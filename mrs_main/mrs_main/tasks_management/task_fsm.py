@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from common.objects import IntrestDescription, TaskConvMsg
 from common.conversation_data import MrsConvPerform
-
+from common.exceptions import InvalidMsgPerformative
 
 class TaskFSM:
 
@@ -38,6 +38,8 @@ class State(ABC):
             return self.respond_to_exec_proposal(msg)
         elif (msg.performative == MrsConvPerform.accept_exec_proposal):
             return self.respond_to_exec_acceptance(msg)
+        else:
+            raise InvalidMsgPerformative
         
     def respond_to_coord_intrest_declaration(self, msg: TaskConvMsg):
         return
