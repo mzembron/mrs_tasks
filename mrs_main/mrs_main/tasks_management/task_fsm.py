@@ -61,8 +61,8 @@ class State(ABC):
 class DefineTaskIntrest(State):
     INTREST_THRESHOLD = 0.5
     def respond_to_coord_intrest_declaration(self, msg: TaskConvMsg) -> TaskConvMsg:
-        print(f"[ DEBUG LOG ] Received partner's interest {partner_intrest}")
         partner_intrest = float(msg.data[0])
+        print(f"[ DEBUG LOG ] Received partner's interest {partner_intrest}")
         reply_msg = TaskConvMsg() 
         if (partner_intrest > self.INTREST_THRESHOLD):
             print(f"[ DEBUG LOG ] Sending exec proposition to {msg.sender}")
