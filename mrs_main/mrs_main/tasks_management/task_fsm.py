@@ -46,6 +46,7 @@ class State(ABC):
         """ transition method, allows for state specific behavior on transition """    
         pass
 
+# virtual methods - respond to specific msg content
     def respond_to_coord_intrest_declaration(self, msg: TaskConvMsg):
         return
     
@@ -78,10 +79,22 @@ class DefineTaskIntrest(State):
         return reply_msg
 
 class WaitForExec(State):
-    pass
+    def change_state_routine(self):
+        print("[ DEBUG LOG ] Moving directly to ExecTask")
+        self._task_fsm.transition_to(ExecTask())
 
 class ExecTask(State):
-    pass
+    def change_state_routine(self):
+        print("[ DEBUG LOG ] Executing task")
+        print("[ DEBUG LOG ] Moving to TaskCompleted")
+        self._task_fsm.transition_to(TaskCompleted())
 
 class SuperviseTask(State):
-    pass
+    def change_state_routine(self):
+        print("[ DEBUG LOG ] Supervising task")
+        print("[ DEBUG LOG ] Moving to TaskCompleted")
+        self._task_fsm.transition_to(TaskCompleted())
+
+class TaskCompleted(State):
+    def __init__(self) -> None:
+        print('[ DEBUG LOG ] Task completed')
