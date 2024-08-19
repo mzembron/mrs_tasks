@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
-from common.objects import IntrestDescription, TaskConvMsg
-from common.conversation_data import MrsConvPerform
-from common.exceptions import InvalidMsgPerformative
+from mrs_main.common.objects import IntrestDescription, TaskConvMsg
+from mrs_main.common.conversation_data import MrsConvPerform
+from mrs_main.common.exceptions import InvalidMsgPerformative
 
 class TaskFSM:
 

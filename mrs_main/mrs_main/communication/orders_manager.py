@@ -1,12 +1,12 @@
 import rclpy
-import common.constants as mrs_const
+import mrs_main.common.constants as mrs_const
 
 from rclpy.node import Node, Subscription, Publisher
 from mrs_msgs.msg import TaskDesc, TaskConv
-from tasks_management.task_manager_interface import TaskManagerInterface
-from tasks_management.task import Task
-from common.objects import IntrestDescription, TopicSubPub, TaskConvMsg
-from common.conversation_data import MrsConvPerform
+from mrs_main.tasks_management.task_manager_interface import TaskManagerInterface
+from mrs_main.tasks_management.task import Task
+from mrs_main.common.objects import IntrestDescription, TopicSubPub, TaskConvMsg
+from mrs_main.common.conversation_data import MrsConvPerform
 
 
 class OrdersManager(Node):
