@@ -1,6 +1,6 @@
-from tasks_management.task import Task
-from tasks_management.task_manager_interface import TaskManagerInterface
-from common.objects import IntrestDescription, TaskConvMsg
+from mrs_main.tasks_management.task import Task
+from mrs_main.tasks_management.task_manager_interface import TaskManagerInterface
+from mrs_main.common.objects import IntrestDescription, TaskConvMsg
 import random
 
 class TaskManager():

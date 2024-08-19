@@ -1,11 +1,11 @@
-from tasks_management.task import Task
+from mrs_main.tasks_management.task import Task
 # from tasks_management.task_manager import TaskManager #TODO: resolve circular import
-from common.objects import IntrestDescription, TaskConvMsg
+from mrs_main.common.objects import IntrestDescription, TaskConvMsg
 
 class TaskManagerInterface:
     def __init__(self, task_dict, concrete_task_manager) -> None:
         self._task_dict = task_dict
-        from tasks_management.task_manager import TaskManager
+        from mrs_main.tasks_management.task_manager import TaskManager
         self.__concrete_task_manager: TaskManager = concrete_task_manager
     
     @property

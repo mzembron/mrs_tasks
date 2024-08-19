@@ -1,7 +1,7 @@
 import rclpy
 from rclpy.node import Node
 from mrs_msgs.msg import TaskDesc
-import common.constants as mrs_const
+import mrs_main.common.constants as mrs_const
 
 class DummyTaskGenerator(Node):
 

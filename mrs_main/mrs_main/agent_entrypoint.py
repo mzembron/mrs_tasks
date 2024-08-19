@@ -1,6 +1,6 @@
 import rclpy
 import sys
-from agent.agent import Agent
+from mrs_main.agent.agent import Agent
 
 
 def main(args=None):

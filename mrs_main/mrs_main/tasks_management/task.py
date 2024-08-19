@@ -1,5 +1,5 @@
-from tasks_management.task_fsm import TaskFSM
-from common.objects import IntrestDescription, TaskConvMsg
+from mrs_main.tasks_management.task_fsm import TaskFSM
+from mrs_main.common.objects import IntrestDescription, TaskConvMsg
 
 class Task():
     def __init__(self, short_id: int, task_desc: list[str]):
