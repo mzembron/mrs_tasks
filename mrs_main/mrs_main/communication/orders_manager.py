@@ -69,7 +69,7 @@ class OrdersManager(Node):
             answer_msg = self.__task_manager.define_next_behavior(conv_msg)
             if (answer_msg is None): return
             answer_msg.add_conversation_context(sender_name=self.agent_name, id=conv_msg.short_id)
-            print(f'Answer msg data {answer_msg.data[0]}')
+            print(f'[ DEBUG LOG ] Answer msg data {answer_msg.data[0]}')
             conv_answer_msg= answer_msg.serialize()
             self.task_topic_subpub_dict[msg.short_id].pub.publish(conv_answer_msg)
 
