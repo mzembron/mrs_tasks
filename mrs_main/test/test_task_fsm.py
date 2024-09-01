@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import MagicMock
-from mrs_main.tasks_management.task_fsm import TaskFSM, State, DefineTaskIntrest
+from mrs_main.tasks_management.task_fsm import TaskFSM, State, DefineTaskIntrest, WaitForExec, TaskCompleted
 from mrs_main.common.objects import TaskConvMsg
 from mrs_main.common.conversation_data import MrsConvPerform
 from mrs_main.common.exceptions import InvalidMsgPerformative
@@ -38,6 +38,17 @@ class TestState:
         msg.performative='invalid_performative'
         with pytest.raises(InvalidMsgPerformative):
             self.state.define_next(msg)
+
+    def test_change_state_to_task_completed(self):
+        self.task_fsm = TaskFSM()
+        self.wait_for_exec = WaitForExec()
+        self.wait_for_exec.task = self.task_fsm
+        self.task_fsm._state = self.wait_for_exec
+        self.wait_for_exec.change_state_routine()
+
+        # Assert that the state has been changed to TaskCompleted
+        assert isinstance(self.task_fsm._state, TaskCompleted)
+
 
 if __name__ == '__main__':
     pytest.main()
