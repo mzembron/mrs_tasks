@@ -1,7 +1,7 @@
 import rclpy
 import mrs_main.common.constants as mrs_const
 
-from rclpy.node import Node, Subscription, Publisher
+from rclpy.node import Node, Publisher
 from mrs_msgs.msg import TaskDesc, TaskConv
 from mrs_main.tasks_management.task_manager_interface import TaskManagerInterface
 from mrs_main.tasks_management.task import Task
@@ -15,6 +15,14 @@ class OrdersManager(Node):
     """
     def __init__(self, agent_name: str, task_manager: TaskManagerInterface):
         """
+        Attributes:
+            agent_name (str)
+            node_name (str): The name of the node, derived from the agent name.
+            subscription_task_def_topic (Subscription): ROS2 subscription to the task definition topic.
+            task_topic_subpub_dict (dict[int, TopicSubPub]): Dictionary mapping task IDs to
+                    their respective TopicSubPub objects (ROS2 subscription and publisher).
+            __task_manager (TaskManagerInterface): The task manager instance, allows accessing 
+                    and managing the state of tasks.
         """
         self.agent_name = agent_name
         self.node_name = 'orders_manager_'+agent_name
@@ -32,6 +40,7 @@ class OrdersManager(Node):
         self.__task_manager = task_manager
 
     def __task_definition_callback(self, msg: TaskDesc):
+        """ Callback for the generic topicwith defintion of any task (action entrypoint)"""
         self.get_logger().info(f'I heard task: {msg.type}')
         task = Task(short_id=msg.short_id, task_desc=msg.data)
         self.__create_sub_pub_for_task(task.short_id)
@@ -40,7 +49,7 @@ class OrdersManager(Node):
         self.__publish_intrest(task.short_id, intrest_estimation)
 
     def __create_sub_pub_for_task(self, task_id):
-
+        """ Creates a new topic specific to the newly defined task """
         dynamic_topic_sub_pub = TopicSubPub() 
         dynamic_topic_sub_pub.pub = self.create_publisher(TaskConv, '/mrs_main/id_' + str(task_id), 10)
         dynamic_topic_sub_pub.sub = self.create_subscription(
@@ -52,6 +61,8 @@ class OrdersManager(Node):
         self.task_topic_subpub_dict[task_id] = dynamic_topic_sub_pub
 
     def __publish_intrest(self, task_id: int, intrest: IntrestDescription):
+        """ publishes the intrest estimation regarding the specific task
+            (on the topic specific to the task) """
         task_conv_msg = TaskConv()
         task_conv_msg.performative = MrsConvPerform.declare_coord_intrest
         task_conv_msg.data = [str(intrest.coordination)]
@@ -61,6 +72,8 @@ class OrdersManager(Node):
         pub.publish(task_conv_msg)
 
     def __generic_task_callback(self, msg: TaskConv):
+        """ Callback run whenever any message shows up on the task-specific topic,
+            performs particular actions depending on the current state of the task"""
         if msg.sender != self.agent_name:
             self.get_logger().info(f'I heard msg from {msg.sender}, \
                                    performative: {msg.performative}, task data: {msg.data}')
@@ -73,13 +86,3 @@ class OrdersManager(Node):
             conv_answer_msg= answer_msg.serialize()
             self.task_topic_subpub_dict[msg.short_id].pub.publish(conv_answer_msg)
 
-
-if __name__ == '__main__':
-    rclpy.init()
-
-    ord_manager = OrdersManager('agent1')
-
-    rclpy.spin(ord_manager)
-
-    ord_manager.destroy_node()
-    rclpy.shutdown()
