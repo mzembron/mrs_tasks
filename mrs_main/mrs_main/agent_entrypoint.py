@@ -9,7 +9,7 @@ def main(args=None):
     intrest_coord = 0.2
     if (len(sys.argv)>1):
         intrest_exec = float(sys.argv[1])
-    if (len(sys.argv)>1):
+    if (len(sys.argv)>2):
         intrest_coord = float(sys.argv[2])
         
     agent = Agent(intrest_exec=intrest_exec, intrest_coord=intrest_coord)
