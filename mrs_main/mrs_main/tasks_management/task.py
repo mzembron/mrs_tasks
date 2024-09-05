@@ -6,7 +6,7 @@ class Task():
     def __init__(self, short_id: int, task_desc: list[str], dependency_manager: DependencyManager) -> None:
         self.short_id: int = short_id
         self.desc: list[str] = task_desc
-        self.fsm = TaskFSM(dependency_manager)
+        self.fsm = TaskFSM(task_id=self.short_id, dependency_manager=dependency_manager)
 
     def get_response(self, msg: TaskConvMsg) -> TaskConvMsg:
         return self.fsm.get_next_message(msg=msg)

@@ -8,17 +8,18 @@ class TaskFSM:
 
     intrest: IntrestDescription
 
-    def __init__(self, dependency_manager: DependencyManager) -> None:
+    def __init__(self, task_id: int, dependency_manager: DependencyManager) -> None:
         self.transition_to(DefineTaskIntrest())
         self._dependency_manager = dependency_manager
-        self._dependency_manager.introduce_task_dependencies()
+        self.task_id = task_id
+        self._dependency_manager.introduce_task_dependencies( )
 
     def get_next_message(self, msg: TaskConvMsg):
         return self._state.define_next(msg)
 
     def transition_to(self, state):
         self._state = state
-        self._state.task = self
+        self._state.task_fsm = self
         self._state.change_state_routine()
 
 
@@ -28,7 +29,7 @@ class State(ABC):
         return self._task_fsm
 
     @task.setter
-    def task(self, task_fsm: TaskFSM):
+    def task_fsm(self, task_fsm: TaskFSM):
         self._task_fsm = task_fsm
 
     def define_next(self, msg: TaskConvMsg) -> TaskConvMsg:
@@ -84,7 +85,8 @@ class DefineTaskIntrest(State):
 class WaitForExec(State):
     def change_state_routine(self):
         print("[ DEBUG LOG ] Moving directly to ExecTask")
-        self._task_fsm.transition_to(ExecTask())
+        if (self._task_fsm._dependency_manager.are_dependencies_met(self.task_fsm.task_id)):
+            self._task_fsm.transition_to(ExecTask())
 
 class ExecTask(State):
     def change_state_routine(self):
