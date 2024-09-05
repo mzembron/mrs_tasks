@@ -42,11 +42,11 @@ class OrdersManager(Node):
     def __task_definition_callback(self, msg: TaskDesc):
         """ Callback for the generic topicwith defintion of any task (action entrypoint)"""
         self.get_logger().info(f'I heard task: {msg.type}')
-        task = Task(short_id=msg.short_id, task_desc=msg.data)
-        self.__create_sub_pub_for_task(task.short_id)
-        self.__task_manager.receive_task(task)
-        intrest_estimation: IntrestDescription = self.__task_manager.get_intrest(task.short_id)
-        self.__publish_intrest(task.short_id, intrest_estimation)
+        
+        self.__create_sub_pub_for_task(msg.short_id)
+        self.__task_manager.receive_task(short_id=msg.short_id, task_desc=msg.data)
+        intrest_estimation: IntrestDescription = self.__task_manager.get_intrest(msg.short_id)
+        self.__publish_intrest(msg.short_id, intrest_estimation)
 
     def __create_sub_pub_for_task(self, task_id):
         """ Creates a new topic specific to the newly defined task """

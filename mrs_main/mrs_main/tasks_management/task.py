@@ -1,11 +1,12 @@
 from mrs_main.tasks_management.task_fsm import TaskFSM
 from mrs_main.common.objects import IntrestDescription, TaskConvMsg
+from mrs_main.tasks_management.dependency_manager import DependencyManager
 
 class Task():
-    def __init__(self, short_id: int, task_desc: list[str]):
+    def __init__(self, short_id: int, task_desc: list[str], dependency_manager: DependencyManager) -> None:
         self.short_id: int = short_id
         self.desc: list[str] = task_desc
-        self.fsm = TaskFSM()
+        self.fsm = TaskFSM(dependency_manager)
 
     def get_response(self, msg: TaskConvMsg) -> TaskConvMsg:
         return self.fsm.get_next_message(msg=msg)

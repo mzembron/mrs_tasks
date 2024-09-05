@@ -2,13 +2,16 @@ from abc import ABC, abstractmethod
 from mrs_main.common.objects import IntrestDescription, TaskConvMsg
 from mrs_main.common.conversation_data import MrsConvPerform
 from mrs_main.common.exceptions import InvalidMsgPerformative
+from mrs_main.tasks_management.dependency_manager import DependencyManager
 
 class TaskFSM:
 
     intrest: IntrestDescription
 
-    def __init__(self):
+    def __init__(self, dependency_manager: DependencyManager) -> None:
         self.transition_to(DefineTaskIntrest())
+        self._dependency_manager = dependency_manager
+        self._dependency_manager.introduce_task_dependencies()
 
     def get_next_message(self, msg: TaskConvMsg):
         return self._state.define_next(msg)
