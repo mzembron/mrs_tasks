@@ -7,9 +7,9 @@ class DependencyManager:
     def __init__(self, tasks_dict) -> None:
         self._tasks_dict = tasks_dict
 
-    def verify_dependencies(self, task_id: int) -> bool:
+    def are_dependencies_met(self, task_id: int) -> bool:
         """ Checks if given task can be executed immediately """
-        pass
+        return True
     
     def update_dependencies(self, task_id: int):
         """ Updates the dependencies after receiving message regarding the task """
