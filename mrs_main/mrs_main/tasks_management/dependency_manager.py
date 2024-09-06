@@ -7,7 +7,7 @@ class DependencyManager:
     def __init__(self, tasks_dict) -> None:
         self._tasks_dict = tasks_dict
 
-    def are_dependencies_met(self, task_id: int) -> bool:
+    def are_task_dependencies_met(self, task_id: int) -> bool:
         """ Checks if given task can be executed immediately """
         return True
     
@@ -21,6 +21,17 @@ class DependencyManager:
         pass
 
     #TODO: should include parameters defining dependencies 
-    def introduce_task_dependencies(self):
+    def introduce_task_dependencies(self, task_id: int):
         """ Define dependencies for new task """
         pass
+
+class TaskDependencyManager:
+    def __init__(self, dependency_manager: DependencyManager, task_id: int) -> None:
+        self.task_id = task_id
+        self.__dependency_manager = dependency_manager
+    
+    def introduce_dependencies(self):
+        return self.__dependency_manager.introduce_task_dependencies(self.task_id)
+    
+    def are_dependencies_met(self):
+        return self.__dependency_manager.are_task_dependencies_met(self.task_id)

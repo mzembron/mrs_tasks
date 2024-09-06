@@ -2,17 +2,16 @@ from abc import ABC, abstractmethod
 from mrs_main.common.objects import IntrestDescription, TaskConvMsg
 from mrs_main.common.conversation_data import MrsConvPerform
 from mrs_main.common.exceptions import InvalidMsgPerformative
-from mrs_main.tasks_management.dependency_manager import DependencyManager
+from mrs_main.tasks_management.dependency_manager import TaskDependencyManager
 
 class TaskFSM:
 
     intrest: IntrestDescription
 
-    def __init__(self, task_id: int, dependency_manager: DependencyManager) -> None:
+    def __init__(self, dependency_manager: TaskDependencyManager) -> None:
         self.transition_to(DefineTaskIntrest())
         self._dependency_manager = dependency_manager
-        self.task_id = task_id
-        self._dependency_manager.introduce_task_dependencies( )
+        self._dependency_manager.introduce_dependencies()
 
     def get_next_message(self, msg: TaskConvMsg):
         return self._state.define_next(msg)
@@ -85,7 +84,7 @@ class DefineTaskIntrest(State):
 class WaitForExec(State):
     def change_state_routine(self):
         print("[ DEBUG LOG ] Moving directly to ExecTask")
-        if (self._task_fsm._dependency_manager.are_dependencies_met(self.task_fsm.task_id)):
+        if (self._task_fsm._dependency_manager.are_dependencies_met()):
             self._task_fsm.transition_to(ExecTask())
 
 class ExecTask(State):
