@@ -1,5 +1,8 @@
+import random
+
 import rclpy
 from rclpy.node import Node
+
 from mrs_msgs.msg import TaskDesc
 import mrs_main.common.constants as mrs_const
 
@@ -16,9 +19,16 @@ class DummyTaskGenerator(Node):
         msg = TaskDesc()
         msg.type = 'Hello World: %d' % self.i
         msg.short_id = self.i
+        msg.data = [str(x) for x in self.genearate_dependencies(self.i)]
         self.publisher_.publish(msg)
         self.get_logger().info('Publishing: "%s"' % msg.type)
         self.i += 1
+
+    def genearate_dependencies(self, task_number: int) -> list[int]:
+        if task_number <= 5:
+            return []
+
+        return random.sample(range(task_number), 2)
 
 
 def main(args=None):
