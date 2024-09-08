@@ -4,6 +4,7 @@ from mrs_main.tasks_management.task import Task
 # from tasks_management.task_manager import TaskManager #TODO: resolve circular import
 from mrs_main.common.objects import IntrestDescription, TaskConvMsg
 from mrs_main.tasks_management.dependency_manager import TaskDependencyManager
+import mrs_main.common.constants as mrs_const
 
 class TaskManagerInterface:
     def __init__(self, concrete_task_manager) -> None:
@@ -22,11 +23,11 @@ class TaskManagerInterface:
             task_desc,
             dependency_manager=TaskDependencyManager(
                     dependency_manager=self.__concrete_task_manager._dependency_manager,
-                    task_id=short_id)
+                    task_id=short_id,
+                    dependencies = task_desc_decoded[mrs_const.TASK_DESC_DEPENDENCIES])
         )
         print(f'[ DEBUG LOG ] Task of type: {task.desc}, received by TaskManager!')
         self._task_dict[task.short_id] = task
-        self.__concrete_task_manager._dependency_manager.update_dependencies(task.short_id)
 
     def get_intrest(self, task_id: int):
         # TODO: implement intrest calculation for every task

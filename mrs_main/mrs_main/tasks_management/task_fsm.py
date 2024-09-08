@@ -11,7 +11,6 @@ class TaskFSM:
     def __init__(self, dependency_manager: TaskDependencyManager) -> None:
         self.transition_to(DefineTaskIntrest())
         self._dependency_manager = dependency_manager
-        self._dependency_manager.introduce_dependencies()
 
     def get_next_message(self, msg: TaskConvMsg):
         return self._state.define_next(msg)
