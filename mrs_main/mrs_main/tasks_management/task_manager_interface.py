@@ -1,3 +1,5 @@
+import json
+
 from mrs_main.tasks_management.task import Task
 # from tasks_management.task_manager import TaskManager #TODO: resolve circular import
 from mrs_main.common.objects import IntrestDescription, TaskConvMsg
@@ -13,7 +15,8 @@ class TaskManagerInterface:
     def task_dict(self):
         return self._task_dict
 
-    def receive_task(self, short_id: int, task_desc: list[str]):
+    def receive_task(self, short_id: int, task_desc: str):
+        task_desc_decoded = json.loads(task_desc)
         task = Task(
             short_id,
             task_desc,
