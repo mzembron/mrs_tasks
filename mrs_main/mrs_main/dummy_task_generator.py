@@ -20,7 +20,7 @@ class DummyTaskGenerator(Node):
         msg = TaskDesc()
         msg.type = 'Hello World: %d' % self.i
         msg.short_id = self.i
-        msg.data = json.dumps({'dependencies': self.genearate_dependencies(self.i)})
+        msg.data = json.dumps({mrs_const.TASK_DESC_DEPENDENCIES: self.genearate_dependencies(self.i)})
         self.publisher_.publish(msg)
         self.get_logger().info('Publishing: "%s"' % msg.type)
         self.i += 1
