@@ -19,7 +19,9 @@ class TaskFSM:
         self._state = state
         self._state.task_fsm = self
         self._state.change_state_routine()
-
+        
+    def inform_about_finished_dependency(self):
+        self._dependency_manager.notify_on_finish()
 
 class State(ABC):
     @property
@@ -101,3 +103,6 @@ class SuperviseTask(State):
 class TaskCompleted(State):
     def __init__(self) -> None:
         print('[ DEBUG LOG ] Task completed')
+
+    def change_state_routine(self):
+        self._task_fsm.inform_about_finished_dependency()
