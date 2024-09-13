@@ -10,7 +10,8 @@ class TestTaskManagerInterface:
     def setup(self):
         self.task_dict = {}
         self.concrete_task_manager = MagicMock()
-        self.task_manager_interface = TaskManagerInterface(self.task_dict, self.concrete_task_manager)
+        self.concrete_task_manager._task_dict = self.task_dict
+        self.task_manager_interface = TaskManagerInterface(self.concrete_task_manager)
 
     def test_init(self, setup):
         assert self.task_manager_interface._task_dict == self.task_dict
@@ -20,13 +21,11 @@ class TestTaskManagerInterface:
         assert self.task_manager_interface.task_dict == self.task_dict
 
     def test_receive_task(self, setup):
-        task = MagicMock(spec=Task)
-        task.short_id = 'task_1'
-        task.desc = 'Test Task'
+        task_desc = '{"desc": "Test Task", "dependencies": []}'
+        self.task_manager_interface.receive_task('task_1', task_desc)
         
-        self.task_manager_interface.receive_task(task)
-        
-        assert self.task_dict['task_1'] == task
+        assert 'task_1' in self.task_dict
+        assert self.task_dict['task_1'].desc == task_desc
 
     def test_get_intrest(self, setup):
         self.concrete_task_manager.intrest_desc = MagicMock(spec=IntrestDescription)

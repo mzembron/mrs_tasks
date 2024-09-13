@@ -4,18 +4,21 @@ from mrs_main.tasks_management.task_fsm import TaskFSM, State, DefineTaskIntrest
 from mrs_main.common.objects import TaskConvMsg
 from mrs_main.common.conversation_data import MrsConvPerform
 from mrs_main.common.exceptions import InvalidMsgPerformative
+from mrs_main.tasks_management.dependency_manager import TaskDependencyManager
 
 def test_initialization():
-    fsm = TaskFSM()
+    dependency_manager = MagicMock(spec=TaskDependencyManager)
+    fsm = TaskFSM(dependency_manager)
     assert isinstance(fsm._state, DefineTaskIntrest)
-    assert fsm._state.task == fsm
+    assert fsm._state.task_fsm == fsm
 
 def test_transition_to():
-    fsm = TaskFSM()
+    dependency_manager = MagicMock(spec=TaskDependencyManager)
+    fsm = TaskFSM(dependency_manager)
     new_state = MagicMock(spec=State)
     fsm.transition_to(new_state)
     assert fsm._state == new_state
-    assert new_state.task == fsm
+    assert new_state.task_fsm == fsm
     new_state.change_state_routine.assert_called_once()
 
 class TestState:
@@ -23,7 +26,7 @@ class TestState:
     @pytest.fixture(autouse=True)
     def setup(self):
         self.state = State()
-        self.state.task = MagicMock(spec=TaskFSM)
+        self.state.task_fsm = MagicMock(spec=TaskFSM)
 
     def test_define_next(self):
         msg = TaskConvMsg()
@@ -35,20 +38,20 @@ class TestState:
 
     def test_invalid_performative(self):
         msg = TaskConvMsg()
-        msg.performative='invalid_performative'
+        msg.performative = 'invalid_performative'
         with pytest.raises(InvalidMsgPerformative):
             self.state.define_next(msg)
 
     def test_change_state_to_task_completed(self):
-        self.task_fsm = TaskFSM()
+        dependency_manager = MagicMock(spec=TaskDependencyManager)
+        self.task_fsm = TaskFSM(dependency_manager)
         self.wait_for_exec = WaitForExec()
-        self.wait_for_exec.task = self.task_fsm
+        self.wait_for_exec.task_fsm = self.task_fsm
         self.task_fsm._state = self.wait_for_exec
         self.wait_for_exec.change_state_routine()
 
         # Assert that the state has been changed to TaskCompleted
         assert isinstance(self.task_fsm._state, TaskCompleted)
-
 
 if __name__ == '__main__':
     pytest.main()
