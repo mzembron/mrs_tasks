@@ -22,6 +22,9 @@ class TaskFSM:
         
     def inform_about_finished_dependency(self):
         self._dependency_manager.notify_on_finish()
+    
+    def on_resolved_dependencies(self):
+        self._state.continue_after_resolved_dependencies()
 
 class State(ABC):
     @property
@@ -49,6 +52,10 @@ class State(ABC):
     def change_state_routine(self):
         """ transition method, allows for state specific behavior on transition """    
         pass
+
+# virtual methods
+    def continue_after_resolved_dependencies(self):
+        return
 
 # virtual methods - respond to specific msg content
     def respond_to_coord_intrest_declaration(self, msg: TaskConvMsg):
@@ -87,6 +94,10 @@ class WaitForExec(State):
         print("[ DEBUG LOG ] Moving directly to ExecTask")
         if (self._task_fsm._dependency_manager.are_dependencies_met()):
             self._task_fsm.transition_to(ExecTask())
+        #else: wait for dependencies to be resolved
+
+    def continue_after_resolved_dependencies(self):
+        self._task_fsm.transition_to(ExecTask())
 
 class ExecTask(State):
     def change_state_routine(self):
