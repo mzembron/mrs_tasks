@@ -1,11 +1,14 @@
 import networkx as nx
 
+
 class DependencyManager:
+    
     """ The main purpose of DependencyManager is to determine whether
         the given task can be executed immediately or if some other 
         dependencies should be resolved beforehand """
     def __init__(self, tasks_dict) -> None:
-        self._tasks_dict = tasks_dict
+        from mrs_main.tasks_management.task import Task
+        self._tasks_dict: dict[int, Task] = tasks_dict
         # self._tasks_dependencies: dict[int, list[int]] = {}
         self._tasks_dependencies = nx.DiGraph()
 
@@ -16,16 +19,20 @@ class DependencyManager:
     
     def update_dependencies(self, finished_task_id: int):
         """ Updates the dependencies after receiving message regarding the task """
+        # TODO: fix this as task dependencies do not seem to be properly managed by this method
         # Remove the finished task from the graph
         if finished_task_id in self._tasks_dependencies:
+            # Extract all tasks that depend on the finished task
+            dependent_tasks = [task for task in self._tasks_dependencies.successors(finished_task_id)]
+            # Remove the edges between the finished task and its dependent tasks
+            self._tasks_dependencies.remove_edges_from([(finished_task_id, task) for task in dependent_tasks])
+            for task in dependent_tasks:
+                # Check if the dependent task can be executed now
+                if self.are_task_dependencies_met(task):
+                    self.__notify_task_on_finish(task)
+        if finished_task_id in self._tasks_dependencies:
             self._tasks_dependencies.remove_node(finished_task_id)
-
-    def notify_task(self):
-        """ sends signal to the task_fsm class to move on with handling the task,
-            when all dependencies are resolved """
-        pass
-
-    #TODO: should include parameters defining dependencies 
+ 
     def introduce_task_dependencies(self, task_id: int, dependencies: list[int]):
         """ Define dependencies for new task """
         # self._tasks_dependencies[task_id] = dependencies
@@ -33,6 +40,11 @@ class DependencyManager:
         self._tasks_dependencies.add_node(task_id)
         for dep in dependencies:
             self._tasks_dependencies.add_edge(dep, task_id)
+
+    def __notify_task_on_finish(self, task_id: int):
+        """ sends signal to the task_fsm class to move on with handling the task,
+            when all dependencies are resolved """
+        self._tasks_dict[task_id].inform_about_finished_dependency()
 
 class TaskDependencyManager:
     """ This class is the interface to interact with the DependencyManager in the scope of 
