@@ -80,7 +80,7 @@ class DefineTaskIntrest(State):
             print(f"[ DEBUG LOG ] Sending exec proposition to {msg.sender}")
             reply_msg.performative = MrsConvPerform.propose_exec_role
             reply_msg.data = [msg.sender]
-            self._task_fsm.transition_to(WaitForExec())
+            self._task_fsm.transition_to(SuperviseTask())
         else:
             reply_msg.performative = MrsConvPerform.declare_coord_intrest
             temp_coord_intrest = '0.4' #TODO: remove coord intrest at all, 
