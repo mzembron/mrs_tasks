@@ -19,9 +19,8 @@ class DependencyManager:
     
     def update_dependencies(self, finished_task_id: int):
         """ Updates the dependencies after receiving message regarding the task """
-        # TODO: fix this as task dependencies do not seem to be properly managed by this method
-        # Remove the finished task from the graph
         if finished_task_id in self._tasks_dependencies:
+            self._tasks_dependencies.nodes[finished_task_id]['finished'] = True
             # Extract all tasks that depend on the finished task
             dependent_tasks = [task for task in self._tasks_dependencies.successors(finished_task_id)]
             # Remove the edges between the finished task and its dependent tasks
@@ -30,16 +29,15 @@ class DependencyManager:
                 # Check if the dependent task can be executed now
                 if self.are_task_dependencies_met(task):
                     self.__notify_task_on_finish(task)
-        if finished_task_id in self._tasks_dependencies:
-            self._tasks_dependencies.remove_node(finished_task_id)
  
     def introduce_task_dependencies(self, task_id: int, dependencies: list[int]):
         """ Define dependencies for new task """
         # self._tasks_dependencies[task_id] = dependencies
         # Add the task and its dependencies to the graph
-        self._tasks_dependencies.add_node(task_id)
+        self._tasks_dependencies.add_node(task_id, finished=False)
         for dep in dependencies:
-            self._tasks_dependencies.add_edge(dep, task_id)
+            if not self._tasks_dependencies.nodes[dep]['finished']:
+                self._tasks_dependencies.add_edge(dep, task_id)
 
     def __notify_task_on_finish(self, task_id: int):
         """ sends signal to the task_fsm class to move on with handling the task,
