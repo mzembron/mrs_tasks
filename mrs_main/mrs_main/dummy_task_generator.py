@@ -24,6 +24,11 @@ class DummyTaskGenerator(Node):
         self.publisher_.publish(msg)
         self.get_logger().info('Publishing: "%s"' % msg.type)
         self.i += 1
+        if(self.i >127): # max int8 value
+            self.get_logger().info('Shutting down')
+            self.destroy_timer(self.timer)
+            self.destroy_node()
+            rclpy.shutdown()
 
     def genearate_dependencies(self, task_number: int) -> list[int]:
         if task_number <= 5:
