@@ -21,7 +21,7 @@ class Task():
     def intrest(self, intrest: IntrestDescription) -> None:
         self.fsm.intrest = intrest
 
-    def inform_about_finished_dependency(self) -> None:
+    def resume_after_finished_dependencies(self) -> None:
         self.fsm.inform_about_finished_dependency()
 
 

@@ -23,7 +23,7 @@ class TaskFSM:
     def inform_about_finished_dependency(self):
         self._dependency_manager.notify_on_finish()
     
-    def on_resolved_dependencies(self):
+    def resume_after_finished_dependencies(self) -> None:
         self._state.continue_after_resolved_dependencies()
 
 class State(ABC):
@@ -88,6 +88,16 @@ class DefineTaskIntrest(State):
             reply_msg.data = [temp_coord_intrest]
         reply_msg.short_id = msg.short_id
         return reply_msg
+    
+    def respond_to_exec_proposal(self, msg: TaskConvMsg):
+        print(f"[ DEBUG LOG ] Received exec proposition from {msg.sender}")
+        reply_msg = TaskConvMsg()
+        reply_msg.short_id = msg.short_id
+        reply_msg.performative = MrsConvPerform.accept_exec_proposal
+        reply_msg.data = [msg.sender]
+        self._task_fsm.transition_to(WaitForExec())
+        return reply_msg
+    
 
 class WaitForExec(State):
     def change_state_routine(self):
@@ -97,6 +107,7 @@ class WaitForExec(State):
         #else: wait for dependencies to be resolved
 
     def continue_after_resolved_dependencies(self):
+        print("[ DEBUG LOG ] $$$$$$$ dependencies resolved $$$$$$ to ExecTask")
         self._task_fsm.transition_to(ExecTask())
 
 class ExecTask(State):

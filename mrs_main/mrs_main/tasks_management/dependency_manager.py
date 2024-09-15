@@ -44,7 +44,7 @@ class DependencyManager:
     def __notify_task_on_finish(self, task_id: int):
         """ sends signal to the task_fsm class to move on with handling the task,
             when all dependencies are resolved """
-        self._tasks_dict[task_id].inform_about_finished_dependency()
+        self._tasks_dict[task_id].resume_after_finished_dependencies()
 
 class TaskDependencyManager:
     """ This class is the interface to interact with the DependencyManager in the scope of 
