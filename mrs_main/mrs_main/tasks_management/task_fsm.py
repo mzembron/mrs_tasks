@@ -3,14 +3,16 @@ from mrs_main.common.objects import IntrestDescription, TaskConvMsg
 from mrs_main.common.conversation_data import MrsConvPerform
 from mrs_main.common.exceptions import InvalidMsgPerformative
 from mrs_main.tasks_management.dependency_manager import TaskDependencyManager
+from mrs_main.task_execution.task_executor import TaskExecutor
 
 class TaskFSM:
 
     intrest: IntrestDescription
 
-    def __init__(self, dependency_manager: TaskDependencyManager) -> None:
+    def __init__(self, dependency_manager: TaskDependencyManager, task_executor: TaskExecutor) -> None:
         self.transition_to(DefineTaskIntrest())
         self._dependency_manager = dependency_manager
+        self._executor = task_executor
 
     def get_next_message(self, msg: TaskConvMsg):
         return self._state.define_next(msg)
@@ -25,6 +27,9 @@ class TaskFSM:
     
     def resume_after_finished_dependencies(self) -> None:
         self._state.continue_after_resolved_dependencies()
+    
+    def start_execution(self) -> None:
+        self._executor.start_supervising_execution()
 
 class State(ABC):
     @property
@@ -114,6 +119,7 @@ class ExecTask(State):
     def change_state_routine(self):
         print("[ DEBUG LOG ] Executing task")
         print("[ DEBUG LOG ] Moving to TaskCompleted")
+        self._task_fsm.start_execution()
         self._task_fsm.transition_to(TaskCompleted())
 
 class SuperviseTask(State):
