@@ -9,7 +9,6 @@ class DependencyManager:
     def __init__(self, tasks_dict) -> None:
         from mrs_main.tasks_management.task import Task
         self._tasks_dict: dict[int, Task] = tasks_dict
-        # self._tasks_dependencies: dict[int, list[int]] = {}
         self._tasks_dependencies = nx.DiGraph()
 
     def are_task_dependencies_met(self, task_id: int) -> bool:
