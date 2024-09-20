@@ -5,21 +5,26 @@ from mrs_main.common.objects import TaskConvMsg
 from mrs_main.common.conversation_data import MrsConvPerform
 from mrs_main.common.exceptions import InvalidMsgPerformative
 from mrs_main.tasks_management.dependency_manager import TaskDependencyManager
+from mrs_main.task_execution.task_executor import TaskExecutor
 
-def test_initialization():
-    dependency_manager = MagicMock(spec=TaskDependencyManager)
-    fsm = TaskFSM(dependency_manager)
-    assert isinstance(fsm._state, DefineTaskIntrest)
-    assert fsm._state.task_fsm == fsm
+class TestTaskFSM:
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.dependency_manager = MagicMock(spec=TaskDependencyManager)
+        self.task_executor = MagicMock(spec=TaskExecutor)
+        self.fsm = TaskFSM(self.dependency_manager, self.task_executor)
 
-def test_transition_to():
-    dependency_manager = MagicMock(spec=TaskDependencyManager)
-    fsm = TaskFSM(dependency_manager)
-    new_state = MagicMock(spec=State)
-    fsm.transition_to(new_state)
-    assert fsm._state == new_state
-    assert new_state.task_fsm == fsm
-    new_state.change_state_routine.assert_called_once()
+    def test_initialization(self):
+        assert isinstance(self.fsm._state, DefineTaskIntrest)
+        assert self.fsm._state.task_fsm == self.fsm
+
+    def test_transition_to(self):
+        new_state = MagicMock(spec=State)
+        self.fsm.transition_to(new_state)
+        assert self.fsm._state == new_state
+        assert new_state.task_fsm == self.fsm
+        new_state.change_state_routine.assert_called_once()
+
 
 class TestState:
 
@@ -44,7 +49,8 @@ class TestState:
 
     def test_change_state_to_task_completed(self):
         dependency_manager = MagicMock(spec=TaskDependencyManager)
-        self.task_fsm = TaskFSM(dependency_manager)
+        task_executor = MagicMock(spec=TaskExecutor)
+        self.task_fsm = TaskFSM(dependency_manager, task_executor)
         self.wait_for_exec = WaitForExec()
         self.wait_for_exec.task_fsm = self.task_fsm
         self.task_fsm._state = self.wait_for_exec
