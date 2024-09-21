@@ -8,3 +8,8 @@ class TaskExecutor:
     def start_supervising_execution(self):
         """ entrypoint to trigger the task execution """
         pass
+
+    def get_task_execution_info(self):
+        """ returns the info regarding execution of the task;
+        e.g. the estimated time to finish the task """
+        pass

@@ -51,6 +51,8 @@ class State(ABC):
             return self.respond_to_exec_proposal(msg)
         elif (msg.performative == MrsConvPerform.accept_exec_proposal):
             return self.respond_to_exec_acceptance(msg)
+        elif (msg.performative == MrsConvPerform.request_exec_info):
+            return self.respond_to_exec_info_request(msg)
         else:
             raise InvalidMsgPerformative
 
@@ -73,6 +75,9 @@ class State(ABC):
         return
     
     def respond_to_exec_acceptance(self, msg: TaskConvMsg):
+        return
+    
+    def respond_to_exec_info_request(self, msg: TaskConvMsg):
         return
 
 class DefineTaskIntrest(State):
@@ -121,6 +126,9 @@ class ExecTask(State):
         print("[ DEBUG LOG ] Moving to TaskCompleted")
         self._task_fsm.start_execution()
         self._task_fsm.transition_to(TaskCompleted())
+
+    def respond_to_exec_info_request(self, msg: TaskConvMsg):
+        return self._task_fsm._executor.get_task_execution_info()
 
 class SuperviseTask(State):
     def change_state_routine(self):
