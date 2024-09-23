@@ -7,12 +7,12 @@ from mrs_main.task_execution.task_executor import TaskExecutor
 
 class TaskFSM:
 
-    intrest: IntrestDescription
 
-    def __init__(self, dependency_manager: TaskDependencyManager, task_executor: TaskExecutor) -> None:
+    def __init__(self, dependency_manager: TaskDependencyManager, task_executor: TaskExecutor, interest_desc: IntrestDescription) -> None:
         self.transition_to(DefineTaskIntrest())
         self._dependency_manager = dependency_manager
         self._executor = task_executor
+        self.interest_desc = interest_desc
 
     def get_next_message(self, msg: TaskConvMsg):
         return self._state.define_next(msg)
@@ -90,12 +90,13 @@ class DefineTaskIntrest(State):
             print(f"[ DEBUG LOG ] Sending exec proposition to {msg.sender}")
             reply_msg.performative = MrsConvPerform.propose_exec_role
             reply_msg.data = [msg.sender]
-            self._task_fsm.transition_to(SuperviseTask())
         else:
             reply_msg.performative = MrsConvPerform.declare_coord_intrest
-            temp_coord_intrest = '0.4' #TODO: remove coord intrest at all, 
+            temp_coord_intrest = str(self._task_fsm.interest_desc.coordination) #TODO: remove coord intrest at all, 
                                             # every agent should take part in supervising
             reply_msg.data = [temp_coord_intrest]
+        if (self._task_fsm.interest_desc.execution <= self.INTREST_THRESHOLD):
+            self._task_fsm.transition_to(SuperviseTask())
         reply_msg.short_id = msg.short_id
         return reply_msg
     

@@ -24,7 +24,8 @@ class TaskManagerInterface:
             dependency_manager=TaskDependencyManager(
                     dependency_manager=self.__concrete_task_manager._dependency_manager,
                     task_id=short_id,
-                    dependencies = task_desc_decoded[mrs_const.TASK_DESC_DEPENDENCIES])
+                    dependencies = task_desc_decoded[mrs_const.TASK_DESC_DEPENDENCIES]),
+            interest_desc = self.get_intrest(short_id)
         )
         print(f'[ DEBUG LOG ] Task of type: {task.desc}, received by TaskManager!')
         self._task_dict[task.short_id] = task
