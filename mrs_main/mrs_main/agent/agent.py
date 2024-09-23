@@ -21,3 +21,8 @@ class Agent():
 
         self.__orders_manager.destroy_node()
         rclpy.shutdown()
+
+    def print_task_states(self):
+        for task_id, task in self.__task_manager._task_dict.items():
+            state_class = type(task.fsm._state).__name__
+            print(f"Task ID: {task_id}, State: {state_class}")

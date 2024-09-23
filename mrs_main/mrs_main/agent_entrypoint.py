@@ -13,7 +13,14 @@ def main(args=None):
         intrest_coord = float(sys.argv[2])
         
     agent = Agent(intrest_exec=intrest_exec, intrest_coord=intrest_coord)
-    agent.start_agent()
+
+    try:
+        agent.start_agent()
+    except KeyboardInterrupt:
+        print("Shutting down agent...")
+        agent.print_task_states()
+        raise KeyboardInterrupt
+
 
 
 if __name__ == '__main__':
