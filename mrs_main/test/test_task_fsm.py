@@ -1,7 +1,8 @@
 import pytest
 from unittest.mock import MagicMock
+
 from mrs_main.tasks_management.task_fsm import TaskFSM, State, DefineTaskIntrest, WaitForExec, TaskCompleted
-from mrs_main.common.objects import TaskConvMsg
+from mrs_main.common.objects import IntrestDescription, TaskConvMsg
 from mrs_main.common.conversation_data import MrsConvPerform
 from mrs_main.common.exceptions import InvalidMsgPerformative
 from mrs_main.tasks_management.dependency_manager import TaskDependencyManager
@@ -12,7 +13,8 @@ class TestTaskFSM:
     def setup(self):
         self.dependency_manager = MagicMock(spec=TaskDependencyManager)
         self.task_executor = MagicMock(spec=TaskExecutor)
-        self.fsm = TaskFSM(self.dependency_manager, self.task_executor)
+        self.interest_desc = MagicMock(spec=IntrestDescription)
+        self.fsm = TaskFSM(self.dependency_manager, self.task_executor, self.interest_desc)
 
     def test_initialization(self):
         assert isinstance(self.fsm._state, DefineTaskIntrest)
@@ -50,7 +52,8 @@ class TestState:
     def test_change_state_to_task_completed(self):
         dependency_manager = MagicMock(spec=TaskDependencyManager)
         task_executor = MagicMock(spec=TaskExecutor)
-        self.task_fsm = TaskFSM(dependency_manager, task_executor)
+        interest_desc = MagicMock(spec=IntrestDescription)
+        self.task_fsm = TaskFSM(dependency_manager, task_executor, interest_desc)
         self.wait_for_exec = WaitForExec()
         self.wait_for_exec.task_fsm = self.task_fsm
         self.task_fsm._state = self.wait_for_exec
