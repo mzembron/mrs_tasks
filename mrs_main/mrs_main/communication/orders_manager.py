@@ -4,10 +4,10 @@ import mrs_main.common.constants as mrs_const
 from rclpy.node import Node, Publisher
 from mrs_msgs.msg import TaskDesc, TaskConv
 from mrs_main.tasks_management.task_manager_interface import TaskManagerInterface
-from mrs_main.tasks_management.task import Task
 from mrs_main.common.objects import IntrestDescription, TopicSubPub, TaskConvMsg
 from mrs_main.common.conversation_data import MrsConvPerform
 
+from rclpy.qos import QoSProfile, ReliabilityPolicy
 
 class OrdersManager(Node):
     """ Orders Manager takes care of communication in the contexts of 
@@ -27,12 +27,12 @@ class OrdersManager(Node):
         self.agent_name = agent_name
         self.node_name = 'orders_manager_'+agent_name
         super().__init__(node_name=self.node_name)
-
+        self._qos_profile = QoSProfile(depth=10, reliability=ReliabilityPolicy.RELIABLE)
         self.subscription_task_def_topic = self.create_subscription(
             msg_type=TaskDesc,
             topic=mrs_const.TASKS_DEFINITION_TOPIC_NAME,
             callback=self.__task_definition_callback,
-            qos_profile=10
+            qos_profile=self._qos_profile
         )
 
         self.task_topic_subpub_dict: dict[int, TopicSubPub] = {} 
@@ -56,7 +56,7 @@ class OrdersManager(Node):
                                                 msg_type=TaskConv,
                                                 topic='/mrs_main/id_' + str(task_id),
                                                 callback=self.__generic_task_callback,
-                                                qos_profile=10
+                                                qos_profile=self._qos_profile
                                             )
         self.task_topic_subpub_dict[task_id] = dynamic_topic_sub_pub
 
