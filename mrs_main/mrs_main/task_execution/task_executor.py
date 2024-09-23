@@ -17,6 +17,6 @@ class TaskExecutor:
         self._concrete_executor.start_execution()
 
     def get_task_execution_info(self):
-        """ returns the info regarding execution of the task;
+        """ returns the info regarding execution of the task,
         e.g. the estimated time to finish the task """
         self._concrete_executor.get_execution_info()
