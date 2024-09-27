@@ -7,7 +7,11 @@ class DummyExecutor(AbstractExecutor):
         pass
 
     def start_execution(self):
+        """ entrypoint to trigger execution of task by external entity """
+        #TODO: start mock of task execution in separate thread
         pass
 
     def get_execution_info(self):
+        """ retrives info regarding task execution status """
+        # retrieve info from separate thread mocking task execution
         pass
