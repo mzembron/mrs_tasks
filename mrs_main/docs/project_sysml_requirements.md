@@ -8,3 +8,4 @@
 - ability to maintain the operations on the failure of any node (not all at once)
 - optimization of execution time (with proper allocation)
 - provide updates on advancements in task execution
+- schedule actions (tasks) of specific robot (plan its future actions)
