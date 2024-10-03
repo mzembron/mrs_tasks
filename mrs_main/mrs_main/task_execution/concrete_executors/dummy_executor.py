@@ -11,12 +11,9 @@ class DummyExecutor(AbstractExecutor):
     def start_execution(self):
         """ entrypoint to trigger execution of task by external entity """
         #TODO: start mock of task execution in separate thread
-        def mock_task_execution():
-            time.sleep(5)
-            print("[ DEBUG LOG ] Task execution completed.")
-            self._on_execution_finished()
+
         
-        self.execution_thread = threading.Thread(target=mock_task_execution)
+        self.execution_thread = threading.Thread(target=self.mock_task_execution)
         self.execution_thread.start()
 
 
@@ -24,6 +21,11 @@ class DummyExecutor(AbstractExecutor):
         """ retrives info regarding task execution status """
         # retrieve info from separate thread mocking task execution
         pass
+
+    def mock_task_execution(self):
+        time.sleep(5)
+        print("[ DEBUG LOG ] Task execution completed.")
+        self._on_execution_finished()
 
     def _on_execution_finished(self):
         """ callback method, called when task execution is finished """
