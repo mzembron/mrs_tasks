@@ -10,3 +10,4 @@
 - provide updates on advancements in task execution,
 - schedule actions (tasks) of specific robot (plan its future actions),
 - possibility to include into a system robot of different natures (heterogenic)
+- ability to maintain reliability/operability with an increasing number of robots/agents in the system (scalable solution).
