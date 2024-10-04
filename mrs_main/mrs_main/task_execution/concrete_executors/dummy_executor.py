@@ -30,3 +30,10 @@ class DummyExecutor(AbstractExecutor):
     def _on_execution_finished(self):
         """ callback method, called when task execution is finished """
         print("[ DEBUG LOG ] Task execution finished.")
+
+
+    def __del__(self):
+        """ Destructor to join the execution thread """
+        if self.execution_thread is not None:
+            self.execution_thread.join()
+            print("[ DEBUG LOG ] Dummy execution thread joined.")
