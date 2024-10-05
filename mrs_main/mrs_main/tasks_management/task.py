@@ -24,6 +24,6 @@ class Task():
         self.fsm.interest_desc = intrest
 
     def resume_after_finished_dependencies(self) -> None:
-        self.fsm.inform_about_finished_dependency()
+        self.fsm.resume_after_finished_dependencies()
 
 
