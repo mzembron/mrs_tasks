@@ -23,9 +23,12 @@ class TaskFSM:
         self._state.change_state_routine()
         
     def inform_about_finished_dependency(self):
+        """ Notify the dependency manager that this task is complete, allowing it
+            to resolve dependencies for other tasks dependent on this one. """
         self._dependency_manager.notify_on_finish()
     
     def resume_after_finished_dependencies(self) -> None:
+        """ Resume task (move to task-execution state) after all dependencies are resolved """
         self._state.continue_after_resolved_dependencies()
     
     def start_execution(self) -> None:

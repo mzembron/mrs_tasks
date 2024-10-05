@@ -22,6 +22,7 @@ class Task():
         self.fsm.interest_desc = intrest
 
     def resume_after_finished_dependencies(self) -> None:
+        """ Resume task after all dependencies are resolved """
         self.fsm.resume_after_finished_dependencies()
 
 
