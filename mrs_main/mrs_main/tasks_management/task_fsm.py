@@ -8,10 +8,10 @@ from mrs_main.task_execution.task_executor import TaskExecutor
 class TaskFSM:
 
 
-    def __init__(self, dependency_manager: TaskDependencyManager, task_executor: TaskExecutor, interest_desc: IntrestDescription) -> None:
+    def __init__(self, dependency_manager: TaskDependencyManager, task_desc: dict, interest_desc: IntrestDescription) -> None:
         self.transition_to(DefineTaskIntrest())
         self._dependency_manager = dependency_manager
-        self._executor = task_executor
+        self._executor = TaskExecutor(task_desc, self.on_task_finished)
         self.interest_desc = interest_desc
 
     def get_next_message(self, msg: TaskConvMsg):
@@ -30,6 +30,9 @@ class TaskFSM:
     
     def start_execution(self) -> None:
         self._executor.start_supervising_execution()
+
+    def on_task_finished(self):
+        self._state.on_task_finished()
 
 class State(ABC):
     @property
@@ -63,7 +66,9 @@ class State(ABC):
 # virtual methods
     def continue_after_resolved_dependencies(self):
         return
-
+    
+    def on_task_finished(self):
+        assert False, "[ DEBUG LOG ] Oops! Task should not be finished in that state!"
 # virtual methods - respond to specific msg content
     def respond_to_coord_intrest_declaration(self, msg: TaskConvMsg):
         return
@@ -124,8 +129,12 @@ class WaitForExec(State):
 class ExecTask(State):
     def change_state_routine(self):
         print("[ DEBUG LOG ] Executing task")
-        print("[ DEBUG LOG ] Moving to TaskCompleted")
+        # print("[ DEBUG LOG ] Moving to TaskCompleted")
         self._task_fsm.start_execution()
+        # self._task_fsm.transition_to(TaskCompleted())
+
+    def on_task_finished(self):
+        print("[ DEBUG LOG ] Moving to TaskCompleted")
         self._task_fsm.transition_to(TaskCompleted())
 
     def respond_to_exec_info_request(self, msg: TaskConvMsg):

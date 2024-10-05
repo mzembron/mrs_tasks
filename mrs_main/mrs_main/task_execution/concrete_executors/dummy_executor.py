@@ -5,7 +5,8 @@ from mrs_main.task_execution.concrete_executors.executor_interface import Abstra
 class DummyExecutor(AbstractExecutor):
     """ class handles execution of tasks for specific type of agent,
     in this case it is a dummy executor, which does nothing """
-    def __init__(self) -> None:
+    def __init__(self, callback_on_finish) -> None:
+        super().__init__(callback_on_finish)
         self.execution_thread = None
 
     def start_execution(self):
@@ -30,6 +31,7 @@ class DummyExecutor(AbstractExecutor):
     def _on_execution_finished(self):
         """ callback method, called when task execution is finished """
         print("[ DEBUG LOG ] Task execution finished.")
+        self.callback_on_finish()
 
 
     def __del__(self):
