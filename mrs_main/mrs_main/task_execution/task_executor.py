@@ -1,8 +1,6 @@
-from mrs_main.task_execution.concrete_executors.dummy_executor import DummyExecutor
-
 
 class TaskExecutor:
-    def __init__(self, task_desc: dict, callback_on_finish,  concrete_executor=DummyExecutor) -> None:
+    def __init__(self, task_desc: dict, callback_on_finish, concrete_executor) -> None:
         """ Takes care of supervising the task execution by some
         external module """
         self._task_desc = task_desc

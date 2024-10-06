@@ -4,14 +4,18 @@ from mrs_main.common.conversation_data import MrsConvPerform
 from mrs_main.common.exceptions import InvalidMsgPerformative
 from mrs_main.tasks_management.dependency_manager import TaskDependencyManager
 from mrs_main.task_execution.task_executor import TaskExecutor
+from mrs_main.task_execution.concrete_executors.dummy_executor import DummyExecutor
 
 class TaskFSM:
 
 
-    def __init__(self, dependency_manager: TaskDependencyManager, task_desc: dict, interest_desc: IntrestDescription) -> None:
+    def __init__(self, dependency_manager: TaskDependencyManager, 
+                    task_desc: dict,
+                    interest_desc: IntrestDescription,
+                    concrete_executor=DummyExecutor) -> None:
         self.transition_to(DefineTaskIntrest())
         self._dependency_manager = dependency_manager
-        self._executor = TaskExecutor(task_desc, self.on_task_finished)
+        self._executor = TaskExecutor(task_desc, self.on_task_finished, concrete_executor)
         self.interest_desc = interest_desc
 
     def get_next_message(self, msg: TaskConvMsg):
