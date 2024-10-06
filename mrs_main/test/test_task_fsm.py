@@ -1,12 +1,13 @@
 import pytest
 from unittest.mock import MagicMock
 
-from mrs_main.tasks_management.task_fsm import TaskFSM, State, DefineTaskIntrest, WaitForExec, TaskCompleted
+from mrs_main.tasks_management.task_fsm import TaskFSM, State, DefineTaskIntrest, WaitForExec, ExecTask, SuperviseTask, TaskCompleted
 from mrs_main.common.objects import IntrestDescription, TaskConvMsg
 from mrs_main.common.conversation_data import MrsConvPerform
 from mrs_main.common.exceptions import InvalidMsgPerformative
 from mrs_main.tasks_management.dependency_manager import TaskDependencyManager
 from mrs_main.task_execution.task_executor import TaskExecutor
+from mrs_main.task_execution.concrete_executors.executor_interface import AbstractExecutor
 
 class TestTaskFSM:
     @pytest.fixture(autouse=True)
@@ -51,15 +52,28 @@ class TestState:
 
     def test_change_state_to_task_completed(self):
         dependency_manager = MagicMock(spec=TaskDependencyManager)
-        task_executor = MagicMock(spec=TaskExecutor)
         interest_desc = MagicMock(spec=IntrestDescription)
-        self.task_fsm = TaskFSM(dependency_manager, task_executor, interest_desc)
+        task_desc = {}
+        class TestTaskExecutor(AbstractExecutor):
+            """ test executor implementation"""
+            def start_execution(self):
+                # intentionally do noting 
+                pass
+            def get_execution_info(self):
+                pass
+
+        self.task_fsm = TaskFSM(dependency_manager, task_desc, interest_desc, TestTaskExecutor)
         self.wait_for_exec = WaitForExec()
         self.wait_for_exec.task_fsm = self.task_fsm
         self.task_fsm._state = self.wait_for_exec
         self.wait_for_exec.change_state_routine()
 
-        # Assert that the state has been changed to TaskCompleted
+        # Assert that the state has been changed to ExecTask 
+        # (TestTaskExecutor does not call end-of-task callback, so the task is not completed)
+        assert isinstance(self.task_fsm._state, ExecTask)
+
+        # Now finish the task "manually" by calling the callback
+        self.task_fsm.on_task_finished()
         assert isinstance(self.task_fsm._state, TaskCompleted)
 
 if __name__ == '__main__':
