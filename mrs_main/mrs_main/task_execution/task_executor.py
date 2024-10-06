@@ -2,14 +2,15 @@ from mrs_main.task_execution.concrete_executors.dummy_executor import DummyExecu
 
 
 class TaskExecutor:
-    def __init__(self, task_desc: dict, callback_on_finish,  concrete_executor = None) -> None:
+    def __init__(self, task_desc: dict, callback_on_finish,  concrete_executor=DummyExecutor) -> None:
         """ Takes care of supervising the task execution by some
         external module """
         self._task_desc = task_desc
 
         # TODO: change concrete_executor to required argument, 
         # and use the concrete_executor object
-        self._concrete_executor = DummyExecutor(callback_on_finish)
+        self._concrete_executor = concrete_executor(callback_on_finish)
+
         
 
     def start_supervising_execution(self):
