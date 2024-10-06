@@ -25,7 +25,6 @@ class DummyExecutor(AbstractExecutor):
 
     def mock_task_execution(self):
         time.sleep(5)
-        print("[ DEBUG LOG ] Task execution completed.")
         self._on_execution_finished()
 
     def _on_execution_finished(self):
