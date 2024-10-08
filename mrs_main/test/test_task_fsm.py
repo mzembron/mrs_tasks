@@ -63,10 +63,10 @@ class TestState:
         interest_desc = MagicMock(spec=IntrestDescription)
         task_desc = {}
         self.task_fsm = TaskFSM(dependency_manager, task_desc, interest_desc, self.TestTaskExecutor)
-        self.wait_for_exec = WaitForExec()
-        self.wait_for_exec.task_fsm = self.task_fsm
-        self.task_fsm._state = self.wait_for_exec
-        self.wait_for_exec.change_state_routine()
+        self.wait_for_exec_state = WaitForExec()
+        self.wait_for_exec_state.task_fsm = self.task_fsm
+        self.task_fsm._state = self.wait_for_exec_state
+        self.wait_for_exec_state.change_state_routine()
 
         # Assert that the state has been changed to ExecTask 
         # (TestTaskExecutor does not call end-of-task callback, so the task is not completed)
