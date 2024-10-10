@@ -16,7 +16,7 @@ class TaskManagerInterface:
     def task_dict(self):
         return self._task_dict
 
-    def receive_task(self, short_id: int, task_desc: str):
+    def receive_task(self, short_id: int, task_desc: str, task_finished_callback):
         task_desc_decoded = json.loads(task_desc)
         task = Task(
             short_id,
@@ -25,7 +25,8 @@ class TaskManagerInterface:
                     dependency_manager=self.__concrete_task_manager._dependency_manager,
                     task_id=short_id,
                     dependencies = task_desc_decoded[mrs_const.TASK_DESC_DEPENDENCIES]),
-            interest_desc = self.get_intrest(short_id)
+            interest_desc = self.get_intrest(short_id),
+            task_finished_callback = task_finished_callback
         )
         print(f'[ DEBUG LOG ] Task of type: {task.desc}, received by TaskManager!')
         self._task_dict[task.short_id] = task

@@ -1,4 +1,6 @@
 from abc import ABC, abstractmethod
+from typing import Callable, Any
+
 from mrs_main.common.objects import IntrestDescription, TaskConvMsg
 from mrs_main.common.conversation_data import MrsConvPerform
 from mrs_main.common.exceptions import InvalidMsgPerformative
@@ -12,11 +14,13 @@ class TaskFSM:
     def __init__(self, dependency_manager: TaskDependencyManager, 
                     task_desc: dict,
                     interest_desc: IntrestDescription,
+                    task_finished_callback: Callable[..., Any],
                     concrete_executor=DummyExecutor) -> None:
         self.transition_to(DefineTaskIntrest())
         self._dependency_manager = dependency_manager
         self._executor = TaskExecutor(task_desc, self.on_task_finished, concrete_executor)
         self.interest_desc = interest_desc
+        self.task_finished_callback = task_finished_callback
 
     def get_next_message(self, msg: TaskConvMsg):
         return self._state.define_next(msg)

@@ -44,7 +44,7 @@ class OrdersManager(Node):
         self.get_logger().info(f'I heard task: {msg.type}')
         
         self.__create_sub_pub_for_task(msg.short_id)
-        self.__task_manager.receive_task(short_id=msg.short_id, task_desc=msg.data)
+        self.__task_manager.receive_task(short_id=msg.short_id, task_desc=msg.data, task_finished_callback=self.__publish_task_finished_info)
         intrest_estimation: IntrestDescription = self.__task_manager.get_intrest(msg.short_id)
         self.__publish_intrest(msg.short_id, intrest_estimation)
 
@@ -85,4 +85,7 @@ class OrdersManager(Node):
             print(f'[ DEBUG LOG ] Answer msg data {answer_msg.data[0]}')
             conv_answer_msg= answer_msg.serialize()
             self.task_topic_subpub_dict[msg.short_id].pub.publish(conv_answer_msg)
+
+    def __publish_task_finished_info(self):
+        pass
 
