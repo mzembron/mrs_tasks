@@ -22,7 +22,8 @@ class TestTaskManagerInterface:
 
     def test_receive_task(self, setup):
         task_desc = '{"desc": "Test Task", "dependencies": []}'
-        self.task_manager_interface.receive_task('task_1', task_desc)
+        task_finished_callback = MagicMock()
+        self.task_manager_interface.receive_task('task_1', task_desc, task_finished_callback)
         
         assert 'task_1' in self.task_dict
         assert self.task_dict['task_1'].desc == task_desc

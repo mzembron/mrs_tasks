@@ -15,7 +15,8 @@ class TestTaskFSM:
         self.dependency_manager = MagicMock(spec=TaskDependencyManager)
         self.task_executor = MagicMock(spec=TaskExecutor)
         self.interest_desc = MagicMock(spec=IntrestDescription)
-        self.fsm = TaskFSM(self.dependency_manager, self.task_executor, self.interest_desc)
+        self.task_finished_callback = MagicMock()
+        self.fsm = TaskFSM(self.dependency_manager, self.task_executor, self.interest_desc, self.task_finished_callback)
 
     def test_initialization(self):
         assert isinstance(self.fsm._state, DefineTaskIntrest)
@@ -61,8 +62,9 @@ class TestState:
     def test_change_state_to_exec_task(self):
         dependency_manager = MagicMock(spec=TaskDependencyManager)
         interest_desc = MagicMock(spec=IntrestDescription)
+        task_finished_callback = MagicMock()
         task_desc = {}
-        self.task_fsm = TaskFSM(dependency_manager, task_desc, interest_desc, self.TestTaskExecutor)
+        self.task_fsm = TaskFSM(dependency_manager, task_desc, interest_desc, task_finished_callback, self.TestTaskExecutor)
         self.wait_for_exec_state = WaitForExec()
         self.wait_for_exec_state.task_fsm = self.task_fsm
         self.task_fsm._state = self.wait_for_exec_state
@@ -75,8 +77,9 @@ class TestState:
     def test_change_state_to_task_completed(self):
         dependency_manager = MagicMock(spec=TaskDependencyManager)
         interest_desc = MagicMock(spec=IntrestDescription)
+        task_finished_callback = MagicMock()
         task_desc = {}
-        self.task_fsm = TaskFSM(dependency_manager, task_desc, interest_desc, self.TestTaskExecutor)
+        self.task_fsm = TaskFSM(dependency_manager, task_desc, interest_desc, task_finished_callback, self.TestTaskExecutor)
         self.exec_task_state = ExecTask()
         self.exec_task_state.task_fsm = self.task_fsm
         self.task_fsm._state = self.exec_task_state
