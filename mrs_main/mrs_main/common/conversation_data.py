@@ -7,4 +7,5 @@ class MrsConvPerform(str, Enum):
     declare_ex_intrest = 'dec_ex_intr'
     declare_coord_intrest = 'dec_coord_intr'
     request_exec_info = 'req_exec_info'
+    inform_task_finished = 'inf_task_fin'
 
