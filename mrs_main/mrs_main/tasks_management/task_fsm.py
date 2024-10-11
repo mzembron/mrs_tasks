@@ -42,6 +42,10 @@ class TaskFSM:
     def start_execution(self) -> None:
         self._executor.start_supervising_execution()
 
+    def handle_task_finished(self):
+        self.inform_about_finished_dependency()
+        self.task_finished_callback()
+
     def on_task_finished(self):
         self._state.on_task_finished()
 
@@ -162,4 +166,4 @@ class TaskCompleted(State):
         print('[ DEBUG LOG ] Task completed')
 
     def change_state_routine(self):
-        self._task_fsm.inform_about_finished_dependency()
+        self._task_fsm.handle_task_finished()
