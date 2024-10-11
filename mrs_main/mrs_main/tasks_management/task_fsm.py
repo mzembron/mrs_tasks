@@ -18,7 +18,7 @@ class TaskFSM:
                     concrete_executor=DummyExecutor) -> None:
         self.transition_to(DefineTaskIntrest())
         self._dependency_manager = dependency_manager
-        self._executor = TaskExecutor(task_desc, self.on_task_finished, concrete_executor)
+        self._executor = TaskExecutor(task_desc, self.receive_task_finished_signal, concrete_executor)
         self.interest_desc = interest_desc
         self.task_finished_callback = task_finished_callback
 
@@ -52,7 +52,7 @@ class TaskFSM:
         self.inform_about_finished_dependency()
         self.task_finished_callback()
 
-    def on_task_finished(self):
+    def receive_task_finished_signal(self):
         """ Callback to trigger the transition to the TaskCompleted state after the task is finished """
         self._state.on_task_finished()
 

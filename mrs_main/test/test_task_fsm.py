@@ -86,7 +86,7 @@ class TestState:
         self.exec_task_state.change_state_routine()
 
         # Now finish the task "manually" by calling the callback
-        self.task_fsm.on_task_finished()
+        self.task_fsm.receive_task_finished_signal()
         assert isinstance(self.task_fsm._state, TaskCompleted)
 
 if __name__ == '__main__':
