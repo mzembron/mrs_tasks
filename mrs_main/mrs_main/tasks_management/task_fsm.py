@@ -23,9 +23,11 @@ class TaskFSM:
         self.task_finished_callback = task_finished_callback
 
     def get_next_message(self, msg: TaskConvMsg):
+        """ Get response (or no response) to the received message based on the current state """
         return self._state.define_next(msg)
 
     def transition_to(self, state):
+        """ Change the state of the task FSM """
         self._state = state
         self._state.task_fsm = self
         self._state.change_state_routine()
@@ -40,13 +42,18 @@ class TaskFSM:
         self._state.continue_after_resolved_dependencies()
     
     def start_execution(self) -> None:
+        """ Trigger execution of the specific task by the executor module"""
         self._executor.start_supervising_execution()
 
     def handle_task_finished(self):
+        """ Perform actions after the task is finished:
+            - notify the dependency manager
+            - call the callback function to inform the task manager that the task is finished """
         self.inform_about_finished_dependency()
         self.task_finished_callback()
 
     def on_task_finished(self):
+        """ Callback to trigger the transition to the TaskCompleted state after the task is finished """
         self._state.on_task_finished()
 
 class State(ABC):
@@ -80,9 +87,11 @@ class State(ABC):
 
 # virtual methods
     def continue_after_resolved_dependencies(self):
+        """ Method to be called once the dependencies are resolved """
         return
     
     def on_task_finished(self):
+        """ Callback method to be called once thetask execution has finished """
         assert False, "[ DEBUG LOG ] Oops! Task should not be finished in that state!"
 # virtual methods - respond to specific msg content
     def respond_to_coord_intrest_declaration(self, msg: TaskConvMsg):
