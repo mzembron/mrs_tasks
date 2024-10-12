@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Callable, Any
+from typing import Callable, Type, Any
 
 from mrs_main.common.objects import IntrestDescription, TaskConvMsg
 from mrs_main.common.conversation_data import MrsConvPerform
@@ -7,6 +7,7 @@ from mrs_main.common.exceptions import InvalidMsgPerformative
 from mrs_main.tasks_management.dependency_manager import TaskDependencyManager
 from mrs_main.task_execution.task_executor import TaskExecutor
 from mrs_main.task_execution.concrete_executors.dummy_executor import DummyExecutor
+from mrs_main.task_execution.concrete_executors.executor_interface import AbstractExecutor
 
 class TaskFSM:
 
@@ -15,7 +16,7 @@ class TaskFSM:
                     task_desc: dict,
                     interest_desc: IntrestDescription,
                     task_finished_callback: Callable[..., Any],
-                    concrete_executor=DummyExecutor) -> None:
+                    concrete_executor: Type[AbstractExecutor]=DummyExecutor) -> None:
         self.transition_to(DefineTaskIntrest())
         self._dependency_manager = dependency_manager
         self._executor = TaskExecutor(task_desc, self.receive_task_finished_signal, concrete_executor)
