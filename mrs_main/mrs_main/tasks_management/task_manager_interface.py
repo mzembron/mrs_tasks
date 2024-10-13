@@ -8,6 +8,9 @@ import mrs_main.common.constants as mrs_const
 
 class TaskManagerInterface:
     def __init__(self, concrete_task_manager) -> None:
+        """ Interface for interaction with the concrete TaskManager class,
+            providing the base task handling functionalities: task state representation,
+            definition of the next behavior (e.g. reply messages), etc. """
         from mrs_main.tasks_management.task_manager import TaskManager
         self.__concrete_task_manager: TaskManager = concrete_task_manager
         self._task_dict = self.__concrete_task_manager._task_dict
@@ -17,6 +20,7 @@ class TaskManagerInterface:
         return self._task_dict
 
     def receive_task(self, short_id: int, task_desc: str, task_finished_callback):
+        """ Method receives the task info, creates the task object, and begins its management """
         task_desc_decoded = json.loads(task_desc)
         task = Task(
             short_id,
@@ -32,9 +36,13 @@ class TaskManagerInterface:
         self._task_dict[task.short_id] = task
 
     def get_intrest(self, task_id: int):
+        """ Returns the 'interest description' for the given task """
         # TODO: implement intrest calculation for every task
         return self.__concrete_task_manager.intrest_desc
 
     def define_next_behavior(self, task_conv_msg: TaskConvMsg) -> TaskConvMsg:
+        """ Method defines next behavior for the given input message, which influences
+            current state of the given task, return might be a reply message 
+            or no response (None) """
         print(f'[ DEBUG LOG ] Received msg about task: {task_conv_msg.short_id}!')
         return self._task_dict[task_conv_msg.short_id].get_response(task_conv_msg)
