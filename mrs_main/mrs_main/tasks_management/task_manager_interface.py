@@ -1,6 +1,5 @@
 import json
 
-# from mrs_main.tasks_management.task import Task
 from mrs_main.tasks_management.task_fsm import TaskFSM
 # from tasks_management.task_manager import TaskManager #TODO: resolve circular import
 from mrs_main.common.objects import IntrestDescription, TaskConvMsg

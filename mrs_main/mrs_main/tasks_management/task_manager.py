@@ -1,5 +1,4 @@
-# from mrs_main.tasks_management.task import Task
-# from mrs_main.tasks_management.task_fsm import TaskFsm
+from mrs_main.tasks_management.task_fsm import TaskFSM
 from mrs_main.tasks_management.task_manager_interface import TaskManagerInterface
 from mrs_main.tasks_management.dependency_manager import DependencyManager
 from mrs_main.common.objects import IntrestDescription, TaskConvMsg
@@ -12,9 +11,8 @@ class TaskManager():
         self.intrest_desc = IntrestDescription()
         self.intrest_desc.execution = intrest_exec
         self.intrest_desc.coordination = intrest_coord
-        # self._task_dict: dict[int, TaskFsm] = {}
-        self._task_dict = {} # all tasks, not only the ones handled by this agent
-         # all tasks, not only the ones handled by this agent
+        self._task_dict: dict[int, TaskFSM] = {} # all tasks, not only the ones handled by this agent
+        self._task_dict = {}
         self._interface = TaskManagerInterface(concrete_task_manager=self)
         self._dependency_manager = DependencyManager(self._task_dict)
 
