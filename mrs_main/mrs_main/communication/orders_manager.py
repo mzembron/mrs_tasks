@@ -88,4 +88,7 @@ class OrdersManager(Node):
 
     def __publish_task_finished_info(self):
         pass
+        # ros_msg = msg.serialize()
+        # pub: Publisher = self.task_topic_subpub_dict[ros_msg.short_id].pub
+        # pub.publish(ros_msg)
 

@@ -7,8 +7,8 @@ class DependencyManager:
         the given task can be executed immediately or if some other 
         dependencies should be resolved beforehand """
     def __init__(self, tasks_dict) -> None:
-        from mrs_main.tasks_management.task import Task
-        self._tasks_dict: dict[int, Task] = tasks_dict
+        from mrs_main.tasks_management.task_fsm import TaskFSM
+        self._tasks_dict: dict[int, TaskFSM] = tasks_dict
         self._tasks_dependencies = nx.DiGraph()
 
     def are_task_dependencies_met(self, task_id: int) -> bool:

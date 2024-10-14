@@ -1,6 +1,7 @@
 import json
 
-from mrs_main.tasks_management.task import Task
+# from mrs_main.tasks_management.task import Task
+from mrs_main.tasks_management.task_fsm import TaskFSM
 # from tasks_management.task_manager import TaskManager #TODO: resolve circular import
 from mrs_main.common.objects import IntrestDescription, TaskConvMsg
 from mrs_main.tasks_management.dependency_manager import TaskDependencyManager
@@ -22,18 +23,25 @@ class TaskManagerInterface:
     def receive_task(self, short_id: int, task_desc: str, task_finished_callback):
         """ Method receives the task info, creates the task object, and begins its management """
         task_desc_decoded = json.loads(task_desc)
-        task = Task(
-            short_id,
-            task_desc,
-            dependency_manager=TaskDependencyManager(
-                    dependency_manager=self.__concrete_task_manager._dependency_manager,
-                    task_id=short_id,
-                    dependencies = task_desc_decoded[mrs_const.TASK_DESC_DEPENDENCIES]),
-            interest_desc = self.get_intrest(short_id),
-            task_finished_callback = task_finished_callback
-        )
-        print(f'[ DEBUG LOG ] Task of type: {task.desc}, received by TaskManager!')
-        self._task_dict[task.short_id] = task
+        # task = Task(
+        #     short_id,
+        #     task_desc,
+        #     dependency_manager=TaskDependencyManager(
+        #             dependency_manager=self.__concrete_task_manager._dependency_manager,
+        #             task_id=short_id,
+        #             dependencies = task_desc_decoded[mrs_const.TASK_DESC_DEPENDENCIES]),
+        #     interest_desc = self.get_intrest(short_id),
+        #     task_finished_callback = task_finished_callback
+        # )
+        task_fsm = TaskFSM(dependency_manager=TaskDependencyManager(
+                                dependency_manager=self.__concrete_task_manager._dependency_manager,
+                                task_id=short_id,
+                                dependencies = task_desc_decoded[mrs_const.TASK_DESC_DEPENDENCIES]),
+                            task_desc=task_desc,
+                            interest_desc=self.get_intrest(short_id),
+                            task_finished_callback=task_finished_callback)
+        print(f'[ DEBUG LOG ] Task of type: {task_desc}, received by TaskManager!')
+        self._task_dict[short_id] = task_fsm
 
     def get_intrest(self, task_id: int):
         """ Returns the 'interest description' for the given task """
@@ -45,4 +53,4 @@ class TaskManagerInterface:
             current state of the given task, return might be a reply message 
             or no response (None) """
         print(f'[ DEBUG LOG ] Received msg about task: {task_conv_msg.short_id}!')
-        return self._task_dict[task_conv_msg.short_id].get_response(task_conv_msg)
+        return self._task_dict[task_conv_msg.short_id].get_next_message(msg=task_conv_msg)
