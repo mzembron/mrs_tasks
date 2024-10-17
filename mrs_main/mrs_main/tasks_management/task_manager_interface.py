@@ -1,6 +1,7 @@
 import json
 
 from mrs_main.tasks_management.task_fsm import TaskFSM
+from mrs_main.common.objects import TaskConvMsg
 # from tasks_management.task_manager import TaskManager #TODO: resolve circular import
 from mrs_main.common.objects import IntrestDescription, TaskConvMsg
 from mrs_main.tasks_management.dependency_manager import TaskDependencyManager
@@ -22,16 +23,6 @@ class TaskManagerInterface:
     def receive_task(self, short_id: int, task_desc: str, task_finished_callback):
         """ Method receives the task info, creates the task object, and begins its management """
         task_desc_decoded = json.loads(task_desc)
-        # task = Task(
-        #     short_id,
-        #     task_desc,
-        #     dependency_manager=TaskDependencyManager(
-        #             dependency_manager=self.__concrete_task_manager._dependency_manager,
-        #             task_id=short_id,
-        #             dependencies = task_desc_decoded[mrs_const.TASK_DESC_DEPENDENCIES]),
-        #     interest_desc = self.get_intrest(short_id),
-        #     task_finished_callback = task_finished_callback
-        # )
         task_fsm = TaskFSM(dependency_manager=TaskDependencyManager(
                                 dependency_manager=self.__concrete_task_manager._dependency_manager,
                                 task_id=short_id,
