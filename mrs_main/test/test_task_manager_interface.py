@@ -11,6 +11,8 @@ class TestTaskManagerInterface:
         self.task_dict = {}
         self.concrete_task_manager = MagicMock()
         self.concrete_task_manager._task_dict = self.task_dict
+        self.concrete_task_manager._dependency_manager = MagicMock()
+        self.concrete_task_manager.intrest_desc = MagicMock(spec=IntrestDescription)
         self.task_manager_interface = TaskManagerInterface(self.concrete_task_manager)
 
     def test_init(self, setup):
@@ -26,7 +28,7 @@ class TestTaskManagerInterface:
         self.task_manager_interface.receive_task('task_1', task_desc, task_finished_callback)
         
         assert 'task_1' in self.task_dict
-        assert self.task_dict['task_1'].desc == task_desc
+        assert self.task_dict['task_1']._task_desc == task_desc
 
     def test_get_intrest(self, setup):
         self.concrete_task_manager.intrest_desc = MagicMock(spec=IntrestDescription)
@@ -36,15 +38,16 @@ class TestTaskManagerInterface:
         assert result == self.concrete_task_manager.intrest_desc
 
     def test_define_next_behavior(self, setup):
+        # TODO: refactor this test
         task_conv_msg = MagicMock(spec=TaskConvMsg)
-        task_conv_msg.short_id = 'task_1'
+        task_conv_msg.short_id = 1
         
         task = MagicMock(spec=TaskFSM)
-        task.get_response.return_value = 'response'
+        task.get_next_message.return_value = 'response'
         
-        self.task_dict['task_1'] = task
+        self.task_dict[task_conv_msg.short_id] = task
         
         result = self.task_manager_interface.define_next_behavior(task_conv_msg)
         
         assert result == 'response'
-        task.get_response.assert_called_once_with(task_conv_msg)
+        task.get_next_message.assert_called_once_with(msg=task_conv_msg)
