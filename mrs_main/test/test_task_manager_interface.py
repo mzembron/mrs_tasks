@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import MagicMock
-from mrs_main.tasks_management.task import Task
+from mrs_main.tasks_management.task_fsm import TaskFSM
 from mrs_main.common.objects import IntrestDescription, TaskConvMsg
 from mrs_main.tasks_management.task_manager_interface import TaskManagerInterface
 
@@ -39,7 +39,7 @@ class TestTaskManagerInterface:
         task_conv_msg = MagicMock(spec=TaskConvMsg)
         task_conv_msg.short_id = 'task_1'
         
-        task = MagicMock(spec=Task)
+        task = MagicMock(spec=TaskFSM)
         task.get_response.return_value = 'response'
         
         self.task_dict['task_1'] = task

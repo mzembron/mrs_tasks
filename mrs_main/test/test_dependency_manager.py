@@ -1,15 +1,15 @@
 import pytest
 from unittest.mock import MagicMock
 from mrs_main.tasks_management.dependency_manager import DependencyManager, TaskDependencyManager
-from mrs_main.tasks_management.task import Task
+from mrs_main.tasks_management.task_fsm import TaskFSM
 
 class TestDependencyManager:
 
     @pytest.fixture
     def setup(self):
         tasks_dict = {}
-        tasks_dict[1] = MagicMock(spec=Task)
-        tasks_dict[2] = MagicMock(spec=Task)
+        tasks_dict[1] = MagicMock(spec=TaskFSM)
+        tasks_dict[2] = MagicMock(spec=TaskFSM)
         self.dependency_manager = DependencyManager(tasks_dict)
 
     def test_are_task_dependencies_met(self, setup):
@@ -39,9 +39,9 @@ class TestTaskDependencyManager:
     @pytest.fixture
     def setup(self):
         tasks_dict = {}
-        tasks_dict[1] = MagicMock(spec=Task)
-        tasks_dict[2] = MagicMock(spec=Task)
-        tasks_dict[3] = MagicMock(spec=Task)
+        tasks_dict[1] = MagicMock(spec=TaskFSM)
+        tasks_dict[2] = MagicMock(spec=TaskFSM)
+        tasks_dict[3] = MagicMock(spec=TaskFSM)
         self.dependency_manager = DependencyManager(tasks_dict)
         self.dependency_manager.introduce_task_dependencies(2, [])
         self.dependency_manager.introduce_task_dependencies(3, [])
