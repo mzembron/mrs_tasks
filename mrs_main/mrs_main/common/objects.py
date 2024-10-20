@@ -37,3 +37,8 @@ class TaskConvMsg:
         """
         self.sender = sender_name
         self.short_id = id
+
+class TaskData:
+    """ Class holds base info regarding task """
+    def __init__(self, task_conv_msg: TaskConvMsg):
+        self.task_data = task_conv_msg
