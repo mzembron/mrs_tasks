@@ -4,6 +4,8 @@ from mrs_main.tasks_management.task_fsm import TaskFSM
 from mrs_main.common.objects import IntrestDescription, TaskConvMsg
 from mrs_main.tasks_management.task_manager_interface import TaskManagerInterface
 
+import json
+
 class TestTaskManagerInterface:
 
     @pytest.fixture
@@ -28,7 +30,7 @@ class TestTaskManagerInterface:
         self.task_manager_interface.receive_task('task_1', task_desc, task_finished_callback)
         
         assert 'task_1' in self.task_dict
-        assert self.task_dict['task_1']._task_desc == task_desc
+        assert self.task_dict['task_1']._task_data.task_desc == json.loads(task_desc)
 
     def test_get_intrest(self, setup):
         self.concrete_task_manager.intrest_desc = MagicMock(spec=IntrestDescription)
