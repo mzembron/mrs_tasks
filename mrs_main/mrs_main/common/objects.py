@@ -1,6 +1,10 @@
 from rclpy.node import Subscription, Publisher
 from mrs_msgs.msg import TaskConv
 
+import mrs_main.common.constants as mrs_const
+
+import json
+
 class IntrestDescription:
     execution: float
     coordination: float
@@ -40,5 +44,12 @@ class TaskConvMsg:
 
 class TaskData:
     """ Class holds base info regarding task """
-    def __init__(self, task_conv_msg: TaskConvMsg):
-        self.task_data = task_conv_msg
+    # TODO: refine constructor
+    # def __init__(self, task_conv_msg: TaskConvMsg):
+    #     self.task_data = task_conv_msg
+
+    def initialize_from_task_definition(self, short_id: int, task_desc: str):
+        task_desc_decoded = json.loads(task_desc)
+        self.short_id = short_id
+        self.dependencies = task_desc_decoded[mrs_const.TASK_DESC_DEPENDENCIES]
+        self.task_desc = task_desc_decoded

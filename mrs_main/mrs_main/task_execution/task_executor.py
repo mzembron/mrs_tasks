@@ -1,9 +1,11 @@
 
+from mrs_main.common.objects import TaskData
+
 class TaskExecutor:
-    def __init__(self, task_desc: dict, callback_on_finish, concrete_executor) -> None:
+    def __init__(self, task_data: TaskData, callback_on_finish, concrete_executor) -> None:
         """ Takes care of supervising the task execution by some
         external module """
-        self._task_desc = task_desc
+        self._task_desc = task_data
 
         # TODO: change concrete_executor to required argument, 
         # and use the concrete_executor object

@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Callable, Type, Any
 
-from mrs_main.common.objects import IntrestDescription, TaskConvMsg
+from mrs_main.common.objects import IntrestDescription, TaskConvMsg, TaskData
 from mrs_main.common.conversation_data import MrsConvPerform
 from mrs_main.common.exceptions import InvalidMsgPerformative
 from mrs_main.tasks_management.dependency_manager import TaskDependencyManager
@@ -13,15 +13,15 @@ class TaskFSM:
 
 
     def __init__(self, dependency_manager: TaskDependencyManager, 
-                    task_desc: dict,
+                    task_data: TaskData,
                     interest_desc: IntrestDescription,
                     task_finished_callback: Callable[..., Any],
                     concrete_executor: Type[AbstractExecutor]=DummyExecutor) -> None:
         # TODO: move all task parameters to other structure, maybe TaskConvMsg?
         self.transition_to(DefineTaskIntrest())
         self._dependency_manager = dependency_manager
-        self._executor = TaskExecutor(task_desc, self.receive_task_finished_signal, concrete_executor)
-        self._task_desc = task_desc
+        self._executor = TaskExecutor(task_data, self.receive_task_finished_signal, concrete_executor)
+        self._task_data = task_data
         self.interest_desc = interest_desc
         self.task_finished_callback = task_finished_callback
 
