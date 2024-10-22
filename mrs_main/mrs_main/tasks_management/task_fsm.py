@@ -53,7 +53,7 @@ class TaskFSM:
             - notify the dependency manager
             - call the callback function to inform the task manager that the task is finished """
         self.inform_about_finished_dependency()
-        self.task_finished_callback()
+        self.task_finished_callback(self._task_data)
 
     def receive_task_finished_signal(self):
         """ Callback to trigger the transition to the TaskCompleted state after the task is finished """

@@ -4,7 +4,7 @@ import mrs_main.common.constants as mrs_const
 from rclpy.node import Node, Publisher
 from mrs_msgs.msg import TaskDesc, TaskConv
 from mrs_main.tasks_management.task_manager_interface import TaskManagerInterface
-from mrs_main.common.objects import IntrestDescription, TopicSubPub, TaskConvMsg
+from mrs_main.common.objects import IntrestDescription, TopicSubPub, TaskConvMsg, TaskData
 from mrs_main.common.conversation_data import MrsConvPerform
 
 from rclpy.qos import QoSProfile, ReliabilityPolicy
@@ -86,9 +86,13 @@ class OrdersManager(Node):
             conv_answer_msg= answer_msg.serialize()
             self.task_topic_subpub_dict[msg.short_id].pub.publish(conv_answer_msg)
 
-    def __publish_task_finished_info(self):
-        pass
+    def __publish_task_finished_info(self, task_data: TaskData):
+
         # ros_msg = msg.serialize()
-        # pub: Publisher = self.task_topic_subpub_dict[ros_msg.short_id].pub
-        # pub.publish(ros_msg)
+        ros_msg = TaskConv()
+        ros_msg.performative = MrsConvPerform.inform_task_finished
+        ros_msg.short_id = task_data.short_id
+        ros_msg.sender = self.agent_name
+        pub: Publisher = self.task_topic_subpub_dict[ros_msg.short_id].pub
+        pub.publish(ros_msg)
 
