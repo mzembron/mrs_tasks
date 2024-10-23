@@ -11,8 +11,7 @@ class TaskManager():
         self.intrest_desc = IntrestDescription()
         self.intrest_desc.execution = intrest_exec
         self.intrest_desc.coordination = intrest_coord
-        self._task_dict: dict[int, TaskFSM] = {} # all tasks, not only the ones handled by this agent
-        self._task_dict = {}
+        self._task_dict: dict[int, TaskFSM] = {} # all sensed tasks, not only the ones handled by this agent
         self._interface = TaskManagerInterface(concrete_task_manager=self)
         self._dependency_manager = DependencyManager(self._task_dict)
 
