@@ -87,12 +87,7 @@ class OrdersManager(Node):
             self.task_topic_subpub_dict[msg.short_id].pub.publish(conv_answer_msg)
 
     def __publish_task_finished_info(self, task_data: TaskData):
-
-        # ros_msg = msg.serialize()
-        ros_msg = TaskConv()
-        ros_msg.performative = MrsConvPerform.inform_task_finished
-        ros_msg.short_id = task_data.short_id
-        ros_msg.sender = self.agent_name
+        ros_msg: TaskConv = task_data.serialize(MrsConvPerform.inform_task_finished, self.agent_name)
         pub: Publisher = self.task_topic_subpub_dict[ros_msg.short_id].pub
         pub.publish(ros_msg)
 

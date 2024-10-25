@@ -53,3 +53,10 @@ class TaskData:
         self.short_id = short_id
         self.dependencies = task_desc_decoded[mrs_const.TASK_DESC_DEPENDENCIES]
         self.task_desc = task_desc_decoded
+
+    def serialize(self, performative, agent_name) -> TaskConv:
+        ros_msg = TaskConv()
+        ros_msg.performative = performative
+        ros_msg.short_id = self.short_id
+        ros_msg.sender = agent_name
+        return ros_msg
