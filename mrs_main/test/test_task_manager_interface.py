@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import MagicMock
 from mrs_main.tasks_management.task_fsm import TaskFSM
 from mrs_main.common.objects import IntrestDescription, TaskConvMsg
-from mrs_main.tasks_management.task_manager_interface import TaskManagerInterface
+from mrs_main.tasks_management.task_manager import TaskManager
 
 import json
 
@@ -15,7 +15,7 @@ class TestTaskManagerInterface:
         self.concrete_task_manager._task_dict = self.task_dict
         self.concrete_task_manager._dependency_manager = MagicMock()
         self.concrete_task_manager.intrest_desc = MagicMock(spec=IntrestDescription)
-        self.task_manager_interface = TaskManagerInterface(self.concrete_task_manager)
+        self.task_manager_interface = TaskManager(self.concrete_task_manager)
 
     def test_init(self, setup):
         assert self.task_manager_interface._task_dict == self.task_dict

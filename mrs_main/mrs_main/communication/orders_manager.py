@@ -3,7 +3,7 @@ import mrs_main.common.constants as mrs_const
 
 from rclpy.node import Node, Publisher
 from mrs_msgs.msg import TaskDesc, TaskConv
-from mrs_main.tasks_management.task_manager_interface import TaskManagerInterface
+from mrs_main.tasks_management.task_manager import TaskManager
 from mrs_main.common.objects import IntrestDescription, TopicSubPub, TaskConvMsg, TaskData
 from mrs_main.common.conversation_data import MrsConvPerform
 
@@ -13,7 +13,7 @@ class OrdersManager(Node):
     """ Orders Manager takes care of communication in the contexts of 
     diffrent tasks - every task has its own ROS topic.
     """
-    def __init__(self, agent_name: str, task_manager: TaskManagerInterface):
+    def __init__(self, agent_name: str, task_manager: TaskManager):
         """
         Attributes:
             agent_name (str)
