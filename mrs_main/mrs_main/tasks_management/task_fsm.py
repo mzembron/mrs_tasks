@@ -17,7 +17,6 @@ class TaskFSM:
                     interest_desc: IntrestDescription,
                     task_finished_callback: Callable[..., Any],
                     concrete_executor: Type[AbstractExecutor]=DummyExecutor) -> None:
-        # TODO: move all task parameters to other structure, maybe TaskConvMsg?
         self.transition_to(DefineTaskIntrest())
         self._dependency_manager = dependency_manager
         self._executor = TaskExecutor(task_data, self.receive_task_finished_signal, concrete_executor)
