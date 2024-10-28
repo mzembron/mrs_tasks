@@ -6,7 +6,6 @@ from mrs_main.common.objects import TaskConvMsg,  TaskData
 from mrs_main.common.objects import IntrestDescription, TaskConvMsg
 from mrs_main.tasks_management.dependency_manager import DependencyManager
 from mrs_main.tasks_management.dependency_manager import TaskDependencyManager
-import mrs_main.common.constants as mrs_const
 
 class TaskManager:
     def __init__(self, agent_name: str, intrest_exec: float = 0.2, intrest_coord: float = 0.2) -> None:
