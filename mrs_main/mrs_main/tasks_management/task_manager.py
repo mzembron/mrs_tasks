@@ -4,8 +4,8 @@ from mrs_main.tasks_management.task_fsm import TaskFSM
 from mrs_main.common.objects import TaskConvMsg,  TaskData
 # from tasks_management.task_manager import TaskManager #TODO: resolve circular import
 from mrs_main.common.objects import IntrestDescription, TaskConvMsg
-from mrs_main.tasks_management.dependency_manager import DependencyManager
-from mrs_main.tasks_management.dependency_manager import TaskDependencyManager
+from mrs_main.tasks_management.dependency_manager import DependencyManager, TaskDependencyManager
+from mrs_main.tasks_management.scheduler import Scheduler
 
 class TaskManager:
     def __init__(self, agent_name: str, intrest_exec: float = 0.2, intrest_coord: float = 0.2) -> None:
@@ -18,6 +18,7 @@ class TaskManager:
         self.intrest_desc.coordination = intrest_coord
         self._task_dict: dict[int, TaskFSM] = {} # all sensed tasks, not only the ones handled by this agent
         self._dependency_manager = DependencyManager(self._task_dict)
+        self._scheduler = Scheduler(self._dependency_manager)
     
     @property
     def task_dict(self):
