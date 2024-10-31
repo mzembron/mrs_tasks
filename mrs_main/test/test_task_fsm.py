@@ -66,6 +66,32 @@ class TestState:
         with pytest.raises(InvalidMsgPerformative):
             self.state.define_next(msg)
 
+    def test_change_state_routine_define_task_interest(self):
+        self.setup_task_fsm_with_executor()
+        self.task_fsm.transition_to(DefineTaskIntrest())
+        assert isinstance(self.task_fsm._state, DefineTaskIntrest)
+
+    def test_change_state_routine_wait_for_exec(self):
+        self.setup_task_fsm_with_executor()
+        self.task_fsm._dependency_manager.are_dependencies_met = MagicMock(return_value=False)
+        self.task_fsm.transition_to(WaitForExec())
+        assert isinstance(self.task_fsm._state, WaitForExec)
+
+    def test_change_state_routine_exec_task(self):
+        self.setup_task_fsm_with_executor()
+        self.task_fsm.transition_to(ExecTask())
+        assert isinstance(self.task_fsm._state, ExecTask)
+
+    def test_change_state_routine_supervise_task(self):
+        self.setup_task_fsm_with_executor()
+        self.task_fsm.transition_to(SuperviseTask())
+        assert isinstance(self.task_fsm._state, SuperviseTask)
+
+    def test_change_state_routine_task_completed(self):
+        self.setup_task_fsm_with_executor()
+        self.task_fsm.transition_to(TaskCompleted())
+        assert isinstance(self.task_fsm._state, TaskCompleted)
+
     def test_change_state_to_exec_task(self):
         self.setup_task_fsm_with_executor()
 
