@@ -68,9 +68,9 @@ class TestState:
 
     def test_change_state_to_exec_task(self):
         self.setup_task_fsm_with_executor()
-        self.task_fsm.transition_to(WaitForExec())
-        # no dependencies on this task - should move to ExecTask state
 
+        self.task_fsm._dependency_manager.are_dependencies_met = MagicMock(return_value=True)
+        self.task_fsm.transition_to(WaitForExec())
         # Assert that the state has been changed to ExecTask 
         # (TestTaskExecutor does not call end-of-task callback, so the task is not completed)
         assert isinstance(self.task_fsm._state, ExecTask)
