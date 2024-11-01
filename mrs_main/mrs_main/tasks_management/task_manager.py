@@ -26,8 +26,7 @@ class TaskManager:
 
     def receive_task(self, short_id: int, task_desc: str, task_finished_callback):
         """ Method receives the task info, creates the task object, and begins its management """
-        task_data = TaskData()
-        task_data.initialize_from_task_definition(short_id, task_desc)
+        task_data = TaskData.from_task_definition(short_id, task_desc)
         task_fsm = TaskFSM(dependency_manager=TaskDependencyManager(
                                 dependency_manager=self._dependency_manager,
                                 task_id=short_id,

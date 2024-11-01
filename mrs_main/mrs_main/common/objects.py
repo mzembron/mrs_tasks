@@ -44,9 +44,22 @@ class TaskConvMsg:
 
 class TaskData:
     """ Class holds base info regarding task """
-    # TODO: refine constructor
-    # def __init__(self, task_conv_msg: TaskConvMsg):
-    #     self.task_data = task_conv_msg
+
+    def __init__(self, short_id: int = None, task_desc: str = None, task_conv_msg: TaskConvMsg = None):
+        if task_conv_msg:
+            self.task_data = task_conv_msg
+        elif short_id is not None and task_desc is not None:
+            self.initialize_from_task_definition(short_id, task_desc)
+        else:
+            raise ValueError("Invalid arguments for TaskData constructor")
+
+    @classmethod
+    def from_task_conv_msg(cls, task_conv_msg: TaskConvMsg):
+        return cls(task_conv_msg=task_conv_msg)
+
+    @classmethod
+    def from_task_definition(cls, short_id: int, task_desc: str):
+        return cls(short_id=short_id, task_desc=task_desc)
 
     def initialize_from_task_definition(self, short_id: int, task_desc: str):
         task_desc_decoded = json.loads(task_desc)
