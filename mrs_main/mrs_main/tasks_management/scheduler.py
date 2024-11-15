@@ -3,7 +3,11 @@ from mrs_main.tasks_management.task import Task
 
 class Scheduler:
     def __init__(self, dependency_manager: DependencyManager):
-        """ Manages the order and timing of task execution """
+        """ Manages the order and timing of task execution
+        """
+
+        # TODO: scheduler should decide if task can be executed or not based on the dependencies
+        #           and current task status 
         self._dependency_manager = dependency_manager
         self.backlog = []
 
@@ -13,4 +17,5 @@ class Scheduler:
 
     def get_next_task(self):
         """ Returns the next task to be executed """
+        #TODO: implement the logic to pull the most appropriate task from the backlog
         pass
