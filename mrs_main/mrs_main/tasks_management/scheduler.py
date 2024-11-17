@@ -7,7 +7,9 @@ class Scheduler:
         """
 
         # TODO: scheduler should decide if task can be executed or not based on the dependencies
-        #           and current task status 
+        #           and current task status
+        #      Additionally scheduler should allow only one task to be executed at the same time,
+        #      other tasks should be planned or supervised (while other agents execute it)
         self._dependency_manager = dependency_manager
         self.backlog = []
 
