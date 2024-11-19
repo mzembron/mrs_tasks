@@ -87,6 +87,8 @@ class OrdersManager(Node):
             self.task_topic_subpub_dict[msg.short_id].pub.publish(conv_answer_msg)
 
     def __publish_task_finished_info(self, task_data: TaskData):
+        #   TODO: refine this method: maybe it should be a generic callback to publish TaskConv from
+        #      the task manager
         ros_msg: TaskConv = task_data.serialize(MrsConvPerform.inform_task_finished, self.agent_name)
         pub: Publisher = self.task_topic_subpub_dict[ros_msg.short_id].pub
         pub.publish(ros_msg)

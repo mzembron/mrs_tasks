@@ -11,13 +11,13 @@ from mrs_main.task_execution.concrete_executors.executor_interface import Abstra
 
 class TaskFSM:
 
-
     def __init__(self, dependency_manager: TaskDependencyManager, 
                     task_data: TaskData,
                     interest_desc: IntrestDescription,
                     task_finished_callback: Callable[..., Any],
                     concrete_executor: Type[AbstractExecutor]=DummyExecutor) -> None:
         self.transition_to(DefineTaskIntrest())
+        #TODO: move dependency manager to the task manager
         self._dependency_manager = dependency_manager
         self._executor = TaskExecutor(task_data, self.receive_task_finished_signal, concrete_executor)
         self._task_data = task_data
@@ -37,6 +37,8 @@ class TaskFSM:
     def inform_about_finished_dependency(self):
         """ Notify the dependency manager that this task is complete, allowing it
             to resolve dependencies for other tasks dependent on this one. """
+        #   TODO: if dependency manager moved to the task manager, this should be merged with
+        #   task_finished_callback
         self._dependency_manager.notify_on_finish()
     
     def resume_after_finished_dependencies(self) -> None:
@@ -150,6 +152,7 @@ class WaitForExec(State):
     def change_state_routine(self):
         print("[ DEBUG LOG ] Moving directly to ExecTask")
         if (self._task_fsm._dependency_manager.are_dependencies_met()):
+            # TODO: let the scheuler decide if the task can be executed now, not the task_fsm itself
             self._task_fsm.transition_to(ExecTask())
         #else: wait for dependencies to be resolved
 
