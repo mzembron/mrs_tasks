@@ -31,7 +31,12 @@ class TaskManager:
                                 dependencies = task_data.dependencies),
                             task_data=task_data,
                             interest_desc=self.get_intrest(short_id),
-                            task_finished_callback=task_finished_callback)
+                            task_finished_callback=task_finished_callback
+                            # Example passing of method with parameter
+                            # from functools import partial
+                            # callback_with_task_id = partial(self.__agent_selected_to_execute_callback, short_id)
+                            # agent_selected_callaback=callback_with_task_id
+                            )
         print(f'[ DEBUG LOG ] Task of type: {task_desc}, received by TaskManager!')
         self._task_dict[short_id] = task_fsm
 
@@ -46,3 +51,8 @@ class TaskManager:
             or no response (None) """
         print(f'[ DEBUG LOG ] Received msg about task: {task_conv_msg.short_id}!')
         return self._task_dict[task_conv_msg.short_id].get_next_message(msg=task_conv_msg)
+    
+    def __agent_selected_to_execute_callback(self, task_id: int):
+        """ Method called when the agent is selected to execute the task """
+        self._scheduler.append_task(self._task_dict[task_id]) # from now on scheduler manages the task FSM
+
