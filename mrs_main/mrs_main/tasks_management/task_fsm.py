@@ -15,7 +15,8 @@ class TaskFSM:
                     task_data: TaskData,
                     interest_desc: IntrestDescription,
                     task_finished_callback: Callable[..., Any],
-                    concrete_executor: Type[AbstractExecutor]=DummyExecutor) -> None:
+                    concrete_executor: Type[AbstractExecutor]=DummyExecutor,
+                    agent_selected_callaback: Callable[..., Any]=None) -> None:
         self.transition_to(DefineTaskIntrest())
         #TODO: move dependency manager to the task manager
         self._dependency_manager = dependency_manager
