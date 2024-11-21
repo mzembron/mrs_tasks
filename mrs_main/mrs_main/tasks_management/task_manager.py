@@ -1,4 +1,5 @@
 import json
+from functools import partial
 
 from mrs_main.tasks_management.task_fsm import TaskFSM
 from mrs_main.common.objects import IntrestDescription, TaskConvMsg,  TaskData
@@ -25,17 +26,15 @@ class TaskManager:
     def receive_task(self, short_id: int, task_desc: str, task_finished_callback):
         """ Method receives the task info, creates the task object, and begins its management """
         task_data = TaskData.from_task_definition(short_id, task_desc)
+        callback_with_task_id = partial(self.__agent_selected_to_execute_callback, short_id)
         task_fsm = TaskFSM(dependency_manager=TaskDependencyManager(
                                 dependency_manager=self._dependency_manager,
                                 task_id=short_id,
                                 dependencies = task_data.dependencies),
                             task_data=task_data,
                             interest_desc=self.get_intrest(short_id),
-                            task_finished_callback=task_finished_callback
-                            # Example passing of method with parameter
-                            # from functools import partial
-                            # callback_with_task_id = partial(self.__agent_selected_to_execute_callback, short_id)
-                            # agent_selected_callaback=callback_with_task_id
+                            task_finished_callback=task_finished_callback,
+                            agent_selected_callaback=callback_with_task_id
                             )
         print(f'[ DEBUG LOG ] Task of type: {task_desc}, received by TaskManager!')
         self._task_dict[short_id] = task_fsm
