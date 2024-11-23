@@ -24,6 +24,7 @@ class TaskFSM:
         self._task_data = task_data
         self.interest_desc = interest_desc
         self.task_finished_callback = task_finished_callback
+        self.agent_selected_callaback = agent_selected_callaback
 
     def get_next_message(self, msg: TaskConvMsg):
         """ Get response (or no response) to the received message based on the current state """
@@ -152,6 +153,8 @@ class DefineTaskIntrest(State):
 class WaitForExec(State):
     def change_state_routine(self):
         print("[ DEBUG LOG ] Moving directly to ExecTask")
+        if (self._task_fsm.agent_selected_callaback):
+            self._task_fsm.agent_selected_callaback()
         if (self._task_fsm._dependency_manager.are_dependencies_met()):
             # TODO: let the scheuler decide if the task can be executed now, not the task_fsm itself
             self._task_fsm.transition_to(ExecTask())
