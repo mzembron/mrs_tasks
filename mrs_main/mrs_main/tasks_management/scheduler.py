@@ -19,6 +19,7 @@ class Scheduler:
 
     def get_next_task(self):
         """ Returns the next task to be executed """
+        #TODO: !!!!! UNIT TEST NEEDED !!!!!
         #TODO: implement the logic to pull the most appropriate task from the backlog
         self.backlog.pop(0) # task finished remove from scheduler backlog
         # dummy implementation - get next one in FIFO manner
