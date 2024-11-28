@@ -32,5 +32,5 @@ def test_get_next_task(scheduler):
 
     scheduler.get_next_task()
 
-    assert not task1.fsm.resume_after_finished_dependencies.called # as it gets removed from the queue
-    assert task2.fsm.resume_after_finished_dependencies.called
+    assert task1.fsm.resume_after_finished_dependencies.called # as it gets removed from the queue
+    assert not task2.fsm.resume_after_finished_dependencies.called

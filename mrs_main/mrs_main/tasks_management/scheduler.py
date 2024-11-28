@@ -17,11 +17,16 @@ class Scheduler:
         """ Appends a new task to the task queue """
         self.backlog.append(task)
 
+    def handle_current_task_finished(self, task: Task):
+        """ Handles the task finished event """
+        assert self.backlog[0] is not None
+        assert task.short_id == self.backlog[0].short_id
+        self.backlog.pop(0) # task finished - remove from scheduler backlog
+
     def get_next_task(self):
         """ Returns the next task to be executed """
         #TODO: !!!!! UNIT TEST NEEDED !!!!!
         #TODO: implement the logic to pull the most appropriate task from the backlog
-        self.backlog.pop(0) # task finished remove from scheduler backlog
         # dummy implementation - get next one in FIFO manner
         for task in self.backlog:
             if self._dependency_manager.are_task_dependencies_met(task.short_id):
