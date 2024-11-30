@@ -9,6 +9,13 @@ def scheduler():
     dependency_manager.are_task_dependencies_met = MagicMock(return_value=True)
     return Scheduler(dependency_manager)
 
+def create_mock_task(short_id):
+    task = MagicMock(spec=Task)
+    task.short_id = short_id
+    task.fsm = MagicMock()
+    task.fsm.resume_after_finished_dependencies = MagicMock()
+    return task
+
 def test_append_task(scheduler):
     task = MagicMock(spec=Task)
     task.short_id = "task1"
@@ -16,14 +23,8 @@ def test_append_task(scheduler):
     assert task in scheduler.backlog
 
 def test_get_next_task(scheduler):
-    task1 = MagicMock(spec=Task)
-    task1.short_id = "task1"
-    task2 = MagicMock(spec=Task)
-    task2.short_id = "task2"
-    task1.fsm = MagicMock()
-    task2.fsm = MagicMock()
-    task1.fsm.resume_after_finished_dependencies = MagicMock()
-    task2.fsm.resume_after_finished_dependencies = MagicMock()
+    task1 = create_mock_task("task1")
+    task2 = create_mock_task("task2")
 
     scheduler.append_task(task1)
     scheduler.append_task(task2)
