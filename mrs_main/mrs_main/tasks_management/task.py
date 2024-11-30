@@ -12,6 +12,7 @@ class Task():
                     task_finished_callback: Callable[..., Any]) -> None:
         self.short_id: int = short_id
         self.desc: dict = task_desc
+        self.is_blocking: bool = True #TODO: add optional attribute to the task description
         # TODO: move dependency manager to the task manager
         self.fsm = TaskFSM(dependency_manager=dependency_manager, task_desc=self.desc, interest_desc=interest_desc, task_finished_callback=task_finished_callback)
 
