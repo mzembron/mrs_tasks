@@ -34,3 +34,12 @@ def test_get_next_task(scheduler):
 
     assert task1.fsm.resume_after_finished_dependencies.called # as it gets removed from the queue
     assert not task2.fsm.resume_after_finished_dependencies.called
+
+def test_handle_current_task_finished(scheduler):
+    task = MagicMock(spec=Task)
+    task.short_id = "task1"
+    scheduler.append_task(task)
+    
+    scheduler.handle_current_task_finished(task)
+    
+    assert task not in scheduler.backlog
