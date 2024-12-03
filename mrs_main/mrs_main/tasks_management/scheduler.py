@@ -29,5 +29,5 @@ class Scheduler:
         # dummy implementation - get next one in FIFO manner
         for task in self.backlog:
             if self._dependency_manager.are_task_dependencies_met(task.short_id):
-                task.fsm.resume_after_finished_dependencies()
+                task.resume_after_finished_dependencies()
                 break # TODO: need to handle the case when no task can be executed
