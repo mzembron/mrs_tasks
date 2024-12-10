@@ -14,7 +14,10 @@ class Task():
         self.desc: dict = task_desc
         self.is_blocking: bool = True #TODO: add optional attribute to the task description
         # TODO: move dependency manager to the task manager
-        self.fsm = TaskFSM(dependency_manager=dependency_manager, task_desc=self.desc, interest_desc=interest_desc, task_finished_callback=task_finished_callback)
+        self.fsm = TaskFSM(dependency_manager=dependency_manager,
+                            task_desc=self.desc,
+                            interest_desc=interest_desc,
+                            task_finished_callback=task_finished_callback)
 
     def get_response(self, msg: TaskConvMsg) -> TaskConvMsg:
         return self.fsm.get_next_message(msg=msg)
