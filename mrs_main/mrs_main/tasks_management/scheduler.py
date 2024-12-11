@@ -1,5 +1,5 @@
 from mrs_main.tasks_management.dependency_manager import DependencyManager
-from mrs_main.tasks_management.task import Task
+from mrs_main.tasks_management.task_fsm import TaskFSM
 
 class Scheduler:
     def __init__(self, dependency_manager: DependencyManager):
@@ -13,14 +13,14 @@ class Scheduler:
         self._dependency_manager = dependency_manager
         self.backlog = [] #queue of tasks scheduled for execution - possibly should be thread safe
 
-    def append_task(self, task: Task):
+    def append_task(self, task_fsm: TaskFSM):
         """ Appends a new task to the task queue """
-        self.backlog.append(task)
+        self.backlog.append(task_fsm)
 
-    def handle_current_task_finished(self, task: Task):
+    def handle_current_task_finished(self, task_id: int):
         """ Handles the task finished event """
         assert self.backlog[0] is not None
-        assert task.short_id == self.backlog[0].short_id
+        assert task_id == self.backlog[0]._task_data.short_id
         self.backlog.pop(0) # task finished - remove from scheduler backlog
 
     def get_next_task(self):
