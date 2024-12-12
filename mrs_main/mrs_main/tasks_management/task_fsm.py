@@ -21,7 +21,7 @@ class TaskFSM:
         #TODO: move dependency manager to the task manager
         self._dependency_manager = dependency_manager
         self._executor = TaskExecutor(task_data, self.receive_task_finished_signal, concrete_executor)
-        self._task_data = task_data
+        self.task_data = task_data
         self.interest_desc = interest_desc
         self.task_finished_callback = task_finished_callback
         self.agent_selected_callaback = agent_selected_callaback
@@ -56,7 +56,7 @@ class TaskFSM:
             - notify the dependency manager
             - call the callback function to inform the task manager that the task is finished """
         self.inform_about_finished_dependency()
-        self.task_finished_callback(self._task_data)
+        self.task_finished_callback(self.task_data)
 
     def receive_task_finished_signal(self):
         """ Callback to trigger the transition to the TaskCompleted state after the task is finished """
