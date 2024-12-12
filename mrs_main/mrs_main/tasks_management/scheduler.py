@@ -29,6 +29,6 @@ class Scheduler:
         #TODO: implement the logic to pull the most appropriate task from the backlog
         # dummy implementation - get next one in FIFO manner
         for task in self.backlog:
-            if self._dependency_manager.are_task_dependencies_met(task.short_id):
+            if self._dependency_manager.are_task_dependencies_met(task.task_data.short_id):
                 task.resume_after_finished_dependencies()
                 break # TODO: need to handle the case when no task can be executed
