@@ -22,7 +22,7 @@ class TestTaskManager:
         self.task_manager.receive_task('task_1', task_desc, task_finished_callback)
         
         assert 'task_1' in self.task_dict
-        assert self.task_dict['task_1']._task_data.task_desc == json.loads(task_desc)
+        assert self.task_dict['task_1'].task_data.task_desc == json.loads(task_desc)
 
     def test_get_intrest(self, setup):
         self.task_manager.intrest_desc = MagicMock(spec=IntrestDescription)
