@@ -1,3 +1,5 @@
+from typing import List
+
 from mrs_main.tasks_management.dependency_manager import DependencyManager
 from mrs_main.tasks_management.task_fsm import TaskFSM
 
@@ -11,7 +13,7 @@ class Scheduler:
         #      Additionally scheduler should allow only one task to be executed at the same time,
         #      other tasks should be planned or supervised (while other agents execute it)
         self._dependency_manager = dependency_manager
-        self.backlog = [] #queue of tasks scheduled for execution - possibly should be thread safe
+        self.backlog: List[TaskFSM] = [] #queue of tasks scheduled for execution - possibly should be thread safe
 
     def append_task(self, task_fsm: TaskFSM):
         """ Appends a new task to the task queue """
