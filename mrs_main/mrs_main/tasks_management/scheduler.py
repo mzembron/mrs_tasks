@@ -1,7 +1,20 @@
 from typing import List
+import threading
+from functools import wraps 
 
 from mrs_main.tasks_management.dependency_manager import DependencyManager
 from mrs_main.tasks_management.task_fsm import TaskFSM
+
+def synchronized(lock_attr_name:str):
+    """ Synchronization decorator. """
+    def wrapper(f):
+        @wraps(f)
+        def wrapped(self, *args, **kwargs):
+            lock = getattr(self, lock_attr_name)
+            with lock:
+                return f(self, *args, **kwargs)
+        return wrapped
+    return wrapper
 
 class Scheduler:
     def __init__(self, dependency_manager: DependencyManager):
@@ -14,11 +27,14 @@ class Scheduler:
         #      other tasks should be planned or supervised (while other agents execute it)
         self._dependency_manager = dependency_manager
         self.backlog: List[TaskFSM] = [] #queue of tasks scheduled for execution - possibly should be thread safe
+        self._backlog_lock = threading.Lock()
 
+    @synchronized(lock_attr_name='_backlog_lock')
     def append_task(self, task_fsm: TaskFSM):
         """ Appends a new task to the task queue """
         self.backlog.append(task_fsm)
 
+    @synchronized(lock_attr_name='_backlog_lock')
     def handle_current_task_finished(self, task_id: int):
         """ Handles the task finished event """
         if not any(task_fsm.task_data.short_id == task_id for task_fsm in self.backlog):
@@ -27,7 +43,8 @@ class Scheduler:
         # assert self.backlog[0].task_data.short_id == task_id # TODO: this should be true everytime 
                                                                     # for now backlog is not managed
         self.backlog.pop(0) # task finished - remove from scheduler backlog
-
+    
+    @synchronized(lock_attr_name='_backlog_lock')
     def get_next_task(self):
         """ Returns the next task to be executed """
         #TODO: implement the logic to pull the most appropriate task from the backlog
