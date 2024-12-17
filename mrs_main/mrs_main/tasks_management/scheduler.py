@@ -24,6 +24,7 @@ class Scheduler:
         if not any(task_fsm.task_data.short_id == task_id for task_fsm in self.backlog):
             return 
         assert self.backlog[0] is not None
+        assert self.backlog[0].task_data.short_id == task_id
         self.backlog.pop(0) # task finished - remove from scheduler backlog
 
     def get_next_task(self):
