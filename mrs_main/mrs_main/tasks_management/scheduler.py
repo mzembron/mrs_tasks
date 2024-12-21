@@ -49,7 +49,9 @@ class Scheduler:
         """ Returns the next task to be executed """
         #TODO: implement the logic to pull the most appropriate task from the backlog
         # dummy implementation - get next one in FIFO manner
-        for task in self.backlog:
+        for idx, task in enumerate(self.backlog):
             if self._dependency_manager.are_task_dependencies_met(task.task_data.short_id):
                 task.resume_after_finished_dependencies()
+                # Move the task to the first position in the backlog
+                self.backlog.insert(0, self.backlog.pop(idx))
                 break # TODO: need to handle the case when no task can be executed
