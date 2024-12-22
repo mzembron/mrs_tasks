@@ -28,8 +28,6 @@ def test_get_next_task(scheduler):
     scheduler.append_task(task1)
     scheduler.append_task(task2)
 
-    scheduler._dependency_manager.are_task_dependencies_met = MagicMock(return_value=True)
-
     scheduler.get_next_task()
 
     assert task1.resume_after_finished_dependencies.called # as it gets removed from the queue
