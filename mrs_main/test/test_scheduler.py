@@ -33,6 +33,19 @@ def test_get_next_task(scheduler):
     assert task1.resume_after_finished_dependencies.called # as it gets removed from the queue
     assert not task2.resume_after_finished_dependencies.called
 
+def test_get_next_task_rearrange_backlog(scheduler):
+    """ verify task to be executed with met dependencies is at the top of the backlog """
+    task1 = create_mock_task_fsm(1)
+    task2 = create_mock_task_fsm(2)
+
+    scheduler.append_task(task1)
+    scheduler.append_task(task2)
+
+    scheduler._dependency_manager.are_task_dependencies_met.side_effect = lambda task_id: {1: False, 2: True}.get(task_id, False)
+    scheduler.get_next_task()
+    assert scheduler.backlog[0] == task2
+    # TODO:mock task1 to not fulfill dependencies  
+
 def test_handle_current_task_finished(scheduler):
     task = create_mock_task_fsm(1)
     scheduler.append_task(task)
