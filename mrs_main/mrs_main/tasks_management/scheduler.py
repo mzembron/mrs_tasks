@@ -1,5 +1,5 @@
 from typing import List
-import threading
+from threading import RLock
 
 from mrs_main.common.synchronization import synchronized
 from mrs_main.tasks_management.dependency_manager import DependencyManager
@@ -15,13 +15,16 @@ class Scheduler:
         #      Additionally scheduler should allow only one task to be executed at the same time,
         #      other tasks should be planned or supervised (while other agents execute it)
         self._dependency_manager = dependency_manager
+        self.current_task = None
         self.backlog: List[TaskFSM] = [] #queue of tasks scheduled for execution - possibly should be thread safe
-        self._backlog_lock = threading.Lock()
+        self._backlog_lock = RLock()
 
     @synchronized(lock_attr_name='_backlog_lock')
     def append_task(self, task_fsm: TaskFSM):
         """ Appends a new task to the task queue """
         self.backlog.append(task_fsm)
+        if self.current_task is None:
+            self.get_next_task()
 
     @synchronized(lock_attr_name='_backlog_lock')
     def handle_current_task_finished(self, task_id: int):
@@ -32,6 +35,7 @@ class Scheduler:
         # assert self.backlog[0].task_data.short_id == task_id # TODO: this should be true everytime 
                                                                     # for now backlog is not managed
         self.backlog.pop(0) # task finished - remove from scheduler backlog
+        self.get_next_task()
     
     @synchronized(lock_attr_name='_backlog_lock')
     def get_next_task(self):
@@ -43,4 +47,7 @@ class Scheduler:
                 task.resume_after_finished_dependencies()
                 # Move the task to the first position in the backlog
                 self.backlog.insert(0, self.backlog.pop(idx))
-                break # TODO: need to handle the case when no task can be executed
+                return
+                # break # TODO: need to handle the case when no task can be executed
+
+        self.current_task = None
