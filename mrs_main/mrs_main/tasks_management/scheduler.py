@@ -1,20 +1,9 @@
 from typing import List
 import threading
-from functools import wraps 
 
+from mrs_main.common.synchronization import synchronized
 from mrs_main.tasks_management.dependency_manager import DependencyManager
 from mrs_main.tasks_management.task_fsm import TaskFSM
-
-def synchronized(lock_attr_name:str):
-    """ Synchronization decorator. """
-    def wrapper(f):
-        @wraps(f)
-        def wrapped(self, *args, **kwargs):
-            lock = getattr(self, lock_attr_name)
-            with lock:
-                return f(self, *args, **kwargs)
-        return wrapped
-    return wrapper
 
 class Scheduler:
     def __init__(self, dependency_manager: DependencyManager):
