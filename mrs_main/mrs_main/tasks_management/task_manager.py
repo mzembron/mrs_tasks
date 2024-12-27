@@ -56,5 +56,6 @@ class TaskManager:
     
     def __agent_selected_to_execute_callback(self, task_id: int):
         """ Method called when the agent is selected to execute the task """
+        print(f'[ DEBUG LOG ] Task {task_id} appended to scheduler!')
         self._scheduler.append_task(self._task_dict[task_id]) # from now on scheduler manages the task FSM
 
