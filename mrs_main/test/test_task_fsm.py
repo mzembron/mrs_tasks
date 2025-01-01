@@ -97,6 +97,7 @@ class TestState:
 
         self.task_fsm._dependency_manager.are_dependencies_met = MagicMock(return_value=True)
         self.task_fsm.transition_to(WaitForExec())
+        self.task_fsm.resume_after_finished_dependencies()
         # Assert that the state has been changed to ExecTask 
         # (TestTaskExecutor does not call end-of-task callback, so the task is not completed)
         assert isinstance(self.task_fsm._state, ExecTask)
