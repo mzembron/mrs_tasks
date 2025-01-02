@@ -4,22 +4,19 @@ from typing import Callable, Type, Any
 from mrs_main.common.objects import IntrestDescription, TaskConvMsg, TaskData
 from mrs_main.common.conversation_data import MrsConvPerform
 from mrs_main.common.exceptions import InvalidMsgPerformative
-from mrs_main.tasks_management.dependency_manager import TaskDependencyManager
 from mrs_main.task_execution.task_executor import TaskExecutor
 from mrs_main.task_execution.concrete_executors.dummy_executor import DummyExecutor
 from mrs_main.task_execution.concrete_executors.executor_interface import AbstractExecutor
 
 class TaskFSM:
 
-    def __init__(self, dependency_manager: TaskDependencyManager, 
-                    task_data: TaskData,
+    def __init__(self, task_data: TaskData,
                     interest_desc: IntrestDescription,
                     task_finished_callback: Callable[..., Any],
                     concrete_executor: Type[AbstractExecutor]=DummyExecutor,
                     agent_selected_callaback: Callable[..., Any]=None) -> None:
         self.transition_to(DefineTaskIntrest())
         #TODO: move dependency manager to the task manager
-        self._dependency_manager = dependency_manager
         self._executor = TaskExecutor(task_data, self.receive_task_finished_signal, concrete_executor)
         self.task_data = task_data
         self.interest_desc = interest_desc
@@ -35,13 +32,6 @@ class TaskFSM:
         self._state = state
         self._state.task_fsm = self
         self._state.change_state_routine()
-        
-    def inform_about_finished_dependency(self):
-        """ Notify the dependency manager that this task is complete, allowing it
-            to resolve dependencies for other tasks dependent on this one. """
-        #   TODO: if dependency manager moved to the task manager, this should be merged with
-        #   task_finished_callback
-        self._dependency_manager.notify_on_finish()
     
     def resume_after_finished_dependencies(self) -> None:
         """ Resume task (move to task-execution state) after all dependencies are resolved """
@@ -55,7 +45,6 @@ class TaskFSM:
         """ Perform actions after the task is finished:
             - notify the dependency manager
             - call the callback function to inform the task manager that the task is finished """
-        self.inform_about_finished_dependency()
         self.task_finished_callback(self.task_data)
 
     def receive_task_finished_signal(self):
