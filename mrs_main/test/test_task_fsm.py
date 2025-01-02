@@ -5,18 +5,16 @@ from mrs_main.tasks_management.task_fsm import TaskFSM, State, DefineTaskIntrest
 from mrs_main.common.objects import IntrestDescription, TaskConvMsg
 from mrs_main.common.conversation_data import MrsConvPerform
 from mrs_main.common.exceptions import InvalidMsgPerformative
-from mrs_main.tasks_management.dependency_manager import TaskDependencyManager
 from mrs_main.task_execution.task_executor import TaskExecutor
 from mrs_main.task_execution.concrete_executors.executor_interface import AbstractExecutor
 
 class TestTaskFSM:
     @pytest.fixture(autouse=True)
     def setup(self):
-        self.dependency_manager = MagicMock(spec=TaskDependencyManager)
         self.task_executor = MagicMock(spec=TaskExecutor)
         self.interest_desc = MagicMock(spec=IntrestDescription)
         self.task_finished_callback = MagicMock()
-        self.fsm = TaskFSM(self.dependency_manager, self.task_executor, self.interest_desc, self.task_finished_callback)
+        self.fsm = TaskFSM(self.task_executor, self.interest_desc, self.task_finished_callback)
 
     def test_initialization(self):
         assert isinstance(self.fsm._state, DefineTaskIntrest)
@@ -46,11 +44,10 @@ class TestState:
         self.state.task_fsm = MagicMock(spec=TaskFSM)
 
     def setup_task_fsm_with_executor(self):
-        dependency_manager = MagicMock(spec=TaskDependencyManager)
         interest_desc = MagicMock(spec=IntrestDescription)
         task_finished_callback = MagicMock()
         task_desc = {}
-        self.task_fsm = TaskFSM(dependency_manager, task_desc, interest_desc, task_finished_callback, self.TestTaskExecutor)
+        self.task_fsm = TaskFSM( task_desc, interest_desc, task_finished_callback, self.TestTaskExecutor)
 
     def test_define_next(self):
         msg = TaskConvMsg()
@@ -73,7 +70,6 @@ class TestState:
 
     def test_change_state_routine_wait_for_exec(self):
         self.setup_task_fsm_with_executor()
-        self.task_fsm._dependency_manager.are_dependencies_met = MagicMock(return_value=False)
         self.task_fsm.transition_to(WaitForExec())
         assert isinstance(self.task_fsm._state, WaitForExec)
 
@@ -95,7 +91,6 @@ class TestState:
     def test_change_state_to_exec_task(self):
         self.setup_task_fsm_with_executor()
 
-        self.task_fsm._dependency_manager.are_dependencies_met = MagicMock(return_value=True)
         self.task_fsm.transition_to(WaitForExec())
         self.task_fsm.resume_after_finished_dependencies()
         # Assert that the state has been changed to ExecTask 
