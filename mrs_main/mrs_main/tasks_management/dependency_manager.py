@@ -43,6 +43,8 @@ class DependencyManager:
             when all dependencies are resolved """
         self._tasks_dict[task_id].resume_after_finished_dependencies()
 
+
+#TODO: remove this class as it appears to be unused
 class TaskDependencyManager:
     """ This class is the interface to interact with the DependencyManager in the scope of 
         a single, specific task """
