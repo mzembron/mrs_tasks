@@ -155,10 +155,6 @@ class WaitForExec(State):
         print("[ DEBUG LOG ] Moving directly to ExecTask")
         if (self._task_fsm.agent_selected_callaback):
             self._task_fsm.agent_selected_callaback()
-        # if (self._task_fsm._dependency_manager.are_dependencies_met()):
-        #     # TODO: let the scheuler decide if the task can be executed now, not the task_fsm itself
-        #     self._task_fsm.transition_to(ExecTask())
-        #else: wait for dependencies to be resolved
 
     def continue_after_resolved_dependencies(self):
         print("[ DEBUG LOG ] $$$$$$$ dependencies resolved $$$$$$ to ExecTask")
