@@ -13,8 +13,9 @@ class TaskFSM:
     def __init__(self, task_data: TaskData,
                     interest_desc: IntrestDescription,
                     task_finished_callback: Callable[..., Any],
+                    agent_selected_callaback: Callable[..., Any],
                     concrete_executor: Type[AbstractExecutor]=DummyExecutor,
-                    agent_selected_callaback: Callable[..., Any]=None) -> None:
+                    ) -> None:
         self.transition_to(DefineTaskIntrest())
         #TODO: move dependency manager to the task manager
         self._executor = TaskExecutor(task_data, self.receive_task_finished_signal, concrete_executor)
@@ -142,8 +143,7 @@ class DefineTaskIntrest(State):
 class WaitForExec(State):
     def change_state_routine(self):
         print("[ DEBUG LOG ] Moving directly to ExecTask")
-        if (self._task_fsm.agent_selected_callaback):
-            self._task_fsm.agent_selected_callaback()
+        self._task_fsm.agent_selected_callaback()
 
     def continue_after_resolved_dependencies(self):
         print("[ DEBUG LOG ] $$$$$$$ dependencies resolved $$$$$$ to ExecTask")
