@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import MagicMock
 
 from mrs_main.tasks_management.task_fsm import TaskFSM, State, DefineTaskIntrest, WaitForExec, ExecTask, SuperviseTask, TaskCompleted
-from mrs_main.common.objects import IntrestDescription, TaskConvMsg
+from mrs_main.common.objects import IntrestDescription, TaskConvMsg, TaskData
 from mrs_main.common.conversation_data import MrsConvPerform
 from mrs_main.common.exceptions import InvalidMsgPerformative
 from mrs_main.task_execution.task_executor import TaskExecutor
@@ -11,10 +11,14 @@ from mrs_main.task_execution.concrete_executors.executor_interface import Abstra
 class TestTaskFSM:
     @pytest.fixture(autouse=True)
     def setup(self):
-        self.task_executor = MagicMock(spec=TaskExecutor)
+        self.task_data = MagicMock(spec=TaskData)
         self.interest_desc = MagicMock(spec=IntrestDescription)
         self.task_finished_callback = MagicMock()
-        self.fsm = TaskFSM(self.task_executor, self.interest_desc, self.task_finished_callback)
+        self.agent_selected_callaback = MagicMock()
+        self.fsm = TaskFSM( self.task_data, 
+                            self.interest_desc,
+                            self.task_finished_callback,
+                            self.agent_selected_callaback)
 
     def test_initialization(self):
         assert isinstance(self.fsm._state, DefineTaskIntrest)
@@ -46,8 +50,13 @@ class TestState:
     def setup_task_fsm_with_executor(self):
         interest_desc = MagicMock(spec=IntrestDescription)
         task_finished_callback = MagicMock()
+        agent_selected_callaback = MagicMock()
         task_desc = {}
-        self.task_fsm = TaskFSM( task_desc, interest_desc, task_finished_callback, self.TestTaskExecutor)
+        self.task_fsm = TaskFSM( task_desc,
+                                 interest_desc,
+                                 task_finished_callback,
+                                 agent_selected_callaback,
+                                 concrete_executor=self.TestTaskExecutor)
 
     def test_define_next(self):
         msg = TaskConvMsg()
