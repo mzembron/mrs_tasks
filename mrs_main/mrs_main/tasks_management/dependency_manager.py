@@ -24,10 +24,6 @@ class DependencyManager:
             dependent_tasks = [task for task in self._tasks_dependencies.successors(finished_task_id)]
             # Remove the edges between the finished task and its dependent tasks
             self._tasks_dependencies.remove_edges_from([(finished_task_id, task) for task in dependent_tasks])
-            for task in dependent_tasks:
-                # Check if the dependent task can be executed now
-                if self.are_task_dependencies_met(task):
-                    self.__notify_task_on_finish(task)
  
     def introduce_task_dependencies(self, task_id: int, dependencies: list[int]):
         """ Define dependencies for new task """
@@ -38,7 +34,3 @@ class DependencyManager:
             if not self._tasks_dependencies.nodes[dep]['finished']:
                 self._tasks_dependencies.add_edge(dep, task_id)
 
-    def __notify_task_on_finish(self, task_id: int):
-        """ sends signal to the task_fsm class to move on with handling the task,
-            when all dependencies are resolved """
-        self._tasks_dict[task_id].resume_after_finished_dependencies()
