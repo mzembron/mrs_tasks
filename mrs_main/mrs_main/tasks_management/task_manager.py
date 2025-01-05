@@ -3,7 +3,7 @@ from functools import partial
 
 from mrs_main.tasks_management.task_fsm import TaskFSM
 from mrs_main.common.objects import IntrestDescription, TaskConvMsg,  TaskData
-from mrs_main.tasks_management.dependency_manager import DependencyManager, TaskDependencyManager
+from mrs_main.tasks_management.dependency_manager import DependencyManager
 from mrs_main.tasks_management.scheduler import Scheduler
 
 class TaskManager:
