@@ -42,21 +42,3 @@ class DependencyManager:
         """ sends signal to the task_fsm class to move on with handling the task,
             when all dependencies are resolved """
         self._tasks_dict[task_id].resume_after_finished_dependencies()
-
-
-#TODO: remove this class as it appears to be unused
-class TaskDependencyManager:
-    """ This class is the interface to interact with the DependencyManager in the scope of 
-        a single, specific task """
-    def __init__(self, dependency_manager: DependencyManager, task_id: int, dependencies: list[int]) -> None:
-        self.task_id = task_id
-        self.__dependency_manager = dependency_manager
-        self.__dependency_manager.introduce_task_dependencies(self.task_id, dependencies)
-
-    def are_dependencies_met(self):
-        """ Check if managed task can be executed at the moment """
-        return self.__dependency_manager.are_task_dependencies_met(self.task_id)
-    
-    def notify_on_finish(self):
-        """ Propagate the info about finished task to the DependencyManager """
-        self.__dependency_manager.update_dependencies(finished_task_id=self.task_id)
