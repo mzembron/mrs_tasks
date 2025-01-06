@@ -17,7 +17,6 @@ class TaskFSM:
                     concrete_executor: Type[AbstractExecutor]=DummyExecutor,
                     ) -> None:
         self.transition_to(DefineTaskIntrest())
-        #TODO: move dependency manager to the task manager
         self._executor = TaskExecutor(task_data, self.receive_task_finished_signal, concrete_executor)
         self.task_data = task_data
         self.interest_desc = interest_desc
@@ -123,7 +122,7 @@ class DefineTaskIntrest(State):
         else:
             reply_msg.performative = MrsConvPerform.declare_coord_intrest
             temp_coord_intrest = str(self._task_fsm.interest_desc.coordination) #TODO: remove coord intrest at all, 
-                                            # every agent should take part in supervising
+                                                                        # every agent should take part in supervising (!should it? - rethink)
             reply_msg.data = [temp_coord_intrest]
         if (self._task_fsm.interest_desc.execution <= self.INTREST_THRESHOLD):
             self._task_fsm.transition_to(SuperviseTask())
