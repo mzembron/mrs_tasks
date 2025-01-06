@@ -44,7 +44,6 @@ def test_get_next_task_rearrange_backlog(scheduler):
     scheduler._dependency_manager.are_task_dependencies_met.side_effect = lambda task_id: {1: False, 2: True}.get(task_id, False)
     scheduler.get_next_task()
     assert scheduler.backlog[0] == task2
-    # TODO:mock task1 to not fulfill dependencies  
 
 def test_handle_current_task_finished(scheduler):
     task = create_mock_task_fsm(1)
