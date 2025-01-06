@@ -1,5 +1,4 @@
 from functools import wraps
-# from threading import RLock, _RLock
 import threading
 
 def synchronized(lock_attr_name: str):
