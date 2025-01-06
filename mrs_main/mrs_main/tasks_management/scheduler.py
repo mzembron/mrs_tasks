@@ -10,13 +10,11 @@ class Scheduler:
         """ Manages the order and timing of task execution
         """
 
-        # TODO: scheduler should decide if task can be executed or not based on the dependencies
-        #           and current task status
         #      Additionally scheduler should allow only one task to be executed at the same time,
         #      other tasks should be planned or supervised (while other agents execute it)
         self._dependency_manager = dependency_manager
         self.current_task = None
-        self.backlog: List[TaskFSM] = [] #queue of tasks scheduled for execution - possibly should be thread safe
+        self.backlog: List[TaskFSM] = [] # queue of tasks scheduled for execution
         self._backlog_lock = RLock()
 
     @synchronized(lock_attr_name='_backlog_lock')
@@ -32,8 +30,8 @@ class Scheduler:
         if not any(task_fsm.task_data.short_id == task_id for task_fsm in self.backlog):
             return 
         assert self.backlog[0] is not None
-        # assert self.backlog[0].task_data.short_id == task_id # TODO: this should be true everytime 
-                                                                    # for now backlog is not managed
+        assert self.backlog[0].task_data.short_id == task_id # make sure the proper task is at the top of the backlog
+
         self.backlog.pop(0) # task finished - remove from scheduler backlog
         self.get_next_task()
     
@@ -48,6 +46,5 @@ class Scheduler:
                 # Move the task to the first position in the backlog
                 self.backlog.insert(0, self.backlog.pop(idx))
                 return
-                # break # TODO: need to handle the case when no task can be executed
 
         self.current_task = None
