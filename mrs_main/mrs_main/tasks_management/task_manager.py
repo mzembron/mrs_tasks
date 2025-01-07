@@ -8,7 +8,7 @@ from mrs_main.tasks_management.scheduler import Scheduler
 from mrs_main.knowledge_base.knowledge_base import KnowledgeBase
 
 class TaskManager:
-    def __init__(self, agent_name: str, intrest_exec: float = 0.2, intrest_coord: float = 0.2) -> None:
+    def __init__(self, agent_name: str, intrest_exec: float = 0.2, intrest_coord: float = 0.2, agent_type: int = 0) -> None:
         """ Interface for interaction with the concrete TaskManager class,
             providing the base task handling functionalities: task state representation,
             definition of the next behavior (e.g. reply messages), etc. """
@@ -17,7 +17,7 @@ class TaskManager:
         self._task_dict: dict[int, TaskFSM] = {} # all sensed tasks, not only the ones handled by this agent
         self._dependency_manager = DependencyManager(self._task_dict)
         self._scheduler = Scheduler(self._dependency_manager)
-        self._knowledge_base = KnowledgeBase()
+        self._knowledge_base = KnowledgeBase(agent_type)
     
     @property
     def task_dict(self):

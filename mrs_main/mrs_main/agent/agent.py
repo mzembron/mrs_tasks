@@ -6,7 +6,7 @@ from mrs_main.tasks_management.task_manager import TaskManager
 
 class Agent():
 
-    def __init__(self, intrest_exec: float = 0.2, intrest_coord: float = 0.2):
+    def __init__(self, intrest_exec: float = 0.2, intrest_coord: float = 0.2, agent_type: int = 0):
         agent_number = str(uuid.uuid1().int)
         self.agent_name = 'agent_' + agent_number
         self.__task_manager = TaskManager(agent_name=self.agent_name,
