@@ -8,6 +8,9 @@ import json
 class IntrestDescription:
     execution: float
     coordination: float
+    def __init__(self, execution: float, coordination: float):
+        self.execution = execution
+        self.coordination = coordination
 
 
 class TopicSubPub:
