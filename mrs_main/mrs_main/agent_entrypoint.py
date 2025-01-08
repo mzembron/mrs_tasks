@@ -8,11 +8,9 @@ def main(args=None):
     intrest_exec = 0.2
     intrest_coord = 0.2
     if (len(sys.argv)>1):
-        intrest_exec = float(sys.argv[1])
-    if (len(sys.argv)>2):
-        intrest_coord = float(sys.argv[2])
+        agent_type = int(sys.argv[1])
         
-    agent = Agent(intrest_exec=intrest_exec, intrest_coord=intrest_coord)
+    agent = Agent(intrest_exec=intrest_exec, intrest_coord=intrest_coord, agent_type=agent_type)
 
     try:
         agent.start_agent()
