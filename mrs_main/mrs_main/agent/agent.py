@@ -11,7 +11,8 @@ class Agent():
         self.agent_name = 'agent_' + agent_number
         self.__task_manager = TaskManager(agent_name=self.agent_name,
                                           intrest_exec=intrest_exec,
-                                          intrest_coord=intrest_coord)
+                                          intrest_coord=intrest_coord,
+                                          agent_type=agent_type)
         self.__orders_manager = OrdersManager(agent_name=self.agent_name,
                                               task_manager=self.__task_manager)
 

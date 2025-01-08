@@ -13,7 +13,6 @@ class TaskManager:
             providing the base task handling functionalities: task state representation,
             definition of the next behavior (e.g. reply messages), etc. """
         self.agent_name: str = agent_name
-        self.intrest_desc = IntrestDescription(intrest_exec, intrest_coord)
         self._task_dict: dict[int, TaskFSM] = {} # all sensed tasks, not only the ones handled by this agent
         self._dependency_manager = DependencyManager(self._task_dict)
         self._scheduler = Scheduler(self._dependency_manager)
@@ -26,7 +25,6 @@ class TaskManager:
     def receive_task(self, short_id: int, task_desc: str, task_finished_callback):
         """ Method receives the task info, creates the task object, and begins its management """
         task_data = TaskData.from_task_definition(short_id, task_desc)
-
         self._dependency_manager.introduce_task_dependencies(short_id, task_data.dependencies)
         callback_with_task_id = partial(self.__agent_selected_to_execute_callback, short_id)
         task_finished_callback_extended = lambda task_data: (task_finished_callback(task_data),
@@ -34,7 +32,7 @@ class TaskManager:
                                                             self._dependency_manager.update_dependencies(short_id))
                                             # task_data will be passed to lambda by the TaskFSM
         task_fsm = TaskFSM( task_data=task_data,
-                            interest_desc=self.get_intrest(short_id), # input 
+                            interest_desc=self._knowledge_base.get_intrest_desc(task_data), # input 
                             task_finished_callback=task_finished_callback_extended,
                             agent_selected_callaback=callback_with_task_id
                             )
@@ -44,7 +42,7 @@ class TaskManager:
     def get_intrest(self, task_id: int):
         """ Returns the 'interest description' for the given task """
         # TODO: implement intrest calculation for every task
-        return self.intrest_desc
+        return self._knowledge_base.get_intrest_desc(self._task_dict[task_id].task_data) # TODO: perform checks if the task is not exceeding the dict size
 
     def define_next_behavior(self, task_conv_msg: TaskConvMsg) -> TaskConvMsg:
         """ Method defines next behavior for the given input message, which influences
