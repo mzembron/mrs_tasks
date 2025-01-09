@@ -7,6 +7,7 @@ def main(args=None):
     rclpy.init()
     intrest_exec = 0.2
     intrest_coord = 0.2
+    agent_type = 1
     if (len(sys.argv)>1):
         agent_type = int(sys.argv[1])
         
