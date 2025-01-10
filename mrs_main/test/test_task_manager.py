@@ -3,6 +3,7 @@ from unittest.mock import MagicMock
 from mrs_main.tasks_management.task_fsm import TaskFSM
 from mrs_main.common.objects import IntrestDescription, TaskConvMsg
 from mrs_main.tasks_management.task_manager import TaskManager
+from mrs_main.knowledge_base.knowledge_base import KnowledgeBase
 
 import json
 
@@ -10,7 +11,8 @@ class TestTaskManager:
 
     @pytest.fixture
     def setup(self):
-        self.task_manager = TaskManager('test_agent')
+        self.test_agent_type = 0
+        self.task_manager = TaskManager('test_agent', agent_type=self.test_agent_type)
         self.task_manager._dependency_manager = MagicMock()
         self.task_manager.intrest_desc = MagicMock(spec=IntrestDescription)
         self.task_dict = {}
@@ -19,21 +21,23 @@ class TestTaskManager:
     def test_receive_task(self, setup):
         task_desc = '{"desc": "Test Task", "dependencies": []}'
         task_finished_callback = MagicMock()
-        self.task_manager.receive_task('task_1', task_desc, task_finished_callback)
+        self.task_manager.receive_task(1, task_desc, task_finished_callback)
         
-        assert 'task_1' in self.task_dict
-        assert self.task_dict['task_1'].task_data.task_desc == json.loads(task_desc)
+        assert 1 in self.task_dict
+        assert self.task_dict[1].task_data.task_desc == json.loads(task_desc)
 
     def test_get_intrest(self, setup):
-        self.task_manager.intrest_desc = MagicMock(spec=IntrestDescription)
         task_desc = '{"desc": "Test Task", "dependencies": []}'
+        test_task_id = 0
         task_finished_callback = MagicMock()
-        self.task_manager.receive_task('task_1', task_desc, task_finished_callback)
-        result = self.task_manager.get_intrest(1)
+        self.task_manager.receive_task(test_task_id, task_desc, task_finished_callback)
+        result = self.task_manager.get_intrest(test_task_id)
         
         # TODO: this test should be corrected after replacing the fake intrest desc
         # with proper implementation 
-        assert result == self.task_manager.intrest_desc
+        expected_result = KnowledgeBase(self.test_agent_type).get_intrest_desc(self.task_manager._task_dict[test_task_id].task_data)
+        assert result.coordination == expected_result.coordination
+        assert result.execution == expected_result.execution
 
     def test_define_next_behavior(self, setup):
         # TODO: refactor this test
