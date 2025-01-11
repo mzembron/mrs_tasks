@@ -5,9 +5,10 @@ from mrs_main.task_execution.concrete_executors.executor_interface import Abstra
 class DummyExecutor(AbstractExecutor):
     """ class handles execution of tasks for specific type of agent,
     in this case it is a dummy executor, which does nothing """
-    def __init__(self, callback_on_finish) -> None:
+    def __init__(self, callback_on_finish, task_exec_length=5) -> None:
         super().__init__(callback_on_finish)
         self.execution_thread = None
+        self.task_exec_length = task_exec_length
 
     def start_execution(self):
         """ entrypoint to trigger execution of task by external entity """
@@ -23,7 +24,7 @@ class DummyExecutor(AbstractExecutor):
         pass
 
     def mock_task_execution(self):
-        time.sleep(5)
+        time.sleep(self.task_exec_length)
         self._on_execution_finished()
 
     def _on_execution_finished(self):
