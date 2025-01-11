@@ -1,5 +1,6 @@
 from typing import List
-from threading import RLock
+from threading import RLock, Thread
+from time import sleep
 
 from mrs_main.common.synchronization import synchronized
 from mrs_main.tasks_management.dependency_manager import DependencyManager
@@ -16,6 +17,9 @@ class Scheduler:
         self.current_task = None
         self.backlog: List[TaskFSM] = [] # queue of tasks scheduled for execution
         self._backlog_lock = RLock()
+        self._scheduling_thread = Thread(target=self._check_for_task_to_execute)
+        self._scheduling_thread.start()
+
 
     @synchronized(lock_attr_name='_backlog_lock')
     def append_task(self, task_fsm: TaskFSM):
@@ -46,5 +50,22 @@ class Scheduler:
                 # Move the task to the first position in the backlog
                 self.backlog.insert(0, self.backlog.pop(idx))
                 return
+            print(f'Task {task.task_data.short_id} has not met dependencies yet')
 
         self.current_task = None
+
+    def _check_for_task_to_execute(self):
+        """ Checks if there is a task to be executed """
+        while True:
+            sleep(5)
+            print(f"[ DEBUG LOG ] [ SCHEDULER ] !! checking for tasks to execute !! Current task is {self.current_task}")
+            with self._backlog_lock:
+                if (self.current_task is None) and len(self.backlog) > 0:
+                    self.get_next_task()
+
+    def __del__(self):
+        """ Destructor to join the  thread """
+        if self._scheduling_thread is not None:
+            self._scheduling_thread.join(timeout=0.1)
+
+    #TODO: scheduler should have separate thread to check if there is task to be executed

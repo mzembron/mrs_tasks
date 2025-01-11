@@ -19,6 +19,7 @@ class DependencyManager:
     def update_dependencies(self, finished_task_id: int):
         """ Updates the dependencies after receiving message regarding the task """
         if finished_task_id in self._tasks_dependencies:
+            print(f"[ DEBUG LOG ] Task {finished_task_id} - removing dependencies for other tasks!")
             self._tasks_dependencies.nodes[finished_task_id]['finished'] = True
             # Extract all tasks that depend on the finished task
             dependent_tasks = [task for task in self._tasks_dependencies.successors(finished_task_id)]
