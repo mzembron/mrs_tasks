@@ -7,7 +7,7 @@ from mrs_main.tasks_management.task_fsm import TaskFSM
 def scheduler():
     dependency_manager = MagicMock()
     dependency_manager.are_task_dependencies_met = MagicMock(return_value=True)
-    return Scheduler(dependency_manager)
+    return Scheduler(dependency_manager, start_kicking_thread=False)
 
 def create_mock_task_fsm(short_id):
     task_fsm = MagicMock(spec=TaskFSM)

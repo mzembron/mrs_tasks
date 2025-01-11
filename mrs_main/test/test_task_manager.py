@@ -12,7 +12,7 @@ class TestTaskManager:
     @pytest.fixture
     def setup(self):
         self.test_agent_type = 0
-        self.task_manager = TaskManager('test_agent', agent_type=self.test_agent_type)
+        self.task_manager = TaskManager('test_agent', agent_type=self.test_agent_type, start_scheduler_kicking_thread=False)
         self.task_manager._dependency_manager = MagicMock()
         self.task_manager.intrest_desc = MagicMock(spec=IntrestDescription)
         self.task_dict = {}

@@ -7,7 +7,7 @@ from mrs_main.tasks_management.dependency_manager import DependencyManager
 from mrs_main.tasks_management.task_fsm import TaskFSM
 
 class Scheduler:
-    def __init__(self, dependency_manager: DependencyManager):
+    def __init__(self, dependency_manager: DependencyManager, start_kicking_thread=True):
         """ Manages the order and timing of task execution
         """
 
@@ -17,8 +17,10 @@ class Scheduler:
         self.current_task = None
         self.backlog: List[TaskFSM] = [] # queue of tasks scheduled for execution
         self._backlog_lock = RLock()
-        self._scheduling_thread = Thread(target=self._check_for_task_to_execute)
-        self._scheduling_thread.start()
+        self._kicking_thread = None
+        if start_kicking_thread:
+            self._kicking_thread = Thread(target=self._check_for_task_to_execute)
+            self._kicking_thread.start()
 
 
     @synchronized(lock_attr_name='_backlog_lock')
@@ -65,7 +67,7 @@ class Scheduler:
 
     def __del__(self):
         """ Destructor to join the  thread """
-        if self._scheduling_thread is not None:
-            self._scheduling_thread.join(timeout=0.1)
+        if self._kicking_thread is not None:
+            self._kicking_thread.join(timeout=0.1)
 
     #TODO: scheduler should have separate thread to check if there is task to be executed
