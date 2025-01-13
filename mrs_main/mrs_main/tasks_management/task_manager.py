@@ -34,7 +34,8 @@ class TaskManager:
         task_fsm = TaskFSM( task_data=task_data,
                             interest_desc=self._knowledge_base.get_intrest_desc(task_data), # input 
                             task_finished_callback=task_finished_callback_extended,
-                            agent_selected_callaback=callback_with_task_id
+                            agent_selected_callaback=callback_with_task_id,
+                            agent_name=self.agent_name
                             )
         print(f'[ DEBUG LOG ] Task of type: {task_desc}, received by TaskManager!')
         self._task_dict[short_id] = task_fsm

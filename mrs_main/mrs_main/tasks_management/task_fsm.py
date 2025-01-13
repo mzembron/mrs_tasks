@@ -15,6 +15,7 @@ class TaskFSM:
                     task_finished_callback: Callable[..., Any],
                     agent_selected_callaback: Callable[..., Any],
                     concrete_executor: Type[AbstractExecutor]=DummyExecutor,
+                    agent_name: str = ''
                     ) -> None:
         self.transition_to(DefineTaskIntrest())
         self._executor = TaskExecutor(task_data, self.receive_task_finished_signal, concrete_executor)
@@ -22,6 +23,7 @@ class TaskFSM:
         self.interest_desc = interest_desc
         self.task_finished_callback = task_finished_callback
         self.agent_selected_callaback = agent_selected_callaback
+        self.agent_name = agent_name
 
     def get_next_message(self, msg: TaskConvMsg):
         """ Get response (or no response) to the received message based on the current state """
@@ -131,12 +133,16 @@ class DefineTaskIntrest(State):
     
     def respond_to_exec_proposal(self, msg: TaskConvMsg):
         print(f"[ DEBUG LOG ] Received exec proposition from {msg.sender}")
-        reply_msg = TaskConvMsg()
-        reply_msg.short_id = msg.short_id
-        reply_msg.performative = MrsConvPerform.accept_exec_proposal
-        reply_msg.data = [msg.sender]
-        self._task_fsm.transition_to(WaitForExec())
-        return reply_msg
+        if (str(msg.data[0]) == self._task_fsm.agent_name):
+            print('[DEBUG LOG] %%%%%%%%%%%%%%%% YaY %%%%%%%%%%%%%%%%')
+            reply_msg = TaskConvMsg()
+            reply_msg.short_id = msg.short_id
+            reply_msg.performative = MrsConvPerform.accept_exec_proposal
+            reply_msg.data = [msg.sender]
+            self._task_fsm.transition_to(WaitForExec())
+            return reply_msg
+        else:
+            return None
     
 
 class WaitForExec(State):
