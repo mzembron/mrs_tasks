@@ -118,7 +118,7 @@ class DefineTaskIntrest(State):
         print(f"[ DEBUG LOG ] Received partner's interest {partner_intrest}")
         reply_msg = TaskConvMsg() 
         if (partner_intrest > self.INTREST_THRESHOLD):
-            print(f"[ DEBUG LOG ] Sending exec proposition to {msg.sender}")
+            print(f"[ DEBUG LOG ] Sending exec proposition of task {msg.short_id} to {msg.sender}")
             reply_msg.performative = MrsConvPerform.propose_exec_role
             reply_msg.data = [msg.sender]
         else:
@@ -126,8 +126,6 @@ class DefineTaskIntrest(State):
             temp_coord_intrest = str(self._task_fsm.interest_desc.coordination) #TODO: remove coord intrest at all, 
                                                                         # every agent should take part in supervising (!should it? - rethink)
             reply_msg.data = [temp_coord_intrest]
-        if (self._task_fsm.interest_desc.execution <= self.INTREST_THRESHOLD):
-            self._task_fsm.transition_to(SuperviseTask())
         reply_msg.short_id = msg.short_id
         return reply_msg
     
@@ -143,6 +141,11 @@ class DefineTaskIntrest(State):
             return reply_msg
         else:
             return None
+        
+    def respond_to_exec_acceptance(self, msg):
+        if(msg.sender != self._task_fsm.agent_name):
+            if (self._task_fsm.interest_desc.execution <= self.INTREST_THRESHOLD):
+                self._task_fsm.transition_to(SuperviseTask())
     
 
 class WaitForExec(State):
@@ -153,6 +156,9 @@ class WaitForExec(State):
     def continue_after_resolved_dependencies(self):
         print("[ DEBUG LOG ] $$$$$$$ dependencies resolved $$$$$$ to ExecTask")
         self._task_fsm.transition_to(ExecTask())
+    
+    def respond_to_exec_proposal(self, msg: TaskConvMsg):
+        print(f"[ DEBUG LOG ] Already assigned to task {msg.short_id} . ignoring!")
 
 class ExecTask(State):
     def change_state_routine(self):
@@ -165,6 +171,9 @@ class ExecTask(State):
 
     def respond_to_exec_info_request(self, msg: TaskConvMsg):
         return self._task_fsm._executor.get_task_execution_info()
+    
+    def respond_to_exec_proposal(self, msg: TaskConvMsg):
+        print(f"[ DEBUG LOG ] Already assigned to task {msg.short_id} . ignoring!")
 
 class SuperviseTask(State):
     def change_state_routine(self):
@@ -173,6 +182,9 @@ class SuperviseTask(State):
     def respond_to_task_finished_info(self, msg: TaskConvMsg):
         print("[ DEBUG LOG ] Moving to TaskCompleted")
         self._task_fsm.transition_to(TaskCompleted())
+    
+    def respond_to_exec_proposal(self, msg: TaskConvMsg):
+        print(f"[ DEBUG LOG ] Cannot execute this task! Other agent is executing task {msg.short_id} ! ignoring!")
 
 class TaskCompleted(State):
     def __init__(self) -> None:
