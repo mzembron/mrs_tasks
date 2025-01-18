@@ -8,7 +8,7 @@ from mrs_main.tasks_management.scheduler import Scheduler
 from mrs_main.knowledge_base.knowledge_base import KnowledgeBase
 
 class TaskManager:
-    def __init__(self, agent_name: str, intrest_exec: float = 0.2, intrest_coord: float = 0.2, agent_type: int = 0, start_scheduler_kicking_thread= True) -> None:
+    def __init__(self, agent_name: str, agent_type: int = 0, start_scheduler_kicking_thread= True) -> None:
         """ Interface for interaction with the concrete TaskManager class,
             providing the base task handling functionalities: task state representation,
             definition of the next behavior (e.g. reply messages), etc. """
