@@ -5,14 +5,16 @@ import rclpy
 from rclpy.node import Node
 
 from mrs_msgs.msg import TaskDesc
+import argparse
 import mrs_main.common.constants as mrs_const
 
 class DummyTaskGenerator(Node):
 
-    def __init__(self):
+    def __init__(self, max_messages=127):
         super().__init__('dummy_task_generator')
         self.publisher_ = self.create_publisher(TaskDesc, mrs_const.TASKS_DEFINITION_TOPIC_NAME, 10)
         timer_period = 0.5  # seconds
+        self.max_messages = max_messages
         self.timer = self.create_timer(timer_period, self.timer_callback)
         self.i = 0
 
@@ -24,7 +26,7 @@ class DummyTaskGenerator(Node):
         self.publisher_.publish(msg)
         self.get_logger().info('Publishing: "%s"' % msg.type)
         self.i += 1
-        if(self.i >127): # max int8 value
+        if(self.i >= self.max_messages): # max int8 value
             self.get_logger().info('Shutting down')
             self.destroy_timer(self.timer)
             self.destroy_node()
@@ -39,8 +41,11 @@ class DummyTaskGenerator(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-
-    minimal_publisher = DummyTaskGenerator()
+    parser = argparse.ArgumentParser(description='Dummy Task Generator')
+    parser.add_argument('--max_messages', type=int, default=127, help='Maximum number of messages to publish')
+    args = parser.parse_args()
+    max_messages = args.max_messages
+    minimal_publisher = DummyTaskGenerator(max_messages)
 
     rclpy.spin(minimal_publisher)
 
