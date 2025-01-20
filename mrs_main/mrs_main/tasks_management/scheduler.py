@@ -1,5 +1,5 @@
 from typing import List
-from threading import RLock, Thread
+from threading import RLock, Thread, Event
 from time import sleep
 
 from mrs_main.common.synchronization import synchronized
@@ -20,6 +20,7 @@ class Scheduler:
         self._kicking_thread = None
         if start_kicking_thread:
             self._kicking_thread = Thread(target=self._check_for_task_to_execute)
+            self._kicking_thread_terminate_event = Event()
             self._kicking_thread.start()
 
 
@@ -59,6 +60,8 @@ class Scheduler:
     def _check_for_task_to_execute(self):
         """ Checks if there is a task to be executed """
         while True:
+            if self._kicking_thread_terminate_event.is_set():
+                return
             sleep(5)
             print(f"[ DEBUG LOG ] [ SCHEDULER ] !! checking for tasks to execute !! Current task is {self.current_task}")
             with self._backlog_lock:
@@ -68,6 +71,7 @@ class Scheduler:
     def __del__(self):
         """ Destructor to join the  thread """
         if self._kicking_thread is not None:
-            self._kicking_thread.join(timeout=0.1)
+            self._kicking_thread_terminate_event.set()
+            self._kicking_thread.join()
 
     #TODO: scheduler should have separate thread to check if there is task to be executed
