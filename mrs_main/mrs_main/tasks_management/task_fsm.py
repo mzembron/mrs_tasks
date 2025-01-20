@@ -125,6 +125,7 @@ class DefineTaskIntrest(State):
             reply_msg.performative = MrsConvPerform.declare_coord_intrest
             temp_coord_intrest = str(self._task_fsm.interest_desc.coordination) #TODO: remove coord intrest at all, 
                                                                         # every agent should take part in supervising (!should it? - rethink)
+            return None
             reply_msg.data = [temp_coord_intrest]
         reply_msg.short_id = msg.short_id
         return reply_msg
