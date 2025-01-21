@@ -27,7 +27,7 @@ class OrdersManager(Node):
         self.agent_name = agent_name
         self.node_name = 'orders_manager_'+agent_name
         super().__init__(node_name=self.node_name)
-        self._qos_profile = QoSProfile(depth=10, reliability=ReliabilityPolicy.RELIABLE)
+        self._qos_profile = QoSProfile(depth=1000, reliability=ReliabilityPolicy.RELIABLE)
         self.subscription_task_def_topic = self.create_subscription(
             msg_type=TaskDesc,
             topic=mrs_const.TASKS_DEFINITION_TOPIC_NAME,
@@ -51,7 +51,7 @@ class OrdersManager(Node):
     def __create_sub_pub_for_task(self, task_id):
         """ Creates a new topic specific to the newly defined task """
         dynamic_topic_sub_pub = TopicSubPub() 
-        dynamic_topic_sub_pub.pub = self.create_publisher(TaskConv, '/mrs_main/id_' + str(task_id), 10)
+        dynamic_topic_sub_pub.pub = self.create_publisher(TaskConv, '/mrs_main/id_' + str(task_id), qos_profile=self._qos_profile)
         dynamic_topic_sub_pub.sub = self.create_subscription(
                                                 msg_type=TaskConv,
                                                 topic='/mrs_main/id_' + str(task_id),
