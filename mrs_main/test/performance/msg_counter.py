@@ -1,15 +1,19 @@
 import rclpy
 from rclpy.node import Node
 from mrs_msgs.msg import  TaskConv
+from rclpy.qos import QoSProfile, ReliabilityPolicy
+
+
 class MessageCounter(Node):
 
     def __init__(self, topic_name):
         super().__init__('message_counter')
+        self._qos_profile = QoSProfile(depth=1000, reliability=ReliabilityPolicy.RELIABLE)
         self.subscription = self.create_subscription(
             TaskConv,  # Change this to the appropriate message type for your topic
             topic_name,
             self.listener_callback,
-            10)
+            qos_profile=self._qos_profile)
         self.subscription  # prevent unused variable warning
         self.message_count = 0
 
