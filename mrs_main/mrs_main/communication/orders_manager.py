@@ -75,7 +75,7 @@ class OrdersManager(Node):
         """ Callback run whenever any message shows up on the task-specific topic,
             performs particular actions depending on the current state of the task"""
         if msg.sender != self.agent_name:
-            self.get_logger().info(f'I heard msg from {msg.sender}, \
+            self.get_logger().info(f'I heard msg from {msg.sender} about task {msg.short_id}, \
                                    performative: {msg.performative}, task data: {msg.data}')
             conv_msg = TaskConvMsg()
             conv_msg.deserialize(msg=msg)
