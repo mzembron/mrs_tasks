@@ -121,14 +121,9 @@ class DefineTaskIntrest(State):
             print(f"[ DEBUG LOG ] Sending exec proposition of task {msg.short_id} to {msg.sender}")
             reply_msg.performative = MrsConvPerform.propose_exec_role
             reply_msg.data = [msg.sender]
-        else:
-            reply_msg.performative = MrsConvPerform.declare_coord_intrest
-            temp_coord_intrest = str(self._task_fsm.interest_desc.coordination) #TODO: remove coord intrest at all, 
-                                                                        # every agent should take part in supervising (!should it? - rethink)
-            return None
-            reply_msg.data = [temp_coord_intrest]
-        reply_msg.short_id = msg.short_id
-        return reply_msg
+            return reply_msg
+        else: #TODO: remove coord intrest at all,                                                     # every agent should take part in supervising (!should it? - rethink)
+            return
     
     def respond_to_exec_proposal(self, msg: TaskConvMsg):
         print(f"[ DEBUG LOG ] Received exec proposition from {msg.sender}")
