@@ -17,6 +17,8 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/TaskId.msg"
   "msg/TaskOutcome.msg"
   "msg/TaskStatus.msg"
+  "msg/TaskUpdate.msg"
+  "msg/TaskAlign.msg"
   DEPENDENCIES builtin_interfaces
 )
 
