@@ -42,9 +42,9 @@ class DummyTaskGenerator(Node):
 def main(args=None):
     rclpy.init(args=args)
     parser = argparse.ArgumentParser(description='Dummy Task Generator')
-    parser.add_argument('--max_messages', type=int, default=127, help='Maximum number of messages to publish')
+    parser.add_argument('--max', type=int, default=127, help='Maximum number of messages to publish')
     args = parser.parse_args()
-    max_messages = args.max_messages
+    max_messages = args.max
     minimal_publisher = DummyTaskGenerator(max_messages)
 
     rclpy.spin(minimal_publisher)
