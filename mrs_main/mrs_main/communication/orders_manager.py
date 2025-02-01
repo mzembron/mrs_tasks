@@ -2,7 +2,7 @@ import rclpy
 import mrs_main.common.constants as mrs_const
 
 from rclpy.node import Node, Publisher
-from mrs_msgs.msg import TaskDesc, TaskConv
+from mrs_msgs.msg import TaskDesc, TaskConv, TaskBacklog
 from mrs_main.tasks_management.task_manager import TaskManager
 from mrs_main.common.objects import IntrestDescription, TopicSubPub, TaskConvMsg, TaskData
 from mrs_main.common.conversation_data import MrsConvPerform
@@ -34,7 +34,13 @@ class OrdersManager(Node):
             callback=self.__task_definition_callback,
             qos_profile=self._qos_profile
         )
-
+        self._backlog_info_publisher = self.create_publisher(TaskBacklog, '/mrs_main/backlog_updates', qos_profile=self._qos_profile)
+        self._backlog_info_subscription = self.create_subscription(
+            msg_type=TaskBacklog,
+            topic='/mrs_main/backlog_updates',
+            callback=self.__update_backlog,
+            qos_profile=self._qos_profile
+        )
         self.task_topic_subpub_dict: dict[int, TopicSubPub] = {} 
 
         self.__task_manager = task_manager
@@ -93,3 +99,8 @@ class OrdersManager(Node):
         pub: Publisher = self.task_topic_subpub_dict[ros_msg.short_id].pub
         pub.publish(ros_msg)
 
+    def __publish_backlog_info(self, task_backlog: TaskBacklog):
+        pass
+
+    def __update_backlog(self, task_backlog: TaskBacklog):
+        pass
