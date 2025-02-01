@@ -1,2 +1,2 @@
-string robot_name
+string sender
 mrs_msgs/TaskDesc[] tasks
