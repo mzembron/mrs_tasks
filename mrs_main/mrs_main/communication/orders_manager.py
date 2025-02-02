@@ -100,6 +100,9 @@ class OrdersManager(Node):
         pub.publish(ros_msg)
 
     def __publish_backlog_info(self, task_backlog: TaskBacklog):
+        # 1: self.__task_manager.task_dict - make retreaving thread safe
+        # 2: dump task dict into TaskBacklog
+        # 3: publish
         pass
 
     def __update_backlog(self, task_backlog: TaskBacklog):
