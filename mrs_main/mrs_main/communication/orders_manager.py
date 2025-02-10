@@ -45,7 +45,7 @@ class OrdersManager(Node):
 
         self.__task_manager = task_manager
 
-        # self.create_timer(10.0, self.__publish_backlog_info) # utilize ros to publish backlog info
+        self.create_timer(5.0, self.__publish_backlog_info) # utilize ros to publish backlog info
 
     def __task_definition_callback(self, msg: TaskDesc):
         """ Callback for the generic topicwith defintion of any task (action entrypoint)"""
@@ -101,11 +101,12 @@ class OrdersManager(Node):
         pub: Publisher = self.task_topic_subpub_dict[ros_msg.short_id].pub
         pub.publish(ros_msg)
 
-    def __publish_backlog_info(self, task_backlog: TaskBacklog):
+    def __publish_backlog_info(self):
         # 1: self.__task_manager.task_dict - make retreaving thread safe
         # 2: dump task dict into TaskBacklog
         # 3: publish
-        pass
+        msg = TaskBacklog() # for now just empty msg
+        self._backlog_info_publisher.publish(msg)
 
     def __update_backlog(self, task_backlog: TaskBacklog):
         pass
