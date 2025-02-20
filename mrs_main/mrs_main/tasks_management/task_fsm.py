@@ -25,6 +25,10 @@ class TaskFSM:
         self.agent_selected_callaback = agent_selected_callaback
         self.agent_name = agent_name
 
+    @property
+    def current_state(self) -> str:
+        return self._state.__class__.__name__
+
     def get_next_message(self, msg: TaskConvMsg):
         """ Get response (or no response) to the received message based on the current state """
         return self._state.define_next(msg)
