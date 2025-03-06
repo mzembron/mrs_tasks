@@ -1,13 +1,14 @@
 
 import rclpy
+import sys
 from rclpy.node import Node
 from geometry_msgs.msg import PoseStamped
 from nav2_simple_commander.robot_navigator import BasicNavigator
 
 class TurtleBot3Navigator(Node):
-    def __init__(self, topic_name):
+    def __init__(self, topic_name, agent_name):
         super().__init__('turtlebot3_navigator')
-        self.navigator = BasicNavigator(namespace='/tb2')
+        self.navigator = BasicNavigator(namespace='/' + agent_name)
         self.goal_publisher = self.create_publisher(PoseStamped, topic_name, 10)
 
     def send_goal(self, x, y, yaw):
@@ -31,22 +32,23 @@ class TurtleBot3Navigator(Node):
         # Wait for the result
         result = self.navigator.getResult()
 
-        # # Check the result
-        # if result == NavigationResult.SUCCEEDED:
-        #     self.get_logger().info('Goal reached successfully!')
-        # else:
-        #     self.get_logger().info('Failed to reach the goal.')
+
 
 def main(args=None):
-    
-    rclpy.init()
     agent_name = 'tb2'
+    goal_x = 2.0
+    goal_y = 0.0
+    if (len(sys.argv)>1):
+        agent_name = sys.argv[1]
+        goal_x = float(sys.argv[2])
+        goal_y = float(sys.argv[3])
+    rclpy.init()
     topic_name = '/' + agent_name + '/goal_pose'  # Replace with your specific topic name
-    navigator = TurtleBot3Navigator(topic_name)
+    navigator = TurtleBot3Navigator(topic_name, agent_name)
 
     try:
         # Example goal coordinates (x, y, yaw)
-        navigator.send_goal(0.0, 1.0, 0.0)
+        navigator.send_goal(goal_x, goal_y, 0.0)
     except KeyboardInterrupt:
         pass
     finally:
