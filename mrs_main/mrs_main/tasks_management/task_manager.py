@@ -22,7 +22,7 @@ class TaskManager:
     def task_dict(self):
         return self._task_dict
 
-    def receive_task(self, short_id: int, task_desc: str, task_finished_callback):
+    def receive_task(self, short_id: int, task_desc: str, task_finished_callback, orders_manager):
         """ Method receives the task info, creates the task object, and begins its management """
         task_data = TaskData.from_task_definition(short_id, task_desc)
         self._dependency_manager.introduce_task_dependencies(short_id, task_data.dependencies)
@@ -35,6 +35,7 @@ class TaskManager:
                             interest_desc=self._knowledge_base.get_intrest_desc(task_data), # input 
                             task_finished_callback=task_finished_callback_extended,
                             agent_selected_callaback=callback_with_task_id,
+                            orders_manager=orders_manager,
                             agent_name=self.agent_name
                             )
         print(f'[ DEBUG LOG ] Task of type: {task_desc}, received by TaskManager!')

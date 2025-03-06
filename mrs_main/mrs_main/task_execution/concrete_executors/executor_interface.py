@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 class AbstractExecutor(ABC):
     """ Interface for task executor allowing to support new types of agents """
 
-    def __init__(self, callback_on_finish):
+    def __init__(self, callback_on_finish, orders_manager=None):
         """ Initialize the executor with a callback function to be called on finish """
         self.callback_on_finish = callback_on_finish
     @abstractmethod

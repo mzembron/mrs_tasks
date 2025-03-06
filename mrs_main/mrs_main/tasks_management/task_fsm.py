@@ -14,11 +14,12 @@ class TaskFSM:
                     interest_desc: IntrestDescription,
                     task_finished_callback: Callable[..., Any],
                     agent_selected_callaback: Callable[..., Any],
+                    orders_manager,
                     concrete_executor: Type[AbstractExecutor]=DummyExecutor,
                     agent_name: str = ''
                     ) -> None:
         self.transition_to(DefineTaskIntrest())
-        self._executor = TaskExecutor(task_data, self.receive_task_finished_signal, concrete_executor)
+        self._executor = TaskExecutor(task_data, self.receive_task_finished_signal, concrete_executor, orders_manager)
         self.task_data = task_data
         self.interest_desc = interest_desc
         self.task_finished_callback = task_finished_callback
