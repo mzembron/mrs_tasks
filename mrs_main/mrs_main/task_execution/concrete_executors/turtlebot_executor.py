@@ -7,10 +7,11 @@ import subprocess
 class TurtlebotExecutor(AbstractExecutor):
     """ class handles execution of tasks for specific type of agent,
     in this case it is a dummy executor, which does nothing """
-    def __init__(self, callback_on_finish, orders_manager , task_exec_length=5) -> None:
+    def __init__(self, callback_on_finish, orders_manager, agent_name, task_exec_length=5) -> None:
         super().__init__(callback_on_finish)
         self.task_exec_length = task_exec_length
         self.orders_manager = orders_manager
+        self.agent_name = agent_name
         self.execution_thread = threading.Thread(target=self.mock_task_execution)
 
     def start_execution(self):
@@ -38,7 +39,10 @@ class TurtlebotExecutor(AbstractExecutor):
 
     def start_new_script(self, script_path):
         try:
-            result = subprocess.run(['python3', script_path, 'tb1', str(3.0), str(0.0) ], capture_output=True, text=True)
+            y_goal = 1.0 
+            if self.agent_name == 'tb1':
+                y_goal = -1.0
+            result = subprocess.run(['python3', script_path, self.agent_name, str(-3.0), str(y_goal) ], capture_output=True, text=True)
             if result.returncode == 0:
                 print("Script output:", result.stdout)
             else:

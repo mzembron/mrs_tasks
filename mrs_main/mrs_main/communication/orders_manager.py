@@ -45,7 +45,7 @@ class OrdersManager(Node):
 
         self.__task_manager = task_manager
 
-        self.create_timer(5.0, self.__publish_backlog_info) # utilize ros to publish backlog info
+        # self.create_timer(5.0, self.__publish_backlog_info) # utilize ros to publish backlog info
 
     def __task_definition_callback(self, msg: TaskDesc):
         """ Callback for the generic topicwith defintion of any task (action entrypoint)"""
