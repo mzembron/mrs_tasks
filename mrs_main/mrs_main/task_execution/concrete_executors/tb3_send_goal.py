@@ -4,6 +4,8 @@ import sys
 from rclpy.node import Node
 from geometry_msgs.msg import PoseStamped
 from nav2_simple_commander.robot_navigator import BasicNavigator
+import time
+
 
 class TurtleBot3Navigator(Node):
     def __init__(self, topic_name, agent_name):
@@ -30,8 +32,11 @@ class TurtleBot3Navigator(Node):
         self.navigator.goToPose(goal_pose)
 
         # Wait for the result
-        result = self.navigator.getResult()
-
+        # result = self.navigator.getResult()
+        while not self.navigator.isTaskComplete():
+            print('waiting for goal to be reached...')
+            time.sleep(1)
+        print('goal achieved')
 
 
 def main(args=None):
