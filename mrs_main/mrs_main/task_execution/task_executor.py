@@ -10,7 +10,7 @@ class TaskExecutor:
         # TODO: change concrete_executor to required argument, 
         # and use the concrete_executor object
         # self._concrete_executor = concrete_executor(callback_on_finish)
-        self._concrete_executor = TurtlebotExecutor(callback_on_finish, orders_manager=orders_manager, agent_name=agent_name)
+        self._concrete_executor = TurtlebotExecutor(callback_on_finish, orders_manager=orders_manager, agent_name=agent_name, task_data=task_data)
 
         
 
