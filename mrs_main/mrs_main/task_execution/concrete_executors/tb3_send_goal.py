@@ -5,13 +5,29 @@ from rclpy.node import Node
 from geometry_msgs.msg import PoseStamped
 from nav2_simple_commander.robot_navigator import BasicNavigator
 import time
+import random
+
+ROOM_DICT = {
+    1 : [(-6.0, 1.0), (-6.0, 7.0), (-8.0, 7.0), (-8.0, -1.0), (-6.0, 1.0) ],
+    2 : [( -3.0, 1.0), (-3.0, -1.0), (4.0, -1.0), (4.0 , 1.0) ],
+    3 : [(-3.0, -4.5), (-8.0, -4.5), (-8.0, -7.5), (-3.0, -7.5), (-3.0, -4.5) ],
+    6 : [(-0.5, -4.5), (-0.5, -7.5), (8.5, -7.5), (8.5, -4.5), (-0.5, -4.5) ],
+    5:  [(5.0, -2.0), (9.0, -2.0), (9.0, 7.0), (5.0, 7.0), (5.0, -2.0) ],
+    4:  [(2.0, 7.0), (-4.0, 7.0), (-4.0, 3.5), (2.0, 3.5) ],
+}
 
 
 class TurtleBot3Navigator(Node):
     def __init__(self, topic_name, agent_name):
         super().__init__('turtlebot3_navigator')
+        time.sleep(random.randint(1, 3))
         self.navigator = BasicNavigator(namespace='/' + agent_name)
         self.goal_publisher = self.create_publisher(PoseStamped, topic_name, 10)
+
+    def inspect_room(self, room_number):
+        room_points = ROOM_DICT[room_number]
+        for point in room_points:
+            self.send_goal(point[0], point[1], 0.0)
 
     def send_goal(self, x, y, yaw):
         # Wait for navigation to fully activate
@@ -40,20 +56,18 @@ class TurtleBot3Navigator(Node):
 
 
 def main(args=None):
-    agent_name = 'tb2'
-    goal_x = 2.0
-    goal_y = 0.0
+    print('@@@@@@@@@@@ starting separate script @@@@@@@@@@@@@')
+    agent_name = ''
     if (len(sys.argv)>1):
         agent_name = sys.argv[1]
-        goal_x = float(sys.argv[2])
-        goal_y = float(sys.argv[3])
+        room_number = int(sys.argv[2])
     rclpy.init()
-    topic_name = '/' + agent_name + '/goal_pose'  # Replace with your specific topic name
+    topic_name = '/' + agent_name + '/goal_pose'
     navigator = TurtleBot3Navigator(topic_name, agent_name)
 
     try:
         # Example goal coordinates (x, y, yaw)
-        navigator.send_goal(goal_x, goal_y, 0.0)
+        navigator.inspect_room(room_number)
     except KeyboardInterrupt:
         pass
     finally:
