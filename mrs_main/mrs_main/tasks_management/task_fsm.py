@@ -14,10 +14,12 @@ class TaskFSM:
                     interest_desc: IntrestDescription,
                     task_finished_callback: Callable[..., Any],
                     agent_selected_callaback: Callable[..., Any],
+                    state_changed_callback: Callable[..., Any],
                     orders_manager,
                     concrete_executor: Type[AbstractExecutor]=DummyExecutor,
                     agent_name: str = ''
                     ) -> None:
+        self.state_change_callback = state_changed_callback
         self.transition_to(DefineTaskIntrest())
         self._executor = TaskExecutor(task_data, self.receive_task_finished_signal, concrete_executor, orders_manager, agent_name=agent_name)
         self.task_data = task_data
@@ -38,6 +40,7 @@ class TaskFSM:
         """ Change the state of the task FSM """
         self._state = state
         self._state.task_fsm = self
+        self.state_change_callback(state.__class__.__name__)
         self._state.change_state_routine()
     
     def resume_after_finished_dependencies(self) -> None:
@@ -133,7 +136,7 @@ class DefineTaskIntrest(State):
     def respond_to_exec_proposal(self, msg: TaskConvMsg):
         print(f"[ DEBUG LOG ] Received exec proposition from {msg.sender}")
         if (str(msg.data[0]) == self._task_fsm.agent_name):
-            print('[DEBUG LOG] %%%%%%%%%%%%%%%% YaY %%%%%%%%%%%%%%%%')
+            print('[ DEBUG LOG ] %%%%%%%%%%%%%%%% Accepting Task %%%%%%%%%%%%%%%%')
             reply_msg = TaskConvMsg()
             reply_msg.short_id = msg.short_id
             reply_msg.performative = MrsConvPerform.accept_exec_proposal

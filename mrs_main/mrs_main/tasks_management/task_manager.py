@@ -14,6 +14,7 @@ class TaskManager:
             definition of the next behavior (e.g. reply messages), etc. """
         self.agent_name: str = agent_name
         self._task_dict: dict[int, TaskFSM] = {} # all sensed tasks, not only the ones handled by this agent
+        self._task_states_list = ['init']
         self._dependency_manager = DependencyManager(self._task_dict)
         self._scheduler = Scheduler(self._dependency_manager, start_kicking_thread=start_scheduler_kicking_thread)
         self._knowledge_base = KnowledgeBase(agent_type)
@@ -27,6 +28,8 @@ class TaskManager:
         task_data = TaskData.from_task_definition(short_id, task_desc)
         self._dependency_manager.introduce_task_dependencies(short_id, task_data.dependencies)
         callback_with_task_id = partial(self.__agent_selected_to_execute_callback, short_id)
+        self._task_states_list.append('init')
+        callback_state_changed = partial(self.change_task_state_in_dict, short_id)
         task_finished_callback_extended = lambda task_data: (task_finished_callback(task_data),
                                                             self._scheduler.handle_current_task_finished(short_id),
                                                             self._dependency_manager.update_dependencies(short_id))
@@ -35,6 +38,7 @@ class TaskManager:
                             interest_desc=self._knowledge_base.get_intrest_desc(task_data), # input 
                             task_finished_callback=task_finished_callback_extended,
                             agent_selected_callaback=callback_with_task_id,
+                            state_changed_callback=callback_state_changed,
                             orders_manager=orders_manager,
                             agent_name=self.agent_name
                             )
@@ -58,3 +62,11 @@ class TaskManager:
         print(f'[ DEBUG LOG ] Task {task_id} appended to scheduler!')
         self._scheduler.append_task(self._task_dict[task_id]) # from now on scheduler manages the task FSM
 
+    def change_task_state_in_dict(self, task_id: int, new_state):
+        """ Changes the state of the task in the task dict """
+        for x in self._task_states_list: print(x)
+
+        self._task_states_list[task_id] = str(new_state)
+
+    def get_states_list(self):
+        return self._task_states_list
