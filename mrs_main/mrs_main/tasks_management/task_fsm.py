@@ -8,6 +8,10 @@ from mrs_main.task_execution.task_executor import TaskExecutor
 from mrs_main.task_execution.concrete_executors.dummy_executor import DummyExecutor
 from mrs_main.task_execution.concrete_executors.executor_interface import AbstractExecutor
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 class TaskFSM:
 
     def __init__(self, task_data: TaskData,
@@ -19,6 +23,7 @@ class TaskFSM:
                     concrete_executor: Type[AbstractExecutor]=DummyExecutor,
                     agent_name: str = ''
                     ) -> None:
+        self._state = None
         self.state_change_callback = state_changed_callback
         self.transition_to(DefineTaskIntrest())
         self._executor = TaskExecutor(task_data, self.receive_task_finished_signal, concrete_executor, orders_manager, agent_name=agent_name)
@@ -38,10 +43,14 @@ class TaskFSM:
 
     def transition_to(self, state):
         """ Change the state of the task FSM """
+        state_data = {}
+        if self._state is not None: state_data = self._state.state_data
         self._state = state
         self._state.task_fsm = self
-        self.state_change_callback(state.__class__.__name__)
+        self._state.state_data = state_data
+        self.state_change_callback(state.__class__.__name__, self._state.state_data)
         self._state.change_state_routine()
+         # clear the state data
     
     def resume_after_finished_dependencies(self) -> None:
         """ Resume task (move to task-execution state) after all dependencies are resolved """
@@ -62,6 +71,7 @@ class TaskFSM:
         self._state.on_task_finished()
 
 class State(ABC):
+    state_data = {}
     @property
     def task(self) -> TaskFSM:
         return self._task_fsm
@@ -125,22 +135,24 @@ class DefineTaskIntrest(State):
         partner_intrest = float(msg.data[0])
         print(f"[ DEBUG LOG ] Received partner's interest {partner_intrest}")
         reply_msg = TaskConvMsg() 
+        self.state_data
         if (partner_intrest > self.INTREST_THRESHOLD):
             print(f"[ DEBUG LOG ] Sending exec proposition of task {msg.short_id} to {msg.sender}")
             reply_msg.performative = MrsConvPerform.propose_exec_role
             reply_msg.data = [msg.sender]
             return reply_msg
-        else: #TODO: remove coord intrest at all,                                                     # every agent should take part in supervising (!should it? - rethink)
+        else:
             return
     
     def respond_to_exec_proposal(self, msg: TaskConvMsg):
-        print(f"[ DEBUG LOG ] Received exec proposition from {msg.sender}")
+        logger.info(f"[ DEBUG LOG ] Received exec proposition from {msg.sender}")
         if (str(msg.data[0]) == self._task_fsm.agent_name):
-            print('[ DEBUG LOG ] %%%%%%%%%%%%%%%% Accepting Task %%%%%%%%%%%%%%%%')
+            logger.info('[ DEBUG LOG ] %%%%%%%%%%%%%%%% Accepting Task %%%%%%%%%%%%%%%%')
             reply_msg = TaskConvMsg()
             reply_msg.short_id = msg.short_id
             reply_msg.performative = MrsConvPerform.accept_exec_proposal
             reply_msg.data = [msg.sender]
+            self.state_data['executor'] = self._task_fsm.agent_name
             self._task_fsm.transition_to(WaitForExec())
             return reply_msg
         else:
@@ -149,6 +161,7 @@ class DefineTaskIntrest(State):
     def respond_to_exec_acceptance(self, msg):
         if(msg.sender != self._task_fsm.agent_name):
             if (self._task_fsm.interest_desc.execution <= self.INTREST_THRESHOLD):
+                self.state_data['executor'] = msg.sender
                 self._task_fsm.transition_to(SuperviseTask())
     
 

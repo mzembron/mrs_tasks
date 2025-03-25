@@ -1,13 +1,18 @@
 import rclpy
+import time
+import logging
+import json
 import mrs_main.common.constants as mrs_const
 
 from rclpy.node import Node, Publisher
-from mrs_msgs.msg import TaskDesc, TaskConv, TaskBacklog, TasksStatesDeclaration
+from mrs_msgs.msg import TaskDesc, TaskConv, TaskBacklog, TasksStatesDeclaration, TaskAlign, TaskUpdate 
 from mrs_main.tasks_management.task_manager import TaskManager
 from mrs_main.common.objects import IntrestDescription, TopicSubPub, TaskConvMsg, TaskData
 from mrs_main.common.conversation_data import MrsConvPerform
 
 from rclpy.qos import QoSProfile, ReliabilityPolicy
+
+logger = logging.getLogger(__name__)
 
 class OrdersManager(Node):
     """ Orders Manager takes care of communication in the contexts of 
@@ -35,26 +40,29 @@ class OrdersManager(Node):
             qos_profile=self._qos_profile
         )
         self._tasks_states_publisher = self.create_publisher(TasksStatesDeclaration, '/mrs_main/tasks_states_declaration', qos_profile=self._qos_profile)
-        # self._backlog_info_publisher = self.create_publisher(TaskBacklog, '/mrs_main/backlog_updates', qos_profile=self._qos_profile)
-        # self._backlog_info_subscription = self.create_subscription(
-        #     msg_type=TaskBacklog,
-        #     topic='/mrs_main/backlog_updates',
-        #     callback=self.__update_backlog,
-        #     qos_profile=self._qos_profile
-        # )
+        self._backlog_info_publisher = self.create_publisher(TaskBacklog, '/mrs_main/backlog_updates', qos_profile=self._qos_profile)
+        self._align_publisher = self.create_publisher(TaskAlign, '/mrs_main/tasks_align', qos_profile=self._qos_profile)
+        self._backlog_info_subscription = self.create_subscription(
+            msg_type=TaskAlign,
+            topic='/mrs_main/tasks_align',
+            callback=self.__update_backlog,
+            qos_profile=self._qos_profile
+        )
         self.task_topic_subpub_dict: dict[int, TopicSubPub] = {} 
 
         self.__task_manager = task_manager
 
         self.create_timer(1.0, self.__publish_tasks_states_decalration) # utilize ros to publish backlog info
+        self.create_timer(1.0, self.__publish_backlog_info)
 
     def __task_definition_callback(self, msg: TaskDesc):
         """ Callback for the generic topicwith defintion of any task (action entrypoint)"""
         self.get_logger().info(f'I heard task: {msg.type}')
         
         self.__create_sub_pub_for_task(msg.short_id)
-        self.__task_manager.receive_task(short_id=msg.short_id, task_desc=msg.data, task_finished_callback=self.__publish_task_finished_info, orders_manager=self)
-        intrest_estimation: IntrestDescription = self.__task_manager.get_intrest(msg.short_id)
+        intrest_estimation: IntrestDescription = self.__task_manager.receive_task(short_id=msg.short_id, task_desc=msg.data, task_finished_callback=self.__publish_task_finished_info, orders_manager=self)
+        # intrest_estimation: IntrestDescription = self.__task_manager.get_intrest(msg.short_id)
+        # time.sleep(3) # wait for others tio create theirs publishers
         self.__publish_intrest(msg.short_id, intrest_estimation)
 
     def __create_sub_pub_for_task(self, task_id):
@@ -106,8 +114,20 @@ class OrdersManager(Node):
         # 1: self.__task_manager.task_dict - make retreaving thread safe
         # 2: dump task dict into TaskBacklog
         # 3: publish
-        msg = TaskBacklog() # for now just empty msg
-        self._backlog_info_publisher.publish(msg)
+        states_info =self.__task_manager.get_states_list()
+        states_data = self.__task_manager.get_states_data()
+        align_msg = TaskAlign() # for now just empty msg
+        align_msg.sender = self.agent_name
+        for idx, state in enumerate(states_info):
+            if state == 'init':
+                continue
+            update_msg = TaskUpdate()
+            
+            update_msg.task_state = state
+            update_msg.task_desc.short_id = idx
+            update_msg.task_conv_data = json.dumps(states_data[idx])
+            align_msg.update_list.append(update_msg)
+        self._align_publisher.publish(align_msg)
 
     def __publish_tasks_states_decalration(self):
         msg = TasksStatesDeclaration()
@@ -116,4 +136,7 @@ class OrdersManager(Node):
         self._tasks_states_publisher.publish(msg)
 
     def __update_backlog(self, task_backlog: TaskBacklog):
+        
+        # task manager compare backlog
         pass
+
