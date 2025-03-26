@@ -26,6 +26,8 @@ class TaskFSM:
         self._state = None
         self.state_change_callback = state_changed_callback
         self.transition_to(DefineTaskIntrest())
+        self._state.state_data['estimations'] = {}
+        self._state.state_data['estimations'][agent_name] = interest_desc.execution
         self._executor = TaskExecutor(task_data, self.receive_task_finished_signal, concrete_executor, orders_manager, agent_name=agent_name)
         self.task_data = task_data
         self.interest_desc = interest_desc
@@ -134,6 +136,7 @@ class DefineTaskIntrest(State):
     def respond_to_coord_intrest_declaration(self, msg: TaskConvMsg) -> TaskConvMsg:
         partner_intrest = float(msg.data[0])
         print(f"[ DEBUG LOG ] Received partner's interest {partner_intrest}")
+        self.state_data['estimations'][msg.sender]  = partner_intrest
         reply_msg = TaskConvMsg() 
         self.state_data
         if (partner_intrest > self.INTREST_THRESHOLD):
