@@ -132,18 +132,24 @@ class State(ABC):
         return
 
 class DefineTaskIntrest(State):
-    INTREST_THRESHOLD = 0.5
+    # INTREST_THRESHOLD = 0.5
     def respond_to_coord_intrest_declaration(self, msg: TaskConvMsg) -> TaskConvMsg:
         partner_intrest = float(msg.data[0])
         print(f"[ DEBUG LOG ] Received partner's interest {partner_intrest}")
         self.state_data['estimations'][msg.sender]  = partner_intrest
         reply_msg = TaskConvMsg() 
         self.state_data
-        if (partner_intrest > self.INTREST_THRESHOLD):
-            print(f"[ DEBUG LOG ] Sending exec proposition of task {msg.short_id} to {msg.sender}")
+        if ( len([key for key in self.state_data['estimations']]))>2:
+            best_executor = min(self.state_data['estimations'], key=self.state_data['estimations'].get)
+            print(f"[ DEBUG LOG ] Sending exec proposition of task {msg.short_id} to {best_executor}")
             reply_msg.performative = MrsConvPerform.propose_exec_role
-            reply_msg.data = [msg.sender]
+            reply_msg.data = [best_executor]
             return reply_msg
+        # if (partner_intrest > self.INTREST_THRESHOLD):
+        #     print(f"[ DEBUG LOG ] Sending exec proposition of task {msg.short_id} to {msg.sender}")
+        #     reply_msg.performative = MrsConvPerform.propose_exec_role
+        #     reply_msg.data = [msg.sender]
+        #     return reply_msg
         else:
             return
     
@@ -163,9 +169,9 @@ class DefineTaskIntrest(State):
         
     def respond_to_exec_acceptance(self, msg):
         if(msg.sender != self._task_fsm.agent_name):
-            if (self._task_fsm.interest_desc.execution <= self.INTREST_THRESHOLD):
-                self.state_data['executor'] = msg.sender
-                self._task_fsm.transition_to(SuperviseTask())
+            # if (self._task_fsm.interest_desc.execution <= self.INTREST_THRESHOLD):
+            self.state_data['executor'] = msg.sender
+            self._task_fsm.transition_to(SuperviseTask())
     
 
 class WaitForExec(State):
