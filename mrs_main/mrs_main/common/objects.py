@@ -76,3 +76,11 @@ class TaskData:
         ros_msg.short_id = self.short_id
         ros_msg.sender = agent_name
         return ros_msg
+    
+# -------------
+class Position:
+    x: float
+    y: float
+    def __init__(self, x: float, y: float):
+        self.x = x
+        self.y = y

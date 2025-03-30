@@ -10,6 +10,9 @@ from mrs_main.tasks_management.task_manager import TaskManager
 from mrs_main.common.objects import IntrestDescription, TopicSubPub, TaskConvMsg, TaskData
 from mrs_main.common.conversation_data import MrsConvPerform
 
+# agent type specific
+from nav_msgs.msg import Odometry
+
 from rclpy.qos import QoSProfile, ReliabilityPolicy
 
 logger = logging.getLogger(__name__)
@@ -48,6 +51,8 @@ class OrdersManager(Node):
             callback=self.__update_backlog,
             qos_profile=self._qos_profile
         )
+
+        self.create_subscription(msg_type=Odometry, topic='/' + self.agent_name+'/odom', callback=self.__update_knowledge_base, qos_profile =10)
         self.task_topic_subpub_dict: dict[int, TopicSubPub] = {} 
 
         self.__task_manager = task_manager
@@ -139,4 +144,7 @@ class OrdersManager(Node):
         
         # task manager compare backlog
         pass
+
+    def __update_knowledge_base(self, msg: Odometry):
+        self.__task_manager._knowledge_base.update_position(msg.pose.pose.position.x, msg.pose.pose.position.y)
 
