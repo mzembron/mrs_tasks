@@ -28,7 +28,20 @@ class KnowledgeBase:
         pass
 
     def get_intrest_desc_search_task(self, task_data: TaskData, prev_task_end_time) -> IntrestDescription:
-        pass
+        if (task_data.short_id > 3 and task_data.short_id < 10):
+            room_coords = ROOM_DICT[task_data.short_id-3]
+            distance = math.sqrt((self.current_position.x -room_coords[0])**2 + (self.current_position.y - room_coords[1])**2)
+            return IntrestDescription(distance + prev_task_end_time, distance + prev_task_end_time)
+
+
+        if (self._agent_type % 3 == 0 and task_data.short_id % 3 == 0):
+            return IntrestDescription(execution=102, coordination=123)
+        elif (self._agent_type % 3 == 1 and task_data.short_id % 3 == 1):
+            return IntrestDescription(execution=33, coordination=33)
+        elif (self._agent_type % 3 == 2 and task_data.short_id % 3 == 2):
+            return IntrestDescription(execution=45, coordination=33)
+        else:
+            return IntrestDescription(execution=1043, coordination=1232)
 
     def get_intrest_desc(self, task_data: TaskData) -> IntrestDescription:
         """ Returns the interest description for the given task """

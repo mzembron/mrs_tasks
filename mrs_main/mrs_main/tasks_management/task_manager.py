@@ -44,8 +44,10 @@ class TaskManager:
                                                             self._scheduler.handle_current_task_finished(short_id),
                                                             self._dependency_manager.update_dependencies(short_id))
                                             # task_data will be passed to lambda by the TaskFSM
+
+        estimation = self._knowledge_base.get_intrest_desc_search_task(task_data, self._scheduler.get_estimated_time())
         task_fsm = TaskFSM( task_data=task_data,
-                            interest_desc=self._knowledge_base.get_intrest_desc(task_data), # input 
+                            interest_desc=estimation,
                             task_finished_callback=task_finished_callback_extended,
                             agent_selected_callaback=callback_with_task_id,
                             state_changed_callback=callback_state_changed,
@@ -54,7 +56,7 @@ class TaskManager:
                             )
         logger.info(f' Task of type: {task_desc}, received by TaskManager!')
         self._task_dict[short_id] = task_fsm
-        return self._knowledge_base.get_intrest_desc(self._task_dict[short_id].task_data)
+        return estimation
 
     # def get_intrest(self, task_id: int):
     #     """ Returns the 'interest description' for the given task """

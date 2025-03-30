@@ -31,6 +31,16 @@ class Scheduler:
         if self.current_task is None:
             self.get_next_task()
 
+    def get_estimated_time(self):
+        """ Returns estimated time for execution of all currently assigned tasks"""
+        estimation = 0
+        for task_fsm in self.backlog:
+            if task_fsm.task_data.short_id  < 4:
+                continue
+            estimation += 20
+        return estimation
+
+
     @synchronized(lock_attr_name='_backlog_lock')
     def handle_current_task_finished(self, task_id: int):
         """ Handles the task finished event """
@@ -63,7 +73,9 @@ class Scheduler:
             if self._kicking_thread_terminate_event.is_set():
                 return
             sleep(5)
-            print(f"[ DEBUG LOG ] [ SCHEDULER ] !! checking for tasks to execute !! Current task is {self.current_task}")
+            # print(f"[ DEBUG LOG ] [ SCHEDULER ] !! checking for tasks to execute !! Current task is {self.current_task}")
+            print(f"[ DEBUG LOG ] [ SCHEDULER ] !! checking for tasks to execute !!")
+            
             with self._backlog_lock:
                 if (self.current_task is None) and len(self.backlog) > 0:
                     self.get_next_task()
