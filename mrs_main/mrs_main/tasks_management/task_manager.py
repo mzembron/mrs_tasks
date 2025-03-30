@@ -20,8 +20,13 @@ class TaskManager:
             definition of the next behavior (e.g. reply messages), etc. """
         self.agent_name: str = agent_name
         self._task_dict: dict[int, TaskFSM] = {} # all sensed tasks, not only the ones handled by this agent
+
+        # task info lists for task alignment algorithm
         self._task_states_list = ['init'] * mrs_config.MAX_TASKS_SUPPORTED
         self._task_states_data= [{}]*mrs_config.MAX_TASKS_SUPPORTED
+        self._task_desc_list = [''] * mrs_config.MAX_TASKS_SUPPORTED
+
+
         self._dependency_manager = DependencyManager(self._task_dict)
         self._scheduler = Scheduler(self._dependency_manager, start_kicking_thread=start_scheduler_kicking_thread)
         # self._scheduler = Scheduler(self._dependency_manager, start_kicking_thread=False)
@@ -33,11 +38,13 @@ class TaskManager:
     def task_dict(self):
         return self._task_dict
 
-    def receive_task(self, short_id: int, task_desc: str, task_finished_callback, orders_manager):
+    def receive_task(self, short_id: int, task_desc, task_data: str, task_finished_callback, orders_manager):
         """ Method receives the task info, creates the task object, and begins its management """
-        task_data = TaskData.from_task_definition(short_id, task_desc)
+        
         self._dependency_manager.introduce_task_dependencies(short_id, task_data.dependencies)
-        # prepare callbacks for task handling
+        self._task_desc_list[short_id] = task_desc
+
+        # prepare callbacks for handling task
         callback_with_task_id = partial(self.__agent_selected_to_execute_callback, short_id)
         callback_state_changed = partial(self.change_task_state_in_dict, short_id)
         task_finished_callback_extended = lambda task_data: (task_finished_callback(task_data),
@@ -84,8 +91,14 @@ class TaskManager:
         self._task_states_data[task_id] = state_data
 
 
+    def receive_task_from_alignment_algorithm(self, task_id: int, task_desc: str):
+        pass
+
     def get_states_list(self):
         return self._task_states_list
     
     def get_states_data(self):
         return self._task_states_data
+
+    def get_task_desc_list(self):
+        return self._task_desc_list

@@ -48,7 +48,7 @@ class OrdersManager(Node):
         self._backlog_info_subscription = self.create_subscription(
             msg_type=TaskAlign,
             topic='/mrs_main/tasks_align',
-            callback=self.__update_backlog,
+            callback=self.__align_tasks,
             qos_profile=self._qos_profile
         )
 
@@ -65,7 +65,9 @@ class OrdersManager(Node):
         self.get_logger().info(f'I heard task: {msg.type}')
         
         self.__create_sub_pub_for_task(msg.short_id)
-        intrest_estimation: IntrestDescription = self.__task_manager.receive_task(short_id=msg.short_id, task_desc=msg.data, task_finished_callback=self.__publish_task_finished_info, orders_manager=self)
+        task_data = TaskData.from_task_definition(msg.short_id, msg.data)
+        task_desc = msg.data
+        intrest_estimation: IntrestDescription = self.__task_manager.receive_task(short_id=msg.short_id, task_desc=task_desc , task_data=task_data, task_finished_callback=self.__publish_task_finished_info, orders_manager=self)
         # intrest_estimation: IntrestDescription = self.__task_manager.get_intrest(msg.short_id)
         # time.sleep(3) # wait for others tio create theirs publishers
         self.__publish_intrest(msg.short_id, intrest_estimation)
@@ -121,6 +123,7 @@ class OrdersManager(Node):
         # 3: publish
         states_info =self.__task_manager.get_states_list()
         states_data = self.__task_manager.get_states_data()
+        task_desc_list = self.__task_manager.get_task_desc_list()
         align_msg = TaskAlign() # for now just empty msg
         align_msg.sender = self.agent_name
         for idx, state in enumerate(states_info):
@@ -130,6 +133,7 @@ class OrdersManager(Node):
             
             update_msg.task_state = state
             update_msg.task_desc.short_id = idx
+            update_msg.task_desc.data = task_desc_list[idx] # TODO: naming misconception, to be fixed
             update_msg.task_conv_data = json.dumps(states_data[idx])
             align_msg.update_list.append(update_msg)
         self._align_publisher.publish(align_msg)
@@ -140,10 +144,21 @@ class OrdersManager(Node):
         msg.tasks_states = self.__task_manager.get_states_list()
         self._tasks_states_publisher.publish(msg)
 
-    def __update_backlog(self, task_backlog: TaskBacklog):
-        
+    def __align_tasks(self, align_msg: TaskAlign):
         # task manager compare backlog
-        pass
+        if align_msg.sender == self.agent_name:
+            return
+        
+        states_info =self.__task_manager.get_states_list()
+        for task_align in align_msg.update_list:
+            align_task_state = task_align.task_state
+            curr_task_state = states_info[task_align.task_desc.short_id]
+            if curr_task_state == 'init' and align_task_state != 'init':
+                logger.warning(f'Found mismatch at the definition of tasks for task id: {task_align.task_desc.short_id}, curr state: init, align state: {align_task_state}')
+                logger.info(' -------------------- initializing task from task assignment --------------------')
+                self.__create_sub_pub_for_task(task_align.task_desc.short_id)
+                task_data = TaskData.from_task_definition(task_align.task_desc.short_id, task_align.task_desc.data)
+                intrest_estimation: IntrestDescription = self.__task_manager.receive_task(short_id=task_align.task_desc.short_id, task_desc=task_align.task_desc.data, task_data=task_data, task_finished_callback=self.__publish_task_finished_info, orders_manager=self)
 
     def __update_knowledge_base(self, msg: Odometry):
         self.__task_manager._knowledge_base.update_position(msg.pose.pose.position.x, msg.pose.pose.position.y)
