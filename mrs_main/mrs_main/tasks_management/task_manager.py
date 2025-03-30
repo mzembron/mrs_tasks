@@ -91,8 +91,11 @@ class TaskManager:
         self._task_states_data[task_id] = state_data
 
 
-    def receive_task_from_alignment_algorithm(self, task_id: int, task_desc: str):
-        pass
+    def update_task_state_from_alignment(self, task_id: int, new_state, state_data):
+        # First adjust the state
+        if new_state == 'WaitForExec' or new_state == 'ExecTask':
+            new_state = 'SuperviseTask'
+        self._task_dict[task_id].update_state_from_alignment(new_state, state_data)
 
     def get_states_list(self):
         return self._task_states_list

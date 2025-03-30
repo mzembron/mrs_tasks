@@ -150,15 +150,24 @@ class OrdersManager(Node):
             return
         
         states_info =self.__task_manager.get_states_list()
-        for task_align in align_msg.update_list:
-            align_task_state = task_align.task_state
-            curr_task_state = states_info[task_align.task_desc.short_id]
+        for task_update in align_msg.update_list:
+            align_task_state = task_update.task_state
+            task_id = task_update.task_desc.short_id
+            curr_task_state = states_info[task_id]
             if curr_task_state == 'init' and align_task_state != 'init':
-                logger.warning(f'Found mismatch at the definition of tasks for task id: {task_align.task_desc.short_id}, curr state: init, align state: {align_task_state}')
+                logger.warning(f'Found mismatch at the definition of tasks for task id: {task_id}, curr state: init, align state: {align_task_state}')
                 logger.info(' -------------------- initializing task from task assignment --------------------')
-                self.__create_sub_pub_for_task(task_align.task_desc.short_id)
-                task_data = TaskData.from_task_definition(task_align.task_desc.short_id, task_align.task_desc.data)
-                intrest_estimation: IntrestDescription = self.__task_manager.receive_task(short_id=task_align.task_desc.short_id, task_desc=task_align.task_desc.data, task_data=task_data, task_finished_callback=self.__publish_task_finished_info, orders_manager=self)
+                self.__create_sub_pub_for_task(task_id)
+                task_data = TaskData.from_task_definition(task_id, task_update.task_desc.data)
+                intrest_estimation: IntrestDescription = self.__task_manager.receive_task(short_id=task_id, task_desc=task_update.task_desc.data, task_data=task_data, task_finished_callback=self.__publish_task_finished_info, orders_manager=self)
+                if (align_task_state == 'DefineTaskIntrest'):
+                    self.__publish_intrest(task_id, intrest_estimation)
+                else:
+                    updated_conv_data = json.loads(task_update.task_conv_data) # for now just copy the data
+                    self.__task_manager.update_task_state_from_alignment(task_id, align_task_state, updated_conv_data)
+
+                    
+                
 
     def __update_knowledge_base(self, msg: Odometry):
         self.__task_manager._knowledge_base.update_position(msg.pose.pose.position.x, msg.pose.pose.position.y)
