@@ -25,20 +25,26 @@ class Example_Node(Node):
         _sub: Subscriber for node
     """
     ROBOT_MAP = {'tb1': 0, 'tb2': 1, 'tb3': 2, 'tb4': 3, 'tb5': 4, 'tb6': 5}
-    STATE_MAP = {'init': 0, 'DefineTaskIntrest': 1, 'WaitForExec': 2, 'ExecTask': 3, 'SuperviseTask': 4, 'TaskCompleted': 5 }
+    STATE_MAP = {'init': 0, 'DefineEstimate': 1, 'WaitForExec': 2, 'ExecTask': 3, 'SuperviseTask': 4, 'TaskCompleted': 5 }
     def __init__(self):
         """Initialize."""
         super().__init__("example_node")
         # Initialize figure and axes and save to class
         self.fig, self.ax = plt.subplots()
         self.ax.set_xticks(np.arange(6))
-        self.ax.set_yticks(np.arange(3))
         self.ax.set_xticklabels(['1', '2', '3', '4', '5', '6'])
+        self.ax.set_yticks(np.arange(3))
         self.ax.set_yticklabels(['tb1', 'tb2', 'tb3'])
+        self.matrix_size = (3, 6)
+
+        # self.ax.set_yticks(np.arange(4))
+        # self.ax.set_yticklabels(['tb1', 'tb2', 'tb3', 'tb4'])
+        # self.matrix_size = (4, 6)
+
+
         # create Thread lock to prevent multiaccess threading errors
         self._lock = threading.Lock()
         # create initial values to plot
-        self.matrix_size = (3, 3)
 
         # Initialize the figure and axis
         self.matrix = np.zeros(self.matrix_size)
@@ -52,7 +58,7 @@ class Example_Node(Node):
         self._sub: Subscription = self.create_subscription(
             TasksStatesDeclaration, '/mrs_main/tasks_states_declaration', self._callback, 10, callback_group=self.cbg
         )
-        # self.text_annotations[1][1].set_text('DefineTaskIntrest')
+        # self.text_annotations[1][1].set_text('DefineEstimate')
         # self.matrix[1][1] = 1
         # self.text_annotations[1][2].set_text('WaitForExec') 
         # self.matrix[1][2] = 2
@@ -73,7 +79,7 @@ class Example_Node(Node):
             for idx, state_name in enumerate(msg.tasks_states):
                 # if idx>5:
                 #     return
-                if idx > 6:
+                if idx > 9:
                     return
                 if idx >3:
                     print(f"state_name: {state_name}, idx: {idx}")

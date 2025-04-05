@@ -160,7 +160,7 @@ class OrdersManager(Node):
                 self.__create_sub_pub_for_task(task_id)
                 task_data = TaskData.from_task_definition(task_id, task_update.task_desc.data)
                 intrest_estimation: IntrestDescription = self.__task_manager.receive_task(short_id=task_id, task_desc=task_update.task_desc.data, task_data=task_data, task_finished_callback=self.__publish_task_finished_info, orders_manager=self)
-                if (align_task_state == 'DefineTaskIntrest'):
+                if (align_task_state == 'DefineEstimate'):
                     self.__publish_intrest(task_id, intrest_estimation)
                 else:
                     updated_conv_data = json.loads(task_update.task_conv_data) # for now just copy the data

@@ -25,7 +25,7 @@ class TaskFSM:
                     ) -> None:
         self._state = None
         self.state_change_callback = state_changed_callback
-        self.transition_to(DefineTaskIntrest())
+        self.transition_to(DefineEstimate())
         self._state.state_data['estimations'] = {}
         self._state.state_data['estimations'][agent_name] = interest_desc.execution
         self._executor = TaskExecutor(task_data, self.receive_task_finished_signal, concrete_executor, orders_manager, agent_name=agent_name)
@@ -138,7 +138,7 @@ class State(ABC):
     def respond_to_task_finished_info(self, msg: TaskConvMsg):
         return
 
-class DefineTaskIntrest(State):
+class DefineEstimate(State):
     # INTREST_THRESHOLD = 0.5
     def respond_to_coord_intrest_declaration(self, msg: TaskConvMsg) -> TaskConvMsg:
         partner_intrest = float(msg.data[0])
