@@ -163,8 +163,18 @@ class OrdersManager(Node):
                 if (align_task_state == 'DefineEstimate'):
                     self.__publish_intrest(task_id, intrest_estimation)
                 else:
-                    updated_conv_data = json.loads(task_update.task_conv_data) # for now just copy the data
+                    updated_conv_data = json.loads(task_update.task_conv_data)
                     self.__task_manager.update_task_state_from_alignment(task_id, align_task_state, updated_conv_data)
+            elif (curr_task_state == 'DefineEstimate') and (align_task_state == 'DefineEstimate'):
+                # Verify lists
+                updated_conv_data = json.loads(task_update.task_conv_data) 
+                # logger.info(task_update.task_conv_data)
+                # logger.info(updated_conv_data)
+                # logger.info(f'type of updated conv data: {type(updated_conv_data)}')
+                if self.__task_manager._task_states_data[task_id]['estimations'].keys() > updated_conv_data['estimations'].keys():
+                    pass
+                    # logger.warning(f'Found mismatch in estimations list for task id: {task_id}')
+
 
                     
                 
