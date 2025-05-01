@@ -35,6 +35,8 @@ class MsgTimelineRecorder(Node):
         # Handle shutdown gracefully
         signal.signal(signal.SIGINT, self.shutdown_handler)
 
+        self.create_timer(5.0, self.write_to_csv)
+
     def callback(self, msg, topic):
         """Callback function to handle incoming messages."""
         timestamp = self.get_clock().now().to_msg()
