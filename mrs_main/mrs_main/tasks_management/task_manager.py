@@ -38,7 +38,7 @@ class TaskManager:
     def task_dict(self):
         return self._task_dict
 
-    def receive_task(self, short_id: int, task_desc, task_data: str, task_finished_callback, orders_manager):
+    def receive_task(self, short_id: int, task_desc, task_data: str, task_finished_callback, async_msg_callback, orders_manager):
         """ Method receives the task info, creates the task object, and begins its management """
         
         self._dependency_manager.introduce_task_dependencies(short_id, task_data.dependencies)
@@ -58,6 +58,7 @@ class TaskManager:
                             task_finished_callback=task_finished_callback_extended,
                             agent_selected_callaback=callback_with_task_id,
                             state_changed_callback=callback_state_changed,
+                            async_task_msg_callback=async_msg_callback,
                             orders_manager=orders_manager,
                             agent_name=self.agent_name
                             )
@@ -84,7 +85,7 @@ class TaskManager:
 
     def change_task_state_in_dict(self, task_id: int, new_state, state_data):
         """ Changes the state of the task in the task dict """
-        for x in self._task_states_list: print(x)
+        # for x in self._task_states_list: print(x)
 
         # self._task_states_list[task_id] = str(task_id) + "-"+str(new_state)
         self._task_states_list[task_id] = str(new_state)
@@ -96,6 +97,9 @@ class TaskManager:
         if new_state == 'WaitForExec' or new_state == 'ExecTask':
             new_state = 'SuperviseTask'
         self._task_dict[task_id].update_state_from_alignment(new_state, state_data)
+
+    def update_estimations_from_alignment(self, task_id: int, incoming_estimations):
+        self._task_dict[task_id].handle_estimations_mismatch(incoming_estimations)
 
     def get_states_list(self):
         return self._task_states_list

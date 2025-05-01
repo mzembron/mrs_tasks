@@ -67,7 +67,7 @@ class OrdersManager(Node):
         self.__create_sub_pub_for_task(msg.short_id)
         task_data = TaskData.from_task_definition(msg.short_id, msg.data)
         task_desc = msg.data
-        intrest_estimation: IntrestDescription = self.__task_manager.receive_task(short_id=msg.short_id, task_desc=task_desc , task_data=task_data, task_finished_callback=self.__publish_task_finished_info, orders_manager=self)
+        intrest_estimation: IntrestDescription = self.__task_manager.receive_task(short_id=msg.short_id, task_desc=task_desc , task_data=task_data, task_finished_callback=self.__publish_task_finished_info, async_msg_callback=self.__generic_async_task_msg_callback, orders_manager=self)
         # intrest_estimation: IntrestDescription = self.__task_manager.get_intrest(msg.short_id)
         # time.sleep(3) # wait for others tio create theirs publishers
         self.__publish_intrest(msg.short_id, intrest_estimation)
@@ -109,6 +109,12 @@ class OrdersManager(Node):
             print(f'[ DEBUG LOG ] Answer msg data {answer_msg.data[0]}')
             conv_answer_msg= answer_msg.serialize()
             self.task_topic_subpub_dict[msg.short_id].pub.publish(conv_answer_msg)
+
+    def __generic_async_task_msg_callback(self, msg: TaskConvMsg):
+        if (msg is None): return
+        print(f'[ DEBUG LOG ] Answer msg data {msg.data[0]}')
+        conv_answer_msg= msg.serialize()
+        self.task_topic_subpub_dict[msg.short_id].pub.publish(conv_answer_msg)
 
     def __publish_task_finished_info(self, task_data: TaskData):
         #   TODO: refine this method: maybe it should be a generic callback to publish TaskConv from
@@ -159,7 +165,12 @@ class OrdersManager(Node):
                 logger.info(' -------------------- initializing task from task assignment --------------------')
                 self.__create_sub_pub_for_task(task_id)
                 task_data = TaskData.from_task_definition(task_id, task_update.task_desc.data)
-                intrest_estimation: IntrestDescription = self.__task_manager.receive_task(short_id=task_id, task_desc=task_update.task_desc.data, task_data=task_data, task_finished_callback=self.__publish_task_finished_info, orders_manager=self)
+                intrest_estimation: IntrestDescription = self.__task_manager.receive_task(short_id=task_id,
+                                                                                            task_desc=task_update.task_desc.data,
+                                                                                            task_data=task_data,
+                                                                                            task_finished_callback=self.__publish_task_finished_info,
+                                                                                            async_msg_callback=self.__generic_async_task_msg_callback,
+                                                                                            orders_manager=self)
                 if (align_task_state == 'DefineEstimate'):
                     self.__publish_intrest(task_id, intrest_estimation)
                 else:
@@ -171,9 +182,12 @@ class OrdersManager(Node):
                 # logger.info(task_update.task_conv_data)
                 # logger.info(updated_conv_data)
                 # logger.info(f'type of updated conv data: {type(updated_conv_data)}')
-                if self.__task_manager._task_states_data[task_id]['estimations'].keys() > updated_conv_data['estimations'].keys():
-                    pass
-                    # logger.warning(f'Found mismatch in estimations list for task id: {task_id}')
+
+                # additional knowledge
+                missing_estimations = set(set(updated_conv_data['estimations'].keys() - self.__task_manager._task_states_data[task_id]['estimations'].keys()))
+                if missing_estimations:
+                    logger.warning(f'Found mismatch in estimations list for task id: {task_id}')
+                    self.__task_manager.update_estimations_from_alignment(task_id, updated_conv_data['estimations'])
 
 
                     

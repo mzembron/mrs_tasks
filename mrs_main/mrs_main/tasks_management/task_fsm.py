@@ -19,16 +19,19 @@ class TaskFSM:
                     task_finished_callback: Callable[..., Any],
                     agent_selected_callaback: Callable[..., Any],
                     state_changed_callback: Callable[..., Any],
+                    async_task_msg_callback: Callable[..., Any],
                     orders_manager,
                     concrete_executor: Type[AbstractExecutor]=DummyExecutor,
                     agent_name: str = ''
                     ) -> None:
         self._state = None
         self.state_change_callback = state_changed_callback
+        self.async_task_msg_callback = async_task_msg_callback
         self.transition_to(DefineEstimate())
         self._state.state_data['estimations'] = {}
         self._state.state_data['estimations'][agent_name] = interest_desc.execution
         self._executor = TaskExecutor(task_data, self.receive_task_finished_signal, concrete_executor, orders_manager, agent_name=agent_name)
+        self.orders_manager = orders_manager
         self.task_data = task_data
         self.interest_desc = interest_desc
         self.task_finished_callback = task_finished_callback
@@ -69,6 +72,9 @@ class TaskFSM:
         """ Trigger execution of the specific task by the executor module"""
         self._executor.start_supervising_execution()
 
+    def send_async_msg(self, msg: TaskConvMsg) -> None:
+        self.async_task_msg_callback(msg)
+
     def handle_task_finished(self):
         """ Perform actions after the task is finished:
             - notify the dependency manager
@@ -78,6 +84,10 @@ class TaskFSM:
     def receive_task_finished_signal(self):
         """ Callback to trigger the transition to the TaskCompleted state after the task is finished """
         self._state.on_task_finished()
+
+    def handle_estimations_mismatch(self, incoming_estimations):
+        """ Handle the case when the estimations of the task execution time are mismatched """
+        self._state.update_estimations_after_mismatch(incoming_estimations)
 
 class State(ABC):
     state_data = {}
@@ -137,20 +147,28 @@ class State(ABC):
 
     def respond_to_task_finished_info(self, msg: TaskConvMsg):
         return
+    
+# virtual methods - respond to knowledge mismatches
+    def update_estimations_after_mismatch(self, incoming_estimations):
+        return
 
 class DefineEstimate(State):
     def respond_to_coord_intrest_declaration(self, msg: TaskConvMsg) -> TaskConvMsg:
         partner_intrest = float(msg.data[0])
+        # # TEMPORARY: for alignment algorithm development
+        # if msg.short_id > 4:
+        #     return
         print(f"[ DEBUG LOG ] Received partner's interest {partner_intrest}")
         self.state_data['estimations'][msg.sender]  = partner_intrest
         reply_msg = TaskConvMsg() 
-        self.state_data
+        # self.state_data
         # if (msg.short_id<7) or (( len([key for key in self.state_data['estimations']]))>2):
         if ( len([key for key in self.state_data['estimations']]))>2:
             best_executor = min(self.state_data['estimations'], key=self.state_data['estimations'].get)
             print(f"[ DEBUG LOG ] Sending exec proposition of task {msg.short_id} to {best_executor}")
             reply_msg.performative = MrsConvPerform.propose_exec_role
             reply_msg.data = [best_executor]
+            reply_msg.sender = self._task_fsm.agent_name
             return reply_msg
         # if (partner_intrest > self.INTREST_THRESHOLD):
         #     print(f"[ DEBUG LOG ] Sending exec proposition of task {msg.short_id} to {msg.sender}")
@@ -179,6 +197,29 @@ class DefineEstimate(State):
             # if (self._task_fsm.interest_desc.execution <= self.INTREST_THRESHOLD):
             self.state_data['executor'] = msg.sender
             self._task_fsm.transition_to(SuperviseTask())
+    
+    def update_estimations_after_mismatch(self, incoming_estimations):
+        logger.warning(f'Updating estimations for task {self._task_fsm.task_data.short_id}')
+        for key, value in  incoming_estimations.items():
+            logger.info(f"Estimation for {key}: {value}")
+
+        for robot_name, estimations in incoming_estimations.items():
+            if robot_name not in self.state_data['estimations']:
+                self.state_data['estimations'][robot_name] = estimations
+
+        if (len([key for key in self.state_data['estimations']]))>2:
+            reply_msg = TaskConvMsg()
+            best_executor = min(self.state_data['estimations'], key=self.state_data['estimations'].get)
+            # logger.info(f"@@@ Would send exec proposition of task {self.task_fsm.task_data.short_id} to {best_executor}")
+            reply_msg.performative = MrsConvPerform.propose_exec_role
+            reply_msg.data = [best_executor]
+            reply_msg.short_id = self.task_fsm.task_data.short_id
+            reply_msg.sender = self._task_fsm.agent_name
+            #TODO: change to callback in TaskManager 
+            # self.task_fsm.orders_manager.__generic_async_task_msg_callback(reply_msg)
+            self.task_fsm.send_async_msg(reply_msg)
+            return
+        
     
 
 class WaitForExec(State):
