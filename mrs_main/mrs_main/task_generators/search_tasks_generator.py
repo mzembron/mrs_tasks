@@ -29,6 +29,12 @@ class SearchTasksGenerator(Node):
         self.i = 0
 
     def timer_callback(self):
+        if(self.i >= self.max_messages):
+            self.get_logger().info('Shutting down')
+            self.destroy_timer(self.timer)
+            self.destroy_node()
+            rclpy.shutdown()
+            return
         msg = TaskDesc()
         if self.i < 4:
             msg.type = 'Init'
@@ -41,19 +47,15 @@ class SearchTasksGenerator(Node):
             msg.short_id = self.i
             self.get_logger().info('Publishing: "%s", room: "%s"' % (msg.type,  room_number))
             msg.data = json.dumps({
-                mrs_const.TASK_DESC_DEPENDENCIES: self.get_dependencies(room_number),
+                mrs_const.TASK_DESC_DEPENDENCIES: self.get_dependencies(msg.short_id),
                 mrs_const.SEARCH_WAYPOINTS: ROOM_DICT[room_number],
                                    })
         self.publisher_.publish(msg)
         self.i += 1
-        if(self.i > self.max_messages): # max int8 value
-            self.get_logger().info('Shutting down')
-            self.destroy_timer(self.timer)
-            self.destroy_node()
-            rclpy.shutdown()
+
 
     def get_dependencies(self, task_number: int) -> list[int]:
-        if task_number > 6 and task_number < 9:
+        if (task_number > 6) and (task_number <= 9):
             return [4, 5, 6]
         else:
             return []
