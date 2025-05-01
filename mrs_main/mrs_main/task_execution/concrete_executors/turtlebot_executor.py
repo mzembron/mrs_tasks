@@ -45,14 +45,10 @@ class TurtlebotExecutor(AbstractExecutor):
     def start_new_script(self, script_path):
         try:
             room_number = 1
-            if (self.task_data.short_id < 3):
+            if (self.task_data.short_id < 4):
                 return
             else:
                 room_number = self.task_data.short_id - 3
-            # if self.agent_name == 'tb2':
-            #     room_number = 2
-            # if self.agent_name == 'tb3':
-            #     room_number = 3
 
             print("############ starting navigation ############")
             time.sleep(random.randint(1, 3))

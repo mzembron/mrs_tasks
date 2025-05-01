@@ -139,13 +139,13 @@ class State(ABC):
         return
 
 class DefineEstimate(State):
-    # INTREST_THRESHOLD = 0.5
     def respond_to_coord_intrest_declaration(self, msg: TaskConvMsg) -> TaskConvMsg:
         partner_intrest = float(msg.data[0])
         print(f"[ DEBUG LOG ] Received partner's interest {partner_intrest}")
         self.state_data['estimations'][msg.sender]  = partner_intrest
         reply_msg = TaskConvMsg() 
         self.state_data
+        # if (msg.short_id<7) or (( len([key for key in self.state_data['estimations']]))>2):
         if ( len([key for key in self.state_data['estimations']]))>2:
             best_executor = min(self.state_data['estimations'], key=self.state_data['estimations'].get)
             print(f"[ DEBUG LOG ] Sending exec proposition of task {msg.short_id} to {best_executor}")
@@ -191,7 +191,8 @@ class WaitForExec(State):
         self._task_fsm.transition_to(ExecTask())
     
     def respond_to_exec_proposal(self, msg: TaskConvMsg):
-        print(f"[ DEBUG LOG ] Already assigned to task {msg.short_id} . ignoring!")
+        pass
+        # print(f"[ DEBUG LOG ] Already assigned to task {msg.short_id} . ignoring!")
 
 class ExecTask(State):
     def change_state_routine(self):
