@@ -13,27 +13,34 @@ class DummyTaskGenerator(Node):
     def __init__(self, max_messages=127):
         super().__init__('dummy_task_generator')
         self.publisher_ = self.create_publisher(TaskDesc, mrs_const.TASKS_DEFINITION_TOPIC_NAME, 10)
-        timer_period = 0.5  # seconds
+        timer_period = 1  # seconds
         self.max_messages = max_messages
         self.timer = self.create_timer(timer_period, self.timer_callback)
-        self.i = 0
+        self.i = 1
 
     def timer_callback(self):
         msg = TaskDesc()
-        msg.type = 'Hello World: %d' % self.i
+        msg.type = 'Search' 
         msg.short_id = self.i
         msg.data = json.dumps({mrs_const.TASK_DESC_DEPENDENCIES: self.genearate_dependencies(self.i)})
         self.publisher_.publish(msg)
         self.get_logger().info('Publishing: "%s"' % msg.type)
+        self.get_logger().info('Id: "%s"' % msg.short_id)
         self.i += 1
-        if(self.i >= self.max_messages): # max int8 value
+        if(self.i > self.max_messages): # max int8 value
             self.get_logger().info('Shutting down')
             self.destroy_timer(self.timer)
             self.destroy_node()
             rclpy.shutdown()
 
     def genearate_dependencies(self, task_number: int) -> list[int]:
-        if task_number <= 5:
+        if task_number == 7:
+            return [4]
+        if task_number == 8:
+            return [4]
+        if task_number == 9:
+            return [4]
+        if task_number <= 30:
             return []
 
         return random.sample(range(task_number), 2)
