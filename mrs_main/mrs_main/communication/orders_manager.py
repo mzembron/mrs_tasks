@@ -154,7 +154,7 @@ class OrdersManager(Node):
         # task manager compare backlog
         if align_msg.sender == self.agent_name:
             return
-        
+        self.__task_manager.update_knowledge_base(align_msg.sender)
         states_info =self.__task_manager.get_states_list()
         for task_update in align_msg.update_list:
             align_task_state = task_update.task_state

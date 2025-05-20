@@ -21,6 +21,7 @@ class TaskFSM:
                     state_changed_callback: Callable[..., Any],
                     async_task_msg_callback: Callable[..., Any],
                     orders_manager,
+                    knowledge_base,
                     concrete_executor: Type[AbstractExecutor]=DummyExecutor,
                     agent_name: str = ''
                     ) -> None:
@@ -30,6 +31,7 @@ class TaskFSM:
         self.transition_to(DefineEstimate())
         self._state.state_data['estimations'] = {}
         self._state.state_data['estimations'][agent_name] = interest_desc.execution
+        self._state.state_data['votes'] = {}
         self._executor = TaskExecutor(task_data, self.receive_task_finished_signal, concrete_executor, orders_manager, agent_name=agent_name)
         self.orders_manager = orders_manager
         self.task_data = task_data
@@ -37,6 +39,7 @@ class TaskFSM:
         self.task_finished_callback = task_finished_callback
         self.agent_selected_callaback = agent_selected_callaback
         self.agent_name = agent_name
+        self.knowledge_base = knowledge_base
 
     @property
     def current_state(self) -> str:
@@ -163,7 +166,7 @@ class DefineEstimate(State):
         reply_msg = TaskConvMsg() 
         # self.state_data
         # if (msg.short_id<7) or (( len([key for key in self.state_data['estimations']]))>2):
-        if ( len([key for key in self.state_data['estimations']]))>2:
+        if ( len([key for key in self.state_data['estimations']]))>self._task_fsm.knowledge_base.get_current_agent_number():
             best_executor = min(self.state_data['estimations'], key=self.state_data['estimations'].get)
             print(f"[ DEBUG LOG ] Sending exec proposition of task {msg.short_id} to {best_executor}")
             reply_msg.performative = MrsConvPerform.propose_exec_role
@@ -207,7 +210,7 @@ class DefineEstimate(State):
             if robot_name not in self.state_data['estimations']:
                 self.state_data['estimations'][robot_name] = estimations
 
-        if (len([key for key in self.state_data['estimations']]))>2:
+        if (len([key for key in self.state_data['estimations']]))>self._task_fsm.knowledge_base.get_current_agent_number():
             reply_msg = TaskConvMsg()
             best_executor = min(self.state_data['estimations'], key=self.state_data['estimations'].get)
             # logger.info(f"@@@ Would send exec proposition of task {self.task_fsm.task_data.short_id} to {best_executor}")

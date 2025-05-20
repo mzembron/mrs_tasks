@@ -60,6 +60,7 @@ class TaskManager:
                             state_changed_callback=callback_state_changed,
                             async_task_msg_callback=async_msg_callback,
                             orders_manager=orders_manager,
+                            knowledge_base=self._knowledge_base,
                             agent_name=self.agent_name
                             )
         logger.info(f' Task of type: {task_desc}, received by TaskManager!')
@@ -97,6 +98,9 @@ class TaskManager:
         if new_state == 'WaitForExec' or new_state == 'ExecTask':
             new_state = 'SuperviseTask'
         self._task_dict[task_id].update_state_from_alignment(new_state, state_data)
+
+    def update_knowledge_base(self, agent_name):
+        self._knowledge_base.update_agents_number(agent_name)
 
     def update_estimations_from_alignment(self, task_id: int, incoming_estimations):
         self._task_dict[task_id].handle_estimations_mismatch(incoming_estimations)

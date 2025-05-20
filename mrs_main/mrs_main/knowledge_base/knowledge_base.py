@@ -1,4 +1,5 @@
 from mrs_main.common.objects import IntrestDescription, TaskData, Position
+import logging
 import math
 ROOM_DICT = {
     1 : (-6.0, 1.0),
@@ -15,7 +16,8 @@ class KnowledgeBase:
         operates in, the tasks it is supposed to perform and its own abilities. """
     def __init__(self, agent_type: int, speed:float = 1.0):
         self._agent_type = agent_type
-        self._agents_number:int = 3
+        self._agents_number:int = 1
+        self._agent_names: list[str] = []
         self._agent_speed: float = speed
         self.current_position: Position = Position(0, 0)
 
@@ -23,6 +25,15 @@ class KnowledgeBase:
         self.current_position.x = x
         self.current_position.y = y
 
+    def update_agents_number(self, incomming_agent_name):
+        if incomming_agent_name not in self._agent_names:
+            self._agent_names.append(incomming_agent_name)
+            logging.info(f"Agent {incomming_agent_name} registered!")
+         
+
+
+    def get_current_agent_number(self):
+        return len(self._agent_names)
 
     def get_intrest_desc_go_to(self, task_data: TaskData, prev_task_end_time) -> IntrestDescription:
         pass
